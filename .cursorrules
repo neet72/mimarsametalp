@@ -1,0 +1,45 @@
+# SAMET ALP MİMARLIK — Frontend & Tasarım Kuralları
+
+Bu depo, mimarlık ofisi web sitesinin premium, modern ve erişilebilir bir arayüzünü hedefler. İçerik hiyerarşisi korunur; görsel dil Apple/Stripe tarzı sade, bol whitespace ve ince mikro-etkileşimlere yakınsar.
+
+## Teknik
+
+- **Framework:** Next.js (App Router), TypeScript.
+- **Stil:** Tailwind CSS. **Inline `style` kullanılmaz.** Tüm görsel düzen `className` + `globals.css` içindeki tasarım tokenları ile yapılır.
+- **Yapı:** Her bölüm (Header, Hero, Footer, vb.) kendi dosyasında; `src/components/` altında anlamlı klasörler.
+- **Responsive:** Mobile-first. Önce küçük ekran, sonra `sm:` `md:` `lg:` `xl:` ile genişlet.
+- **Performans:** `next/image` ile görseller; fontlar `next/font` ile yüklenir.
+
+## Tasarım Sistemi (tek kaynak)
+
+Tokenlar `src/app/globals.css` içindeki `:root` altında tanımlıdır. Yeni renk veya gölge eklerken önce oraya ekle, ardından `tailwind.config.ts` ile eşleştir.
+
+| Rol | Değer |
+|-----|--------|
+| **Primary (ana metin / güçlü UI)** | `#0F172A` → `--color-primary-rgb` |
+| **Accent (vurgu, link hover, ince detay)** | `#A67C52` → `--color-accent-rgb` |
+| **Surface (sayfa zemini)** | `#FAFAFA` → `--color-surface-rgb` |
+| **Muted (ikincil metin)** | `#64748B` → `--color-muted-rgb` |
+| **Border** | `#E2E8F0` → `--color-border-rgb` |
+| **Ana font (gövde)** | Inter — `--font-sans` |
+| **Başlık fontu** | Outfit — `--font-display` |
+
+Başlıklarda `font-display`, gövdede `font-sans`. Başlıklarda genişlik 600–700, mümkünse hafif negatif `tracking-tight`.
+
+## UX / UI İlkeleri
+
+- Kontrast WCAG’e uygun kalsın; dekorasyon okunabilirliği düşürmesin.
+- Odak halkaları ve klavye ile gezinme korunur (`focus-visible`).
+- Animasyonlar kısa (150–300ms), `prefers-reduced-motion` için saygılı utility kullan.
+- Kart ve grid öğelerinde hover’da hafif scale veya shadow artışı; abartılı hareket yok.
+
+## İçerik
+
+- Metinler Türkçe; navigasyon etiketleri mevcut site ile uyumlu: PROJELER, HAKKIMIZDA / HAKKINDA, İLETİŞİM.
+- Placeholder sayfalar sadece iskelet içindir; gerçek metin ve görseller içerik turunda güncellenir.
+
+## Kod Kalitesi
+
+- Gereksiz soyutlama yok; bileşenler tek sorumluluklu ve okunaklı.
+- `any` kullanma; props tipleri açık.
+- İlgili olmayan dosyalara dokunma; görev dışı refactor yapma.

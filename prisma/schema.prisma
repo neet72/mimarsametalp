@@ -1,0 +1,45 @@
+// Yerel: provider = "sqlite" + DATABASE_URL="file:./dev.db"
+// Hostinger MySQL: provider = "mysql", DATABASE_URL panelden; yeni migrate veya db push gerekir.
+// Komutlar: npm run build | db:deploy | db:migrate
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  category    String?
+  description String?
+  /// JSON dizi: ["https://.../a.webp","..."]
+  imageUrls   String   @default("[]")
+  published   Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, sortOrder])
+  @@index([slug])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String
+  body      String
+  /// Gizlilik: ham IP yerine isteğe bağlı hash
+  ipHash    String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([createdAt])
+}

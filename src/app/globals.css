@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Tasarım tokenları — .cursorrules ile senkron.
+  RGB üçlüleri Tailwind alpha ile kullanılır: rgb(var(--x) / <alpha-value>)
+*/
+
+:root {
+  /* HEX referansları: Primary #0F172A, Accent #A67C52, Surface #FAFAFA */
+  --color-primary-rgb: 15 23 42;
+  --color-accent-rgb: 166 124 82;
+  --color-surface-rgb: 250 250 250;
+  --color-muted-rgb: 100 116 139;
+  --color-border-rgb: 226 232 240;
+
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.06), 0 8px 24px rgb(15 23 42 / 0.06);
+  --shadow-card-hover: 0 4px 12px rgb(15 23 42 / 0.08), 0 16px 40px rgb(15 23 42 / 0.1);
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-pill: 9999px;
+
+  /* Yaklaşık sticky yükseklik (kompakt navbar) */
+  --header-h: 5.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply min-h-dvh bg-surface font-sans text-primary antialiased;
+  }
+
+  ::selection {
+    @apply bg-accent/15 text-primary;
+  }
+}
