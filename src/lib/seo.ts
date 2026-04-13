@@ -16,12 +16,24 @@ type PageMetaInput = {
   path: `/${string}`;
 };
 
+function toTrPath(path: `/${string}`) {
+  return (path.startsWith("/en/") ? (path.slice(3) as `/${string}`) : path) as `/${string}`;
+}
+
+function toEnPath(path: `/${string}`) {
+  if (path === "/") return "/en";
+  return (path.startsWith("/en/") ? path : (`/en${path}` as `/${string}`)) as `/${string}`;
+}
+
 /**
  * Sayfa bazlı metadata — Open Graph ve Twitter kartları portföy siteleri için hazır.
  * Görseller eklendiğinde `openGraph.images` burada veya sayfada genişletilebilir.
  */
 export function pageMetadata({ title, description, path }: PageMetaInput): Metadata {
   const url = path;
+  const isEn = path === "/en" || path.startsWith("/en/");
+  const trPath = toTrPath(path);
+  const enPath = toEnPath(path);
   const fullTitle = `${title} · ${siteName}`;
 
   return {
@@ -29,19 +41,25 @@ export function pageMetadata({ title, description, path }: PageMetaInput): Metad
     description,
     alternates: {
       canonical: url,
+      languages: {
+        "tr-TR": trPath,
+        "en-US": enPath,
+      },
     },
     openGraph: {
       type: "website",
-      locale: "tr_TR",
+      locale: isEn ? "en_US" : "tr_TR",
       siteName,
       title: fullTitle,
       description,
       url,
+      images: [{ url: "/opengraph-image" }],
     },
     twitter: {
       card: "summary_large_image",
       title: fullTitle,
       description,
+      images: ["/opengraph-image"],
     },
   };
 }

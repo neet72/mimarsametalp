@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ContactPageExperience } from "@/components/contact/ContactPageExperience";
 import { pageMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
 export const metadata: Metadata = pageMetadata({
   title: "İletişim",
@@ -10,5 +11,17 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default function IletisimPage() {
-  return <ContactPageExperience />;
+  return (
+    <>
+      <script
+        {...jsonLdScriptProps(
+          breadcrumbJsonLd([
+            { name: "Ana Sayfa", path: "/" },
+            { name: "İletişim", path: "/iletisim" },
+          ]),
+        )}
+      />
+      <ContactPageExperience />
+    </>
+  );
 }

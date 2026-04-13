@@ -1,5 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { isAdminEmail } from "@/lib/security/admin";
 
 /**
  * Edge / middleware — bcrypt yok. Gerçek doğrulama `auth.ts` içinde aynı provider id ile.
@@ -30,6 +31,7 @@ export default {
       if (user) {
         token.sub = user.id;
         token.email = user.email;
+        token.isAdmin = isAdminEmail(user.email);
       }
       return token;
     },
@@ -37,6 +39,7 @@ export default {
       if (session.user) {
         session.user.id = token.sub ?? "admin";
         session.user.email = token.email as string;
+        session.user.isAdmin = Boolean(token.isAdmin);
       }
       return session;
     },

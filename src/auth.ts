@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import authConfig from "./auth.config";
+import { rateLimit } from "@/lib/security/rate-limit";
 
 function stripEnvQuotes(value: string): string {
   const t = value.trim();
@@ -53,6 +54,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (!credentials?.email || !credentials?.password) return null;
 
           const email = String(credentials.email).toLowerCase().trim();
+
+          // Brute-force koruması (email bazlı) — 10 dakikada 8 deneme.
+          const rl = rateLimit(`admin-login:${email}`, 8, 10 * 60 * 1000);
+          if (!rl.ok) return null;
+
           const adminEmail = normalizeAdminEmailEnv();
           if (!adminEmail || email !== adminEmail) return null;
 

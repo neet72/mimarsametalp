@@ -8,7 +8,6 @@ import {
   type Variants,
 } from "framer-motion";
 import { useEffect } from "react";
-import { PROJECTS } from "@/data/projects";
 import { ProjectCard } from "./ProjectCard";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -43,11 +42,22 @@ const titleLetter: Variants = {
   }),
 };
 
-export function ProjectsPortfolio() {
+export type ProjectsPortfolioProject = {
+  slug: string;
+  title: string;
+  imageUrl: string;
+};
+
+export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioProject[] }) {
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (reduceMotion) return;
+    // Mobil / touch cihazlarda native scroll daha stabil (Lenis kapalı)
+    if (typeof window !== "undefined") {
+      const isCoarse = window.matchMedia?.("(pointer: coarse)")?.matches === true;
+      if (isCoarse) return;
+    }
 
     const lenis = new Lenis({
       lerp: 0.09,
@@ -78,7 +88,7 @@ export function ProjectsPortfolio() {
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgb(var(--color-accent-rgb)/0.07),transparent_55%),radial-gradient(ellipse_70%_50%_at_100%_50%,rgb(var(--color-primary-rgb)/0.04),transparent_50%)]"
       />
 
-      <div className="relative mx-auto w-full max-w-[1680px] px-6 sm:px-10 md:px-14 lg:px-16">
+      <div className="relative mx-auto w-full max-w-[1680px] px-4 sm:px-6 md:px-10 lg:px-16">
         <motion.header
           className="flex flex-col items-center py-16 text-center md:py-24"
           variants={headerContainer}
@@ -93,7 +103,7 @@ export function ProjectsPortfolio() {
           </motion.p>
 
           <motion.h1
-            className="mt-5 flex flex-wrap justify-center gap-x-[0.04em] font-display text-5xl font-semibold tracking-tight text-primary perspective-[800px] sm:text-6xl md:text-7xl"
+            className="mt-5 flex flex-wrap justify-center gap-x-[0.04em] font-display text-4xl font-semibold tracking-tight text-primary perspective-[800px] sm:text-6xl md:text-7xl"
             aria-label={title}
           >
             {title.split("").map((char, i) => (
@@ -119,16 +129,12 @@ export function ProjectsPortfolio() {
           </motion.p>
         </motion.header>
 
-        <div className="grid grid-cols-1 gap-14 pb-20 pt-4 sm:gap-16 md:grid-cols-2 md:gap-x-12 md:gap-y-16 md:pb-28 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-20">
-          {PROJECTS.map((project, index) => (
+        <div className="grid grid-cols-1 gap-12 pb-16 pt-4 sm:gap-14 sm:pb-20 md:grid-cols-2 md:gap-x-10 md:gap-y-14 md:pb-28 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-20">
+          {projects.map((project, index) => (
             <motion.div
-              key={project.id}
+              key={project.slug}
               initial={reduceMotion ? false : { opacity: 0, y: 52 }}
-              whileInView={
-                reduceMotion
-                  ? undefined
-                  : { opacity: 1, y: 0 }
-              }
+              whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "0px 0px -12% 0px" }}
               transition={{
                 delay: reduceMotion ? 0 : Math.min(index * 0.07, 0.42),

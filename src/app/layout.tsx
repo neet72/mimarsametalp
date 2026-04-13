@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { metadataBase, siteName } from "@/lib/seo";
+import { jsonLdScriptProps, organizationJsonLd, websiteJsonLd } from "@/lib/seo-jsonld";
 import "./globals.css";
 
 const inter = Inter({
@@ -18,6 +19,17 @@ const outfit = Outfit({
 
 const defaultDescription =
   "Konut, ticari ve iç mimarlık projelerinde mimari tasarım, ruhsat ve anahtar teslim uygulama. Adana merkezli Samet Alp Mimarlık portföyü ve iletişim.";
+
+/** Mobil tarayıcılar, notch ve PWA çubuğu için */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
+};
 
 export const metadata: Metadata = {
   metadataBase,
@@ -36,6 +48,10 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "/",
+    languages: {
+      "tr-TR": "/",
+      "en-US": "/en",
+    },
   },
   openGraph: {
     type: "website",
@@ -44,11 +60,13 @@ export const metadata: Metadata = {
     siteName,
     title: siteName,
     description: defaultDescription,
+    images: [{ url: "/opengraph-image" }],
   },
   twitter: {
     card: "summary_large_image",
     title: siteName,
     description: defaultDescription,
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,
@@ -67,6 +85,8 @@ export default function RootLayout({
         className="font-sans [--font-display:var(--font-outfit)] [--font-sans:var(--font-inter)]"
         suppressHydrationWarning
       >
+        <script {...jsonLdScriptProps(organizationJsonLd())} />
+        <script {...jsonLdScriptProps(websiteJsonLd())} />
         <MainLayout>{children}</MainLayout>
       </body>
     </html>

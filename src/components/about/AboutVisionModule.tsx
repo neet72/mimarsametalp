@@ -13,13 +13,23 @@ import {
   ABOUT_VISION_BODY,
   ABOUT_VISION_TITLE,
 } from "@/content/about-page";
+import {
+  ABOUT_VISION_BODY as ABOUT_VISION_BODY_EN,
+  ABOUT_VISION_TITLE as ABOUT_VISION_TITLE_EN,
+} from "@/content/about-page.en";
 import { pageContainerClass } from "@/lib/page-layout";
 import { cn } from "@/lib/cn";
+import { usePathname } from "next/navigation";
+import { localeFromPathname } from "@/lib/locale";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
 export function AboutVisionModule() {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useReducedMotion() === true;
+  const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
+  const title = locale === "en" ? ABOUT_VISION_TITLE_EN : ABOUT_VISION_TITLE;
+  const body = locale === "en" ? ABOUT_VISION_BODY_EN : ABOUT_VISION_BODY;
   const sectionRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -120,7 +130,7 @@ export function AboutVisionModule() {
           >
             <motion.div className="overflow-hidden" variants={titleReveal}>
               <h1 className="text-center font-display text-[1.65rem] font-semibold leading-[1.2] tracking-tight text-primary sm:text-3xl md:text-[2.125rem] md:leading-[1.15]">
-                {ABOUT_VISION_TITLE}
+                {title}
               </h1>
             </motion.div>
 
@@ -137,7 +147,7 @@ export function AboutVisionModule() {
               variants={bodyFade}
               className="mt-6 text-pretty text-left text-[0.9375rem] leading-[1.7] text-primary/68 sm:text-base sm:leading-relaxed md:text-lg md:leading-relaxed"
             >
-              {ABOUT_VISION_BODY}
+              {body}
             </motion.p>
           </motion.div>
         </div>

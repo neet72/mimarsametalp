@@ -76,7 +76,7 @@ export function ContactFormPanel() {
 
   return (
     <motion.div
-      className="flex flex-col border-x border-border/60 px-4 sm:px-6 md:px-7"
+      className="flex flex-col px-4 sm:px-6 md:border-x md:border-border/60 md:px-7"
       initial={reduceMotion ? false : { opacity: 0, x: 44 }}
       whileInView={reduceMotion ? undefined : { opacity: 1, x: 0 }}
       viewport={{ once: true, amount: 0.08 }}

@@ -23,6 +23,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# caches
+.turbo
+.swc
+
 # env files
 .env
 .env*.local
@@ -33,3 +37,12 @@ prisma/*.db-journal
 
 # typescript
 *.tsbuildinfo
+
+# vercel
+.vercel
+
+# local uploads (admin upload target)
+/public/uploads/
+
+# local reference assets (do not commit)
+/REFERENCE_animation_logic/

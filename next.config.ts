@@ -27,6 +27,16 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["bcryptjs"],
   images: {
     formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "mpm.ph",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+    ],
   },
   async headers() {
     return [

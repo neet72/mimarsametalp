@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AboutSection } from "@/components/home/AboutSection";
-import { HeroSlider } from "@/components/home/HeroSlider";
+import { CinematicScrollHero } from "@/components/home/CinematicScrollHero";
 import { ServicesSection } from "@/components/home/ServicesSection";
 import { VisionIntro } from "@/components/home/VisionIntro";
 import { SocialGallery } from "@/components/home/SocialGallery";
@@ -16,7 +16,8 @@ export const metadata: Metadata = pageMetadata({
 export default function HomePage() {
   return (
     <>
-      <HeroSlider />
+      <CinematicScrollHero />
+      <div id="home-content-start" />
       <VisionIntro />
       <ServicesSection />
       <AboutSection />

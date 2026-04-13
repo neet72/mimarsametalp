@@ -9,8 +9,8 @@ const address =
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-border bg-surface">
-      <div className={cn("relative py-12", pageContainerClass)}>
+    <footer className="mt-auto border-t border-border bg-surface pb-[max(0px,env(safe-area-inset-bottom,0px))]">
+      <div className={cn("relative py-10 sm:py-12", pageContainerClass)}>
         <div className="grid gap-10 md:grid-cols-3 md:gap-8">
           <div className="space-y-4">
             <p className="font-display text-lg font-semibold uppercase tracking-[0.14em] text-primary">
@@ -32,7 +32,7 @@ export function Footer() {
               <li>
                 <a
                   href="mailto:info@mimarsametalp.com"
-                  className="transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className="touch-manipulation inline-flex min-h-[44px] items-center py-1 transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-h-0"
                 >
                   info@mimarsametalp.com
                 </a>
@@ -40,7 +40,7 @@ export function Footer() {
               <li>
                 <a
                   href="tel:+905414267644"
-                  className="transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className="touch-manipulation inline-flex min-h-[44px] items-center py-1 transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-h-0"
                 >
                   0 (541) 426 76 44
                 </a>

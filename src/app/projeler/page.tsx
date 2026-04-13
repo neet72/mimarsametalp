@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { ProjectsPortfolio } from "@/components/projects/ProjectsPortfolio";
 import { pageMetadata } from "@/lib/seo";
+import { getPublicProjects } from "@/lib/public/projects";
+import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
 export const metadata: Metadata = pageMetadata({
   title: "Projeler",
@@ -9,6 +11,24 @@ export const metadata: Metadata = pageMetadata({
   path: "/projeler",
 });
 
-export default function ProjelerPage() {
-  return <ProjectsPortfolio />;
+export default async function ProjelerPage() {
+  const rows = await getPublicProjects();
+  const projects = rows.map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    imageUrl: p.imageUrls[0] ?? "/images/hero-1.webp",
+  }));
+  return (
+    <>
+      <script
+        {...jsonLdScriptProps(
+          breadcrumbJsonLd([
+            { name: "Ana Sayfa", path: "/" },
+            { name: "Projeler", path: "/projeler" },
+          ]),
+        )}
+      />
+      <ProjectsPortfolio projects={projects} />
+    </>
+  );
 }

@@ -17,7 +17,8 @@ type AboutHeroLoopVideoProps = {
  * Görünür alanda oynatır; görünürlük dışında duraklatır (pil / performans).
  */
 export function AboutHeroLoopVideo({ className }: AboutHeroLoopVideoProps) {
-  const reduceMotion = useReducedMotion();
+  /** SSR ile ilk istemci çiziminde aynı dal; ayrıca video üzerinde eklenti kaynaklı class farkları için suppressHydrationWarning. */
+  const reduceMotion = useReducedMotion() === true;
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const isInView = useInView(containerRef, { amount: 0.2, margin: "0px 0px -10% 0px" });
@@ -58,6 +59,7 @@ export function AboutHeroLoopVideo({ className }: AboutHeroLoopVideoProps) {
     <div ref={containerRef} className={cn("absolute inset-0", className)}>
       <video
         ref={videoRef}
+        suppressHydrationWarning
         className="h-full w-full scale-[1.02] object-cover object-center"
         aria-label="Mimari çizim ve render döngü videosu"
         muted

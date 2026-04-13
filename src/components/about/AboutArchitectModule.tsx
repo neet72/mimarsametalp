@@ -13,7 +13,14 @@ import {
   ABOUT_ARCHITECT_NAME,
   ABOUT_ARCHITECT_ROLE,
 } from "@/content/about-page";
+import {
+  ABOUT_ARCHITECT_BIO as ABOUT_ARCHITECT_BIO_EN,
+  ABOUT_ARCHITECT_NAME as ABOUT_ARCHITECT_NAME_EN,
+  ABOUT_ARCHITECT_ROLE as ABOUT_ARCHITECT_ROLE_EN,
+} from "@/content/about-page.en";
 import { cn } from "@/lib/cn";
+import { usePathname } from "next/navigation";
+import { localeFromPathname } from "@/lib/locale";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -21,6 +28,11 @@ const PORTRAIT_SRC = "/images/samet-alp-portrait.jpg";
 
 export function AboutArchitectModule() {
   const reduceMotion = useReducedMotion();
+  const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
+  const name = locale === "en" ? ABOUT_ARCHITECT_NAME_EN : ABOUT_ARCHITECT_NAME;
+  const role = locale === "en" ? ABOUT_ARCHITECT_ROLE_EN : ABOUT_ARCHITECT_ROLE;
+  const bio = locale === "en" ? ABOUT_ARCHITECT_BIO_EN : ABOUT_ARCHITECT_BIO;
   const sectionRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -69,7 +81,7 @@ export function AboutArchitectModule() {
               >
                 <Image
                   src={PORTRAIT_SRC}
-                  alt={`${ABOUT_ARCHITECT_NAME} portre`}
+                  alt={locale === "en" ? `${name} portrait` : `${name} portre`}
                   fill
                   className={cn(
                     "object-cover object-[center_22%] transition-transform duration-[880ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
@@ -93,10 +105,10 @@ export function AboutArchitectModule() {
               transition={{ duration: 0.82, ease }}
             >
               <h2 className="font-display text-[2rem] font-semibold tracking-tight text-primary sm:text-4xl md:text-[2.35rem] md:leading-[1.12]">
-                {ABOUT_ARCHITECT_NAME}
+                {name}
               </h2>
               <p className="mt-2.5 font-display text-[0.6875rem] font-semibold uppercase tracking-[0.32em] text-accent sm:text-xs">
-                {ABOUT_ARCHITECT_ROLE}
+                {role}
               </p>
             </motion.div>
 
@@ -107,7 +119,7 @@ export function AboutArchitectModule() {
               viewport={{ once: true, margin: "0px 0px -14% 0px" }}
               transition={{ duration: 0.92, ease, delay: reduceMotion ? 0 : 0.06 }}
             >
-              {ABOUT_ARCHITECT_BIO}
+              {bio}
             </motion.p>
 
             <motion.div

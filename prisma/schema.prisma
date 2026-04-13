@@ -17,6 +17,10 @@ model Project {
   title       String
   category    String?
   description String?
+  status      String?
+  year        Int?
+  location    String?
+  areaM2      Int?
   /// JSON dizi: ["https://.../a.webp","..."]
   imageUrls   String   @default("[]")
   published   Boolean  @default(false)
@@ -42,4 +46,22 @@ model Message {
 
   @@index([email])
   @@index([createdAt])
+}
+
+model AdminAuditLog {
+  id        String   @id @default(cuid())
+  /// Kim yaptı? (admin email)
+  actor     String
+  /// Ne yaptı? (örn: "project.create")
+  action    String
+  /// Hangi kayıt? (örn: "Project")
+  entity    String?
+  entityId  String?
+  /// Opsiyonel metadata (JSON string)
+  meta      String?
+  createdAt DateTime @default(now())
+
+  @@index([actor, createdAt])
+  @@index([action, createdAt])
+  @@index([entity, entityId])
 }

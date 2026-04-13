@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { usePathname } from "next/navigation";
 import {
   CONTACT_PAGE_CLOSING,
   CONTACT_PAGE_INTRO,
@@ -8,6 +9,14 @@ import {
   CONTACT_STEPS,
   CONTACT_STEPS_HEADING,
 } from "@/content/contact-page";
+import {
+  CONTACT_PAGE_CLOSING as CONTACT_PAGE_CLOSING_EN,
+  CONTACT_PAGE_INTRO as CONTACT_PAGE_INTRO_EN,
+  CONTACT_PAGE_TITLE as CONTACT_PAGE_TITLE_EN,
+  CONTACT_STEPS as CONTACT_STEPS_EN,
+  CONTACT_STEPS_HEADING as CONTACT_STEPS_HEADING_EN,
+} from "@/content/contact-page.en";
+import { localeFromPathname } from "@/lib/locale";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -29,6 +38,14 @@ const timelineItem: Variants = {
 
 export function ContactStoryColumn() {
   const reduceMotion = useReducedMotion();
+  const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
+  const title = locale === "en" ? CONTACT_PAGE_TITLE_EN : CONTACT_PAGE_TITLE;
+  const intro = locale === "en" ? CONTACT_PAGE_INTRO_EN : CONTACT_PAGE_INTRO;
+  const stepsHeading =
+    locale === "en" ? CONTACT_STEPS_HEADING_EN : CONTACT_STEPS_HEADING;
+  const steps = locale === "en" ? CONTACT_STEPS_EN : CONTACT_STEPS;
+  const closing = locale === "en" ? CONTACT_PAGE_CLOSING_EN : CONTACT_PAGE_CLOSING;
 
   return (
     <motion.div
@@ -39,7 +56,7 @@ export function ContactStoryColumn() {
       transition={{ duration: 0.88, ease }}
     >
       <h1 className="font-display text-[2rem] font-semibold leading-tight tracking-tight text-primary sm:text-4xl md:text-[2.35rem]">
-        {CONTACT_PAGE_TITLE}
+        {title}
       </h1>
 
       <motion.p
@@ -49,7 +66,7 @@ export function ContactStoryColumn() {
         viewport={{ once: true }}
         transition={{ duration: 0.76, ease, delay: reduceMotion ? 0 : 0.08 }}
       >
-        {CONTACT_PAGE_INTRO}
+        {intro}
       </motion.p>
 
       <motion.h2
@@ -59,7 +76,7 @@ export function ContactStoryColumn() {
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease, delay: reduceMotion ? 0 : 0.12 }}
       >
-        {CONTACT_STEPS_HEADING}
+        {stepsHeading}
       </motion.h2>
 
       <motion.ol
@@ -73,7 +90,7 @@ export function ContactStoryColumn() {
           aria-hidden
           className="absolute left-[15px] top-3 bottom-3 w-px bg-gradient-to-b from-border via-accent/35 to-border sm:left-[17px]"
         />
-        {CONTACT_STEPS.map((step, index) => (
+        {steps.map((step, index) => (
           <motion.li
             key={step.title}
             variants={timelineItem}
@@ -103,7 +120,7 @@ export function ContactStoryColumn() {
         viewport={{ once: true }}
         transition={{ duration: 0.72, ease, delay: reduceMotion ? 0 : 0.06 }}
       >
-        {CONTACT_PAGE_CLOSING}
+        {closing}
       </motion.p>
     </motion.div>
   );

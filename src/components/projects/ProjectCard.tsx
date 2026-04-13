@@ -1,19 +1,29 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import type { Project } from "@/data/projects";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
+import { localeFromPathname, withLocalePath } from "@/lib/locale";
 
 const spring = { type: "spring" as const, stiffness: 380, damping: 28 };
 
+export type ProjectCardModel = {
+  slug: string;
+  title: string;
+  imageUrl: string;
+};
+
 type ProjectCardProps = {
-  project: Project;
+  project: ProjectCardModel;
   index: number;
 };
 
 export function ProjectCard({ project, index }: ProjectCardProps) {
   const reduceMotion = useReducedMotion();
+  const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
 
   return (
     <motion.article
@@ -27,31 +37,42 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       whileTap={reduceMotion ? undefined : { scale: 0.985 }}
       transition={spring}
     >
-      <div
-        className={cn(
-          "relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-border/30",
-          "shadow-[var(--shadow-card)] transition-shadow duration-500 ease-out",
-          "group-hover:shadow-[var(--shadow-card-hover)]",
-        )}
+      <Link
+        href={withLocalePath(`/projeler/${project.slug}`, locale)}
+        className="block w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent rounded-lg"
+        aria-label={
+          locale === "en"
+            ? `Go to ${project.title} details`
+            : `${project.title} detay sayfasına git`
+        }
       >
         <div
           className={cn(
-            "absolute inset-0 origin-center transition-transform duration-[750ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform",
-            "group-hover:scale-[1.03] motion-reduce:group-hover:scale-100",
+            "relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-border/30",
+            "shadow-[var(--shadow-card)] ring-1 ring-inset ring-primary/[0.06]",
+            "transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            "group-hover:shadow-[var(--shadow-card-hover)]",
+            "motion-reduce:transition-none",
           )}
         >
-          <Image
-            src={project.imageUrl}
-            alt={project.title}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            priority={index < 3}
+          <div
             className={cn(
-              "object-cover object-center transition-[filter] duration-700 ease-out",
-              "group-hover:brightness-[1.03] motion-reduce:group-hover:brightness-100",
+              "absolute inset-0 origin-center transition-transform duration-[750ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform",
+              "group-hover:scale-[1.03] motion-reduce:group-hover:scale-100",
             )}
-          />
-        </div>
+          >
+            <Image
+              src={project.imageUrl}
+              alt={project.title}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={index < 3}
+              className={cn(
+                "object-cover object-center transition-[filter] duration-700 ease-out",
+                "group-hover:brightness-[1.03] motion-reduce:group-hover:brightness-100",
+              )}
+            />
+          </div>
 
         <div
           aria-hidden
@@ -70,13 +91,14 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
             "group-hover:scale-x-100 motion-reduce:group-hover:scale-x-0",
           )}
         />
-      </div>
+        </div>
 
-      <div className="mt-5 text-center sm:text-left">
-        <h2 className="font-display text-xs font-semibold uppercase tracking-[0.24em] text-muted transition-colors duration-300 group-hover:text-primary sm:text-[0.8125rem] sm:tracking-[0.26em] md:text-sm md:tracking-[0.28em]">
-          {project.title}
-        </h2>
-      </div>
+        <div className="mt-5 text-center sm:text-left">
+          <h2 className="font-display text-xs font-semibold uppercase tracking-[0.24em] text-muted transition-colors duration-300 group-hover:text-primary sm:text-[0.8125rem] sm:tracking-[0.26em] md:text-sm md:tracking-[0.28em]">
+            {project.title}
+          </h2>
+        </div>
+      </Link>
     </motion.article>
   );
 }

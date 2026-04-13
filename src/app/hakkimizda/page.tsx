@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AboutPageExperience } from "@/components/about/AboutPageExperience";
 import { pageMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
 export const metadata: Metadata = pageMetadata({
   title: "Hakkımızda",
@@ -10,5 +11,17 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default function HakkimizdaPage() {
-  return <AboutPageExperience />;
+  return (
+    <>
+      <script
+        {...jsonLdScriptProps(
+          breadcrumbJsonLd([
+            { name: "Ana Sayfa", path: "/" },
+            { name: "Hakkımızda", path: "/hakkimizda" },
+          ]),
+        )}
+      />
+      <AboutPageExperience />
+    </>
+  );
 }

@@ -11,8 +11,7 @@ export function ContactMapSection() {
 
   return (
     <motion.section
-      className="relative mt-20 w-screen max-w-none border-t border-border/60 bg-border/20 md:mt-28"
-      style={{ marginLeft: "calc(50% - 50vw)", marginRight: "calc(50% - 50vw)" }}
+      className="relative mt-20 w-screen max-w-none border-t border-border/60 bg-border/20 md:mt-28 left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]"
       initial={reduceMotion ? false : { opacity: 0, y: 28 }}
       whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
