@@ -7,7 +7,7 @@ const routes = ["", "/projeler", "/hizmetlerimiz", "/hakkimizda", "/iletisim"] a
 const enRoutes = ["/en", "/en/projeler", "/en/hizmetlerimiz", "/en/hakkimizda", "/en/iletisim"] as const;
 
 // Çok sık değişmiyor — cache dostu.
-export const revalidate = 60 * 60 * 24; // 1 gün
+export const revalidate = 86400; // 1 gün
 
 const lastModified = new Date();
 
