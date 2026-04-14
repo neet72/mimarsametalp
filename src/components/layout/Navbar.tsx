@@ -5,7 +5,7 @@ import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { PAGE_MAX_CLASS, PAGE_PAD_X } from "@/lib/page-layout";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
@@ -92,6 +92,9 @@ export function Navbar() {
   const navItems = locale === "en" ? navEn : nav;
   const [open, setOpen] = useState(false);
   const reduceMotion = useReducedMotion();
+  const [hiddenOnScroll, setHiddenOnScroll] = useState(false);
+  const lastYRef = useRef(0);
+  const lastDirRef = useRef<"up" | "down">("up");
   const panelId = useId();
   const motionDuration = reduceMotion ? 0.01 : 0.28;
   const motionEase = [0.22, 1, 0.36, 1] as const;
@@ -117,12 +120,54 @@ export function Navbar() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  useEffect(() => {
+    if (open) {
+      setHiddenOnScroll(false);
+      return;
+    }
+    const MIN_Y = 120; // don't hide near top
+    const DELTA = 2; // sensitivity (smaller = comes back easier)
+
+    lastYRef.current = typeof window !== "undefined" ? window.scrollY : 0;
+    lastDirRef.current = "up";
+
+    const onScroll = () => {
+      const y = window.scrollY || 0;
+      const prev = lastYRef.current;
+      const diff = y - prev;
+
+      // Always show close to top.
+      if (y < 40) {
+        setHiddenOnScroll(false);
+        lastDirRef.current = "up";
+        lastYRef.current = y;
+        return;
+      }
+
+      if (diff > DELTA && y > MIN_Y) {
+        if (lastDirRef.current !== "down") lastDirRef.current = "down";
+        setHiddenOnScroll(true);
+      } else if (diff < -DELTA) {
+        if (lastDirRef.current !== "up") lastDirRef.current = "up";
+        setHiddenOnScroll(false);
+      }
+
+      lastYRef.current = y;
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [open]);
+
   return (
     <header
       className={cn(
-        "sticky top-0 border-b border-border/70 pt-[env(safe-area-inset-top,0px)]",
-        "z-50 isolate",
+        "fixed inset-x-0 top-0 border-b border-border/70 pt-[env(safe-area-inset-top,0px)]",
+        "z-[250] isolate",
         "bg-surface/80 backdrop-blur-xl",
+        "will-change-transform transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+        // Tailwind arbitrary calc() can be dropped by tooling; keep it robust.
+        hiddenOnScroll && "-translate-y-full",
       )}
     >
       {/* Üst bar: backdrop ve panelin üzerinde kalmalı */}

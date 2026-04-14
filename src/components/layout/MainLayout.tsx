@@ -14,6 +14,7 @@ export function MainLayout({ children }: MainLayoutProps) {
     <div className="flex min-h-dvh flex-col">
       <ScrollManager />
       <Navbar />
+      <div aria-hidden className="h-[var(--header-h)]" />
       <main id="icerik" className="min-h-0 flex-1">
         <PageTransition>{children}</PageTransition>
       </main>

@@ -11,6 +11,13 @@ export default auth((req) => {
   const email = req.auth?.user?.email;
   const isAdmin = isLoggedIn && isAdminEmail(email ?? null);
 
+  // Avoid noisy 404s: redirect legacy favicon request to app icon.
+  if (pathname === "/favicon.ico") {
+    const url = req.nextUrl.clone();
+    url.pathname = "/icon.svg";
+    return NextResponse.redirect(url);
+  }
+
   // Pass locale to Server Components (root layout) without breaking routing.
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set("x-locale", pathname === "/en" || pathname.startsWith("/en/") ? "en" : "tr");
@@ -32,5 +39,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/).*)"],
+  matcher: ["/((?!_next/static|_next/image|api/).*)"],
 };

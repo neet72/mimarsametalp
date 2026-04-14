@@ -1,6 +1,6 @@
 import type { SVGProps } from "react";
 
-export function LinkedinGlyph({ strokeWidth: _strokeWidth = 1.9, ...props }: SVGProps<SVGSVGElement>) {
+export function LinkedinGlyph(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden {...props}>
       {/* Brand-like mark: "in" inside rounded square */}
