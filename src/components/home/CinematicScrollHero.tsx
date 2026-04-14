@@ -79,6 +79,9 @@ export function CinematicScrollHero() {
     const canvasEl = canvasRef.current;
     const scrollSpaceEl = scrollSpaceRef.current;
     const ctx = gsap.context(() => {
+      const inView = { v: true };
+      let io: IntersectionObserver | null = null;
+
       const renderer = new THREE.WebGLRenderer({
         canvas: canvasEl,
         antialias: true,
@@ -281,6 +284,7 @@ export function CinematicScrollHero() {
 
       const tick = () => {
         raf = window.requestAnimationFrame(tick);
+        if (!inView.v) return;
         const time = clock.getElapsedTime();
         windTime.t = time;
 
@@ -475,9 +479,24 @@ export function CinematicScrollHero() {
       };
       window.addEventListener("resize", onResize);
 
+      // Pause rendering when the hero is offscreen (big perf win on mobile).
+      if ("IntersectionObserver" in window) {
+        io = new IntersectionObserver(
+          (entries) => {
+            const e = entries[0];
+            if (!e) return;
+            inView.v = e.isIntersecting || e.intersectionRatio > 0;
+          },
+          { root: null, threshold: [0, 0.01, 0.1] },
+        );
+        io.observe(stageEl);
+      }
+
       return () => {
         disposed = true;
         window.removeEventListener("resize", onResize);
+        io?.disconnect();
+        io = null;
         tl?.kill();
         window.cancelAnimationFrame(raf);
 

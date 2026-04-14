@@ -101,7 +101,7 @@ export function AboutArchitectModule() {
             <motion.div
               initial={reduceMotion ? false : { opacity: 0, y: 36, filter: "blur(8px)" }}
               whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              viewport={{ once: true, amount: 0.32 }}
+              viewport={{ once: false, amount: 0.32 }}
               transition={{ duration: 0.82, ease }}
             >
               <h2 className="font-display text-[2rem] font-semibold tracking-tight text-primary sm:text-4xl md:text-[2.35rem] md:leading-[1.12]">
@@ -116,7 +116,7 @@ export function AboutArchitectModule() {
               className="mt-7 max-w-2xl text-pretty text-[0.9375rem] leading-[1.65] text-primary/70 sm:text-base sm:leading-relaxed md:text-lg md:leading-relaxed"
               initial={reduceMotion ? false : { opacity: 0, y: 26 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "0px 0px -14% 0px" }}
+              viewport={{ once: false, margin: "0px 0px -14% 0px" }}
               transition={{ duration: 0.92, ease, delay: reduceMotion ? 0 : 0.06 }}
             >
               {bio}
@@ -126,7 +126,7 @@ export function AboutArchitectModule() {
               className="mt-10 h-px max-w-[12rem] origin-left bg-gradient-to-r from-accent/50 to-transparent"
               initial={reduceMotion ? false : { scaleX: 0, opacity: 0 }}
               whileInView={{ scaleX: 1, opacity: 1 }}
-              viewport={{ once: true, amount: 0.5 }}
+              viewport={{ once: false, amount: 0.5 }}
               transition={{ duration: 0.85, ease, delay: reduceMotion ? 0 : 0.12 }}
             />
           </div>

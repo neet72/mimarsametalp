@@ -69,12 +69,18 @@ function NavUnderlineLink({
       <span className="relative z-10">{children}</span>
       <span
         aria-hidden
-        className={cn(
-          "pointer-events-none absolute bottom-1 left-1/2 h-px w-[min(100%,11rem)] -translate-x-1/2 origin-center bg-accent transition-transform duration-500 ease-out motion-reduce:transition-none",
-          active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100 group-focus-visible:scale-x-100",
+        className="pointer-events-none absolute bottom-1 left-0 right-0 flex justify-center"
+      >
+        {active ? (
+          <motion.span
+            layoutId="nav-underline"
+            className="h-px w-[min(100%,11rem)] bg-accent"
+            transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+          />
+        ) : (
+          <span className="h-px w-[min(100%,11rem)] scale-x-0 bg-accent transition-transform duration-500 ease-out group-hover:scale-x-100 group-focus-visible:scale-x-100 motion-reduce:transition-none" />
         )}
-        style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)" }}
-      />
+      </span>
     </Link>
   );
 }

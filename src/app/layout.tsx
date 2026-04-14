@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
+import { headers } from "next/headers";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { metadataBase, siteName } from "@/lib/seo";
 import { jsonLdScriptProps, organizationJsonLd, websiteJsonLd } from "@/lib/seo-jsonld";
@@ -74,19 +75,28 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const h = await headers();
+  const locale = (h.get("x-locale") ?? "") === "en" ? "en" : "tr";
   return (
-    <html lang="tr" className={`${inter.variable} ${outfit.variable}`}>
+    <html lang={locale === "en" ? "en" : "tr"} className={`${inter.variable} ${outfit.variable}`}>
       <body
         className="font-sans [--font-display:var(--font-outfit)] [--font-sans:var(--font-inter)]"
         suppressHydrationWarning
       >
         <script {...jsonLdScriptProps(organizationJsonLd())} />
-        <script {...jsonLdScriptProps(websiteJsonLd())} />
+        <script
+          {...jsonLdScriptProps(
+            websiteJsonLd({
+              inLanguage: locale === "en" ? "en-US" : "tr-TR",
+              path: locale === "en" ? "/en" : "/",
+            }),
+          )}
+        />
         <MainLayout>{children}</MainLayout>
       </body>
     </html>

@@ -10,6 +10,7 @@ import { HIZMETLERIMIZ_INTRO as HIZMETLERIMIZ_INTRO_TR } from "@/content/hizmetl
 import { HIZMETLERIMIZ_INTRO as HIZMETLERIMIZ_INTRO_EN } from "@/content/hizmetlerimiz-page.en";
 import { cn } from "@/lib/cn";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
+import { fadeUpSoft } from "@/lib/motion";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -21,10 +22,11 @@ const gridContainer: Variants = {
 };
 
 const cardItem: Variants = {
-  hidden: { opacity: 0, y: 36 },
+  hidden: { opacity: 0, y: 28, filter: "blur(6px)" },
   visible: {
     opacity: 1,
     y: 0,
+    filter: "blur(0px)",
     transition: { duration: 0.7, ease },
   },
 };
@@ -115,8 +117,9 @@ export function HizmetlerimizPageContent() {
       <div className="mx-auto w-full min-w-0 max-w-[1440px] px-4 min-[400px]:px-6 py-16 sm:py-20 md:px-8 md:py-24">
         <motion.header
           className="mx-auto max-w-3xl text-center"
-          initial={reduceMotion ? false : { opacity: 0, y: 22 }}
-          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          variants={reduceMotion ? undefined : fadeUpSoft}
+          initial={reduceMotion ? false : "hidden"}
+          animate={reduceMotion ? undefined : "visible"}
           transition={{ duration: 0.72, ease }}
         >
           <h1 className="font-display text-xl font-semibold uppercase tracking-[0.35em] text-primary sm:text-2xl md:text-[1.65rem] md:tracking-[0.38em]">
@@ -132,7 +135,7 @@ export function HizmetlerimizPageContent() {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.06, margin: "-4% 0px" }}
+          viewport={{ once: false, amount: 0.06, margin: "-4% 0px" }}
         >
           {SERVICES_GALLERY.map((service, index) => (
             <motion.div

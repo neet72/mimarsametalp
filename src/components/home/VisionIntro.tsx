@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { ABOUT_SECTION_BODY as ABOUT_SECTION_BODY_TR } from "@/content/home-copy";
 import { ABOUT_SECTION_BODY as ABOUT_SECTION_BODY_EN } from "@/content/home-copy.en";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
-import { easePremium, fadeUp, stagger } from "@/lib/motion";
+import { easePremium, fadeUpSoft, stagger } from "@/lib/motion";
 
 export function VisionIntro() {
   const reduceMotion = useReducedMotion();
@@ -24,23 +24,23 @@ export function VisionIntro() {
           variants={reduceMotion ? undefined : stagger({ stagger: 0.09, delay: 0.02 })}
           initial={reduceMotion ? false : "hidden"}
           whileInView={reduceMotion ? undefined : "visible"}
-          viewport={{ once: true, margin: "-10% 0px" }}
+          viewport={{ once: false, margin: "-10% 0px" }}
           transition={reduceMotion ? undefined : { duration: 0.6, ease: easePremium }}
         >
-          <motion.p variants={reduceMotion ? undefined : fadeUp} className="font-display text-[10px] font-semibold uppercase tracking-[0.34em] text-muted sm:text-[11px]">
+          <motion.p variants={reduceMotion ? undefined : fadeUpSoft} className="font-display text-[10px] font-semibold uppercase tracking-[0.34em] text-muted sm:text-[11px]">
             Samet Alp Mimarlık
           </motion.p>
           <motion.h1
             id="vizyon-baslik"
             className="mt-5 font-display text-3xl font-semibold leading-tight tracking-tight text-primary sm:text-4xl lg:text-[2.35rem]"
-            variants={reduceMotion ? undefined : fadeUp}
+            variants={reduceMotion ? undefined : fadeUpSoft}
           >
             {locale === "en" ? "We connect spaces with life." : "Mekânları yaşamla buluşturuyoruz."}
           </motion.h1>
-          <motion.p variants={reduceMotion ? undefined : fadeUp} className="mt-7 text-pretty text-base leading-relaxed text-muted sm:text-lg">
+          <motion.p variants={reduceMotion ? undefined : fadeUpSoft} className="mt-7 text-pretty text-base leading-relaxed text-muted sm:text-lg">
             {ABOUT_SECTION_BODY}
           </motion.p>
-          <motion.div variants={reduceMotion ? undefined : fadeUp} className="mt-12 flex flex-wrap items-center justify-center gap-4 sm:mt-14">
+          <motion.div variants={reduceMotion ? undefined : fadeUpSoft} className="mt-12 flex flex-wrap items-center justify-center gap-4 sm:mt-14">
             <Link
               href={withLocalePath("/hakkimizda", locale)}
               aria-label={

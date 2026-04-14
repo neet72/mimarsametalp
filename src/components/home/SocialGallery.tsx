@@ -10,13 +10,13 @@ import { SOCIAL_GALLERY_IMAGES as SOCIAL_GALLERY_IMAGES_EN } from "@/content/hom
 import { cn } from "@/lib/cn";
 import { pageContainerClass } from "@/lib/page-layout";
 import { localeFromPathname } from "@/lib/locale";
-import { easePremium, fadeUp, stagger } from "@/lib/motion";
+import { easePremium, fadeUpSoft, stagger } from "@/lib/motion";
 
 const instagramHref =
   process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "https://www.instagram.com/";
 
 const container = stagger({ stagger: 0.07, delay: 0.06 });
-const tile = fadeUp;
+const tile = fadeUpSoft;
 
 export function SocialGallery() {
   const reduceMotion = useReducedMotion();
@@ -42,13 +42,13 @@ export function SocialGallery() {
           variants={reduceMotion ? undefined : stagger({ stagger: 0.08, delay: 0.02 })}
           initial={reduceMotion ? false : "hidden"}
           whileInView={reduceMotion ? undefined : "visible"}
-          viewport={{ once: true, margin: "-12% 0px" }}
+          viewport={{ once: false, margin: "-12% 0px" }}
           transition={reduceMotion ? undefined : { duration: 0.65, ease: easePremium }}
         >
           <motion.h2
             id="sosyal-baslik"
             className="font-display text-2xl font-semibold tracking-tight text-primary sm:text-3xl"
-            variants={reduceMotion ? undefined : fadeUp}
+            variants={reduceMotion ? undefined : fadeUpSoft}
           >
             {locale === "en" ? "Follow us on social" : "Bizi Sosyal Medyada Takip Edin"}
           </motion.h2>
@@ -59,7 +59,7 @@ export function SocialGallery() {
           variants={variants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-8% 0px" }}
+          viewport={{ once: false, margin: "-8% 0px" }}
           transition={reduceMotion ? undefined : { duration: 0.6, ease: easePremium }}
         >
           <div className="grid grid-cols-2 gap-px bg-border/45 md:grid-cols-4">
@@ -95,7 +95,7 @@ export function SocialGallery() {
           className="mt-12 flex justify-center sm:mt-14"
           initial={reduceMotion ? false : { opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-10% 0px" }}
+          viewport={{ once: false, margin: "-10% 0px" }}
           transition={{ duration: 0.55, delay: reduceMotion ? 0 : 0.08, ease: easePremium }}
         >
           <Link

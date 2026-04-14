@@ -6,7 +6,7 @@ import { SERVICES_GALLERY as SERVICES_GALLERY_TR } from "@/content/services-gall
 import { SERVICES_GALLERY as SERVICES_GALLERY_EN } from "@/content/services-gallery.en";
 import { ServiceGalleryCard } from "./ServiceGalleryCard";
 import { localeFromPathname } from "@/lib/locale";
-import { easePremium } from "@/lib/motion";
+import { easePremium, fadeUpSoft } from "@/lib/motion";
 
 const gridContainer: Variants = {
   hidden: {},
@@ -55,9 +55,10 @@ export function ServicesSection() {
       <div className="mx-auto w-full min-w-0 max-w-[1440px] px-4 min-[400px]:px-6 md:px-16">
         <motion.div
           className="mx-auto max-w-4xl text-center"
-          initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-          whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-10% 0px" }}
+          variants={reduceMotion ? undefined : fadeUpSoft}
+          initial={reduceMotion ? false : "hidden"}
+          whileInView={reduceMotion ? undefined : "visible"}
+          viewport={{ once: false, margin: "-10% 0px" }}
           transition={{ duration: 0.75, ease: easePremium }}
         >
           <h2
@@ -73,7 +74,7 @@ export function ServicesSection() {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-6% 0px", amount: 0.08 }}
+          viewport={{ once: false, margin: "-6% 0px", amount: 0.08 }}
         >
           {SERVICES_GALLERY.map((service, index) => (
             <motion.div

@@ -11,11 +11,15 @@ export default auth((req) => {
   const email = req.auth?.user?.email;
   const isAdmin = isLoggedIn && isAdminEmail(email ?? null);
 
+  // Pass locale to Server Components (root layout) without breaking routing.
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-locale", pathname === "/en" || pathname.startsWith("/en/") ? "en" : "tr");
+
   if (pathname === "/admin/login") {
     if (isLoggedIn && isAdmin) {
       return NextResponse.redirect(new URL("/admin", req.nextUrl.origin));
     }
-    return NextResponse.next();
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
   if (pathname.startsWith("/admin")) {
@@ -24,9 +28,9 @@ export default auth((req) => {
     }
   }
 
-  return NextResponse.next();
+  return NextResponse.next({ request: { headers: requestHeaders } });
 });
 
 export const config = {
-  matcher: ["/admin", "/admin/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/).*)"],
 };

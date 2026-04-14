@@ -86,10 +86,11 @@ export default function ProjectForm({
         const fd = new FormData();
         fd.set("file", f);
         const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-        const json = (await res.json()) as { ok: boolean; url?: string; error?: string };
+        const json = (await res.json()) as { ok: boolean; url?: string; error?: string; warning?: string };
         if (!res.ok || !json.ok || !json.url) {
           throw new Error(json.error || "Yükleme başarısız.");
         }
+        if (json.warning) setUploadError(json.warning);
         urls.push(json.url);
       }
       setImageUrlsRaw((prev) => {

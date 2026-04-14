@@ -12,7 +12,7 @@ export type FadeInProps = HTMLMotionProps<"div"> & {
 };
 
 /**
- * Görünür alana girince yumuşak fade-in + yukarı kayma (scroll tetikli, bir kez).
+ * Görünür alana girince yumuşak fade-in + yukarı kayma (scroll tetikli, tekrarlar).
  */
 export function FadeIn({
   children,
@@ -27,7 +27,7 @@ export function FadeIn({
     <motion.div
       initial={reduceMotion ? false : { opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-10% 0px -8% 0px" }}
+      viewport={{ once: false, margin: "-10% 0px -8% 0px" }}
       transition={
         reduceMotion ? { duration: 0.01, delay: 0 } : { duration: 0.62, delay, ease }
       }

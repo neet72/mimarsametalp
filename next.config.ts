@@ -18,6 +18,26 @@ const securityHeaders = [
     value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
   },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  // CSP is added as Report-Only first to avoid breaking 3rd-party embeds.
+  {
+    key: "Content-Security-Policy-Report-Only",
+    value: [
+      "default-src 'self'",
+      "base-uri 'self'",
+      "object-src 'none'",
+      "frame-ancestors 'self'",
+      "form-action 'self'",
+      "img-src 'self' data: blob: https:",
+      "font-src 'self' data: https:",
+      "style-src 'self' 'unsafe-inline' https:",
+      // Next/Three/GSAP may require eval in dev; keep permissive in report-only.
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
+      "connect-src 'self' https:",
+      "media-src 'self' https: blob:",
+      // Google Maps embeds (if present) + generic https frames.
+      "frame-src 'self' https:",
+    ].join("; "),
+  },
 ] as const;
 
 const nextConfig: NextConfig = {

@@ -98,7 +98,7 @@ export function AboutVisionModule() {
             className="relative aspect-[16/10] w-full max-h-[min(58vh,560px)] min-h-[220px] overflow-hidden rounded-lg bg-border/40 shadow-[var(--shadow-card)] sm:aspect-[16/9] md:max-h-[min(52vh,600px)]"
             initial={reduceMotion ? false : { opacity: 0, scale: 1.02 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.9, ease }}
           >
             <motion.div
@@ -126,7 +126,7 @@ export function AboutVisionModule() {
             variants={cardContainer}
             initial="hidden"
             whileInView="show"
-            viewport={{ once: true, amount: 0.35, margin: "0px 0px -8% 0px" }}
+            viewport={{ once: false, amount: 0.35, margin: "0px 0px -8% 0px" }}
           >
             <motion.div className="overflow-hidden" variants={titleReveal}>
               <h1 className="text-center font-display text-[1.65rem] font-semibold leading-[1.2] tracking-tight text-primary sm:text-3xl md:text-[2.125rem] md:leading-[1.15]">
@@ -139,7 +139,7 @@ export function AboutVisionModule() {
               className="mx-auto mt-6 h-px w-12 max-w-full bg-gradient-to-r from-transparent via-accent/45 to-transparent sm:mt-7"
               initial={reduceMotion ? false : { scaleX: 0, opacity: 0 }}
               whileInView={{ scaleX: 1, opacity: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: false }}
               transition={{ duration: 0.75, ease, delay: 0.15 }}
             />
 

@@ -65,3 +65,39 @@ model AdminAuditLog {
   @@index([action, createdAt])
   @@index([entity, entityId])
 }
+
+model Service {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  title            String
+  shortDescription String?
+  heroImageUrl     String?
+  /// JSON string: ["..."] — optional for future usage
+  scope            String?  @default("[]")
+  /// JSON string: [{title,description}, ...]
+  process          String?  @default("[]")
+  /// JSON string: [{q,a}, ...]
+  faq              String?  @default("[]")
+  published        Boolean  @default(false)
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([published, sortOrder])
+  @@index([slug])
+}
+
+model SiteContent {
+  id        String   @id @default(cuid())
+  /// e.g. "about", "contact"
+  key       String
+  /// "tr" | "en"
+  locale    String
+  /// JSON string payload
+  data      String   @default("{}")
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@unique([key, locale])
+  @@index([key, locale])
+}

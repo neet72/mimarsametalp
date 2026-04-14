@@ -5,7 +5,12 @@ export const runtime = "edge";
 export const size = { width: 1200, height: 630 } as const;
 export const contentType = "image/png";
 
-export default async function OpengraphImage() {
+export default async function OpengraphImage(request: Request) {
+  const url = new URL(request.url);
+  const titleParam = url.searchParams.get("title");
+  const descParam = url.searchParams.get("desc");
+  const title = (titleParam?.trim() || "Architectural design, permits, and turnkey delivery").slice(0, 90);
+  const desc = (descParam?.trim() || "Residential • Commercial • Interior — Portfolio & contact").slice(0, 160);
   return new ImageResponse(
     (
       <div
@@ -66,7 +71,7 @@ export default async function OpengraphImage() {
               maxWidth: 980,
             }}
           >
-            Architectural design, permits, and turnkey delivery
+            {title}
           </div>
 
           <div
@@ -77,7 +82,7 @@ export default async function OpengraphImage() {
               maxWidth: 900,
             }}
           >
-            Residential • Commercial • Interior — Portfolio & contact
+            {desc}
           </div>
         </div>
       </div>

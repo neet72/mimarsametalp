@@ -29,6 +29,12 @@ export function ContactFormPanel() {
   const [fieldErrors, setFieldErrors] = useState<ContactFieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [lastPayload, setLastPayload] = useState<{
+    firstName: string;
+    lastName: string;
+    email: string;
+    message: string;
+  } | null>(null);
 
   const firstErr = fieldErrors.firstName?.[0];
   const lastErr = fieldErrors.lastName?.[0];
@@ -49,6 +55,7 @@ export function ContactFormPanel() {
         message,
         company: honeypot || undefined,
       };
+      setLastPayload({ firstName, lastName, email, message });
 
       const clientParsed = contactFormSchema.safeParse(payload);
       if (!clientParsed.success) {
@@ -79,7 +86,7 @@ export function ContactFormPanel() {
       className="flex flex-col px-4 sm:px-6 md:border-x md:border-border/60 md:px-7"
       initial={reduceMotion ? false : { opacity: 0, x: 44 }}
       whileInView={reduceMotion ? undefined : { opacity: 1, x: 0 }}
-      viewport={{ once: true, amount: 0.08 }}
+      viewport={{ once: false, amount: 0.08 }}
       transition={{ duration: 0.88, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="space-y-1 border-b border-border/60 pb-8">
@@ -168,14 +175,25 @@ export function ContactFormPanel() {
         />
 
         {formError ? (
-          <p className="text-sm text-red-600/90" role="alert">
-            {formError}
-          </p>
+          <div
+            className="rounded-xl border border-red-200/70 bg-red-50 px-4 py-3 text-sm text-red-700"
+            role="alert"
+          >
+            <p className="font-medium">{formError}</p>
+            {lastPayload ? (
+              <p className="mt-1 text-xs text-red-700/80">
+                İstersen WhatsApp üzerinden de yazabilirsin: {lastPayload.firstName} {lastPayload.lastName}
+              </p>
+            ) : null}
+          </div>
         ) : null}
         {success ? (
-          <p className="text-sm text-primary/70" role="status">
+          <div
+            className="rounded-xl border border-border/70 bg-surface px-4 py-3 text-sm text-primary/75"
+            role="status"
+          >
             {success}
-          </p>
+          </div>
         ) : null}
 
         <motion.button

@@ -19,6 +19,16 @@ export const fadeUp: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.62, ease: easePremium } },
 };
 
+export const fadeUpSoft: Variants = {
+  hidden: { opacity: 0, y: 18, filter: "blur(6px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.68, ease: easePremium },
+  },
+};
+
 export function fadeInX(direction: -1 | 1, distance = 44): Variants {
   return {
     hidden: { opacity: 0, x: direction * distance },

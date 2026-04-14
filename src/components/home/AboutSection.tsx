@@ -9,6 +9,7 @@ import { ABOUT_SECTION_BODY as ABOUT_SECTION_BODY_EN } from "@/content/home-copy
 import { cn } from "@/lib/cn";
 import { pageContainerClass } from "@/lib/page-layout";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
+import { fadeUpSoft } from "@/lib/motion";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -31,9 +32,9 @@ export function AboutSection() {
         <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16 xl:gap-20 2xl:gap-24">
           <motion.div
             className="relative lg:col-span-5"
-            initial={reduceMotion ? false : { opacity: 0, x: xImage }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-10% 0px" }}
+            initial={reduceMotion ? false : { opacity: 0, x: xImage, filter: "blur(6px)" }}
+            whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+            viewport={{ once: false, margin: "-10% 0px" }}
             transition={{ duration: 0.78, ease }}
           >
             <div
@@ -107,9 +108,9 @@ export function AboutSection() {
 
           <motion.div
             className="flex flex-col justify-center lg:col-span-7"
-            initial={reduceMotion ? false : { opacity: 0, x: xText }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-10% 0px" }}
+            initial={reduceMotion ? false : { opacity: 0, x: xText, filter: "blur(6px)" }}
+            whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+            viewport={{ once: false, margin: "-10% 0px" }}
             transition={{ duration: 0.78, delay: reduceMotion ? 0 : 0.06, ease }}
           >
             <h2
@@ -118,9 +119,15 @@ export function AboutSection() {
             >
               {locale === "en" ? "About the Studio" : "Firmamız Hakkında"}
             </h2>
-            <p className="mt-6 max-w-3xl text-pretty text-base leading-[1.85] text-muted sm:text-lg">
+            <motion.p
+              className="mt-6 max-w-3xl text-pretty text-base leading-[1.85] text-muted sm:text-lg"
+              variants={reduceMotion ? undefined : fadeUpSoft}
+              initial={reduceMotion ? false : "hidden"}
+              whileInView={reduceMotion ? undefined : "visible"}
+              viewport={{ once: false, margin: "-12% 0px" }}
+            >
               {ABOUT_SECTION_BODY}
-            </p>
+            </motion.p>
             <div className="mt-10">
               <Link
                 href={withLocalePath("/hakkimizda", locale)}

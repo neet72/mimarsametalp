@@ -70,4 +70,35 @@
   .overscroll-contain {
     overscroll-behavior: contain;
   }
+
+  /* Desktop-only: mouse position tilt (JS sets --rx/--ry/--glow-x/--glow-y) */
+  @media (hover: hover) and (pointer: fine) {
+    .tilt-card {
+      transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))
+        translateZ(0);
+      transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 450ms cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
+    }
+
+    .tilt-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 350ms cubic-bezier(0.22, 1, 0.36, 1);
+      background: radial-gradient(
+        420px circle at var(--glow-x, 50%) var(--glow-y, 30%),
+        rgba(255, 255, 255, 0.14),
+        transparent 55%
+      );
+      mix-blend-mode: overlay;
+    }
+
+    .group:hover .tilt-card::before {
+      opacity: 1;
+    }
+  }
 }

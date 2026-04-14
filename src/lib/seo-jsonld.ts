@@ -1,6 +1,13 @@
 import "server-only";
 
 import { getSiteUrl, siteName } from "@/lib/seo";
+import {
+  CONTACT_EMAIL,
+  CONTACT_PHONE_TEL,
+  CONTACT_SOCIAL_INSTAGRAM,
+  CONTACT_SOCIAL_LINKEDIN,
+  CONTACT_SOCIAL_WHATSAPP,
+} from "@/content/contact-page";
 
 type JsonLd = Record<string, unknown>;
 
@@ -20,7 +27,18 @@ export function organizationJsonLd() {
     name: siteName,
     url: base,
     logo: `${base}/favicon.ico`,
-    sameAs: [],
+    email: CONTACT_EMAIL,
+    telephone: CONTACT_PHONE_TEL,
+    sameAs: [CONTACT_SOCIAL_INSTAGRAM, CONTACT_SOCIAL_WHATSAPP, CONTACT_SOCIAL_LINKEDIN].filter(Boolean),
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        telephone: CONTACT_PHONE_TEL,
+        email: CONTACT_EMAIL,
+        availableLanguage: ["tr-TR", "en-US"],
+      },
+    ],
   } satisfies JsonLd;
 }
 

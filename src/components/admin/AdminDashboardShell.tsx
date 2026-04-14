@@ -5,12 +5,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { SessionProvider } from "next-auth/react";
-import { LayoutDashboard, FolderKanban, Inbox, LogOut } from "lucide-react";
+import { LayoutDashboard, FolderKanban, Inbox, LogOut, Wrench, Info, Phone } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const nav = [
   { href: "/admin", label: "Özet", icon: LayoutDashboard },
   { href: "/admin/projects", label: "Projeler", icon: FolderKanban },
+  { href: "/admin/services", label: "Hizmetler", icon: Wrench },
+  { href: "/admin/about", label: "Hakkımızda", icon: Info },
+  { href: "/admin/contact", label: "İletişim", icon: Phone },
   { href: "/admin/messages", label: "Mesajlar", icon: Inbox },
 ] as const;
 

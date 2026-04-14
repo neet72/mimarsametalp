@@ -57,7 +57,7 @@ export function ContactSocialLinks() {
       className="mt-8 border-t border-border/50 pt-8"
       initial={reduceMotion ? false : { opacity: 0 }}
       whileInView={reduceMotion ? undefined : { opacity: 1 }}
-      viewport={{ once: true, amount: 0.4 }}
+      viewport={{ once: false, amount: 0.4 }}
       transition={{ duration: 0.5, ease }}
     >
       <p className="font-display text-[10px] font-semibold uppercase tracking-[0.28em] text-primary/40">
@@ -68,7 +68,7 @@ export function ContactSocialLinks() {
         variants={list}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.5 }}
+        viewport={{ once: false, amount: 0.5 }}
         aria-label="Sosyal medya bağlantıları"
       >
         {social.map(({ href, label, Icon }) => (
@@ -94,7 +94,7 @@ export function ContactSocialLinks() {
                 aria-hidden
                 className="pointer-events-none absolute inset-0 bg-gradient-to-br from-accent/[0.07] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
               />
-              <Icon className="relative z-[1] h-[1.15rem] w-[1.15rem]" />
+              <Icon className="relative z-[1] h-5 w-5 text-primary/70 transition-colors duration-300 group-hover:text-primary" strokeWidth={2} />
               <span className="sr-only">{label}</span>
             </motion.a>
           </motion.li>

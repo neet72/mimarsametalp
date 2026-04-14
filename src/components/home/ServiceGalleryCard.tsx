@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCallback } from "react";
 import { cn } from "@/lib/cn";
 import type { ServiceGalleryItem } from "@/content/services-gallery";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
@@ -15,6 +16,28 @@ type ServiceGalleryCardProps = {
 export function ServiceGalleryCard({ service, index }: ServiceGalleryCardProps) {
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
+
+  const onMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    const ry = (px - 0.5) * 6;
+    const rx = (0.5 - py) * 5;
+    el.style.setProperty("--rx", `${rx.toFixed(2)}deg`);
+    el.style.setProperty("--ry", `${ry.toFixed(2)}deg`);
+    el.style.setProperty("--glow-x", `${(px * 100).toFixed(1)}%`);
+    el.style.setProperty("--glow-y", `${(py * 100).toFixed(1)}%`);
+  }, []);
+
+  const onLeave = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const el = e.currentTarget;
+    el.style.setProperty("--rx", "0deg");
+    el.style.setProperty("--ry", "0deg");
+    el.style.setProperty("--glow-x", "50%");
+    el.style.setProperty("--glow-y", "30%");
+  }, []);
+
   return (
     <Link
       href={withLocalePath(`/hizmetlerimiz/${service.slug}`, locale)}
@@ -27,12 +50,14 @@ export function ServiceGalleryCard({ service, index }: ServiceGalleryCardProps) 
     >
       <article
         className={cn(
-          "relative w-full min-w-0 max-w-full overflow-hidden rounded-2xl bg-border/25",
+          "tilt-card relative w-full min-w-0 max-w-full overflow-hidden rounded-2xl bg-border/25",
           "shadow-[var(--shadow-card)] ring-1 ring-inset ring-primary/[0.06]",
           "transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
           "group-hover:-translate-y-1 group-hover:shadow-[var(--shadow-card-hover)]",
           "motion-reduce:transition-none motion-reduce:group-hover:translate-y-0",
         )}
+        onMouseMove={onMove}
+        onMouseLeave={onLeave}
       >
         <div className="relative aspect-video w-full min-w-0 overflow-hidden">
           <Image

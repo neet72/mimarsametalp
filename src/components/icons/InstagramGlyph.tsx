@@ -1,7 +1,7 @@
 import type { SVGProps } from "react";
 
 /** Lucide eski sürümlerde Instagram yok; marka uyumlu basit glif. */
-export function InstagramGlyph(props: SVGProps<SVGSVGElement>) {
+export function InstagramGlyph({ strokeWidth = 1.9, ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden {...props}>
       <rect
@@ -11,9 +11,19 @@ export function InstagramGlyph(props: SVGProps<SVGSVGElement>) {
         height="18"
         rx="5"
         stroke="currentColor"
-        strokeWidth="1.75"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <circle cx="12" cy="12" r="3.25" stroke="currentColor" strokeWidth="1.75" />
+      <circle
+        cx="12"
+        cy="12"
+        r="3.25"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
       <circle cx="17" cy="7" r="1.1" fill="currentColor" />
     </svg>
   );

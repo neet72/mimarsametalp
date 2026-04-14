@@ -81,7 +81,7 @@ export function ServiceDetailClient({ service }: Props) {
         variants={stagger}
         initial={sectionInitial}
         whileInView={sectionWhileInView}
-        viewport={{ once: true, amount: 0.18, margin: "-8% 0px" }}
+        viewport={{ once: false, amount: 0.18, margin: "-8% 0px" }}
       >
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           <motion.div variants={fadeUp}>
@@ -122,7 +122,7 @@ export function ServiceDetailClient({ service }: Props) {
         variants={stagger}
         initial={sectionInitial}
         whileInView={sectionWhileInView}
-        viewport={{ once: true, amount: 0.12, margin: "-10% 0px" }}
+        viewport={{ once: false, amount: 0.12, margin: "-10% 0px" }}
       >
         <motion.div variants={fadeUp} className="flex items-end justify-between gap-6">
           <div>
@@ -174,7 +174,7 @@ export function ServiceDetailClient({ service }: Props) {
         variants={stagger}
         initial={sectionInitial}
         whileInView={sectionWhileInView}
-        viewport={{ once: true, amount: 0.12, margin: "-10% 0px" }}
+        viewport={{ once: false, amount: 0.12, margin: "-10% 0px" }}
       >
         <motion.div variants={fadeUp}>
           <h2 className="font-display text-2xl font-semibold tracking-tight text-primary sm:text-3xl">

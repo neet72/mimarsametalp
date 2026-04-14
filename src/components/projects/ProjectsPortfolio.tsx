@@ -9,6 +9,7 @@ import {
 } from "framer-motion";
 import { useEffect } from "react";
 import { ProjectCard } from "./ProjectCard";
+import { fadeUpSoft } from "@/lib/motion";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -120,7 +121,7 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
           </motion.h1>
 
           <motion.p
-            variants={headerItem}
+            variants={reduceMotion ? headerItem : fadeUpSoft}
             className="mt-6 max-w-3xl text-pretty text-lg leading-relaxed text-primary/65 sm:text-xl sm:leading-relaxed md:text-2xl md:leading-relaxed"
           >
             Seçili mimari ve iç mekân çalışmalarımızdan oluşan portfolyo seçkisi.
@@ -133,12 +134,20 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
           {projects.map((project, index) => (
             <motion.div
               key={project.slug}
-              initial={reduceMotion ? false : { opacity: 0, y: 52 }}
-              whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "0px 0px -12% 0px" }}
+              initial={
+                reduceMotion
+                  ? false
+                  : { opacity: 0, y: 28, filter: "blur(6px)" }
+              }
+              whileInView={
+                reduceMotion
+                  ? undefined
+                  : { opacity: 1, y: 0, filter: "blur(0px)" }
+              }
+              viewport={{ once: false, margin: "0px 0px -12% 0px" }}
               transition={{
                 delay: reduceMotion ? 0 : Math.min(index * 0.07, 0.42),
-                duration: 0.62,
+                duration: 0.68,
                 ease,
               }}
             >

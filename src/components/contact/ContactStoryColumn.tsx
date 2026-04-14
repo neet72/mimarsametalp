@@ -52,7 +52,7 @@ export function ContactStoryColumn() {
       className="flex flex-col"
       initial={reduceMotion ? false : { opacity: 0, x: -44 }}
       whileInView={reduceMotion ? undefined : { opacity: 1, x: 0 }}
-      viewport={{ once: true, amount: 0.08 }}
+      viewport={{ once: false, amount: 0.08 }}
       transition={{ duration: 0.88, ease }}
     >
       <h1 className="font-display text-[2rem] font-semibold leading-tight tracking-tight text-primary sm:text-4xl md:text-[2.35rem]">
@@ -63,7 +63,7 @@ export function ContactStoryColumn() {
         className="mt-8 max-w-xl text-pretty text-[0.9375rem] leading-[1.75] text-primary/68 sm:text-base md:text-lg md:leading-relaxed"
         initial={reduceMotion ? false : { opacity: 0, y: 18 }}
         whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 0.76, ease, delay: reduceMotion ? 0 : 0.08 }}
       >
         {intro}
@@ -73,7 +73,7 @@ export function ContactStoryColumn() {
         className="mt-12 font-display text-sm font-semibold uppercase tracking-[0.2em] text-primary/50 sm:text-[0.8125rem]"
         initial={reduceMotion ? false : { opacity: 0, y: 10 }}
         whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 0.6, ease, delay: reduceMotion ? 0 : 0.12 }}
       >
         {stepsHeading}
@@ -84,7 +84,7 @@ export function ContactStoryColumn() {
         variants={timelineContainer}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.12 }}
+        viewport={{ once: false, amount: 0.12 }}
       >
         <span
           aria-hidden
@@ -117,7 +117,7 @@ export function ContactStoryColumn() {
         className="mt-12 max-w-xl border-t border-border/80 pt-10 text-pretty text-[0.9375rem] leading-[1.75] text-primary/72 sm:text-base"
         initial={reduceMotion ? false : { opacity: 0, y: 14 }}
         whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        viewport={{ once: false }}
         transition={{ duration: 0.72, ease, delay: reduceMotion ? 0 : 0.06 }}
       >
         {closing}

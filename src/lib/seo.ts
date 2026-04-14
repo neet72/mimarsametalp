@@ -35,6 +35,10 @@ export function pageMetadata({ title, description, path }: PageMetaInput): Metad
   const trPath = toTrPath(path);
   const enPath = toEnPath(path);
   const fullTitle = `${title} · ${siteName}`;
+  const ogTitle = encodeURIComponent(fullTitle.slice(0, 72));
+  const ogDesc = encodeURIComponent(description.slice(0, 120));
+  const ogPath = isEn ? "/en/opengraph-image" : "/opengraph-image";
+  const ogUrl = `${ogPath}?title=${ogTitle}&desc=${ogDesc}`;
 
   return {
     title,
@@ -53,13 +57,13 @@ export function pageMetadata({ title, description, path }: PageMetaInput): Metad
       title: fullTitle,
       description,
       url,
-      images: [{ url: "/opengraph-image" }],
+      images: [{ url: ogUrl }],
     },
     twitter: {
       card: "summary_large_image",
       title: fullTitle,
       description,
-      images: ["/opengraph-image"],
+      images: [ogUrl],
     },
   };
 }

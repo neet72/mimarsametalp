@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { useCallback } from "react";
 import { cn } from "@/lib/cn";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
 
@@ -24,6 +25,28 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
   const reduceMotion = useReducedMotion();
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
+
+  const onMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    // Desktop-only effect (CSS guarded). Keep very subtle.
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    const ry = (px - 0.5) * 6; // degrees
+    const rx = (0.5 - py) * 5; // degrees
+    el.style.setProperty("--rx", `${rx.toFixed(2)}deg`);
+    el.style.setProperty("--ry", `${ry.toFixed(2)}deg`);
+    el.style.setProperty("--glow-x", `${(px * 100).toFixed(1)}%`);
+    el.style.setProperty("--glow-y", `${(py * 100).toFixed(1)}%`);
+  }, []);
+
+  const onLeave = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const el = e.currentTarget;
+    el.style.setProperty("--rx", "0deg");
+    el.style.setProperty("--ry", "0deg");
+    el.style.setProperty("--glow-x", "50%");
+    el.style.setProperty("--glow-y", "30%");
+  }, []);
 
   return (
     <motion.article
@@ -48,12 +71,14 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       >
         <div
           className={cn(
-            "relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-border/30",
+            "tilt-card relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-border/30",
             "shadow-[var(--shadow-card)] ring-1 ring-inset ring-primary/[0.06]",
             "transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
             "group-hover:shadow-[var(--shadow-card-hover)]",
             "motion-reduce:transition-none",
           )}
+          onMouseMove={reduceMotion ? undefined : onMove}
+          onMouseLeave={reduceMotion ? undefined : onLeave}
         >
           <div
             className={cn(

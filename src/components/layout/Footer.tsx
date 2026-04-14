@@ -45,6 +45,26 @@ export function Footer() {
                   0 (541) 426 76 44
                 </a>
               </li>
+              <li>
+                <a
+                  href="https://wa.me/905414267644?text=Merhaba%20Samet%20Alp%20Mimarl%C4%B1k%2C%20bilgi%20almak%20istiyorum."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="touch-manipulation inline-flex min-h-[44px] items-center py-1 font-medium transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-h-0"
+                >
+                  WhatsApp
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.linkedin.com/in/samet-alp-714851232/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="touch-manipulation inline-flex min-h-[44px] items-center py-1 font-medium transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-h-0"
+                >
+                  LinkedIn
+                </a>
+              </li>
             </ul>
           </div>
         </div>
