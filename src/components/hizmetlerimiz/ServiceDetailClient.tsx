@@ -242,7 +242,7 @@ export function ServiceDetailClient({ service }: Props) {
         className="mx-auto w-full max-w-[1200px] px-4 pb-16 sm:px-6 sm:pb-20 md:px-8 md:pb-24"
         initial={sectionInitial}
         whileInView={sectionWhileInView}
-        viewport={{ once: true, amount: 0.2, margin: "-10% 0px" }}
+        viewport={{ once: false, amount: 0.2, margin: "-10% 0px" }}
       >
         <motion.div
           variants={fadeUp}
@@ -260,12 +260,20 @@ export function ServiceDetailClient({ service }: Props) {
                 : "Kısa bir görüşme ile kapsamı netleştirip size en doğru yol haritasını çıkaralım."}
             </p>
           </div>
-          <Link
-            href={withLocalePath("/iletisim", locale)}
-            className="inline-flex shrink-0 items-center justify-center rounded-xl bg-primary px-7 py-4 font-display text-sm font-semibold uppercase tracking-[0.22em] text-white transition-colors hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-          >
-            {locale === "en" ? "Contact" : "İletişime Geç"}
-          </Link>
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <Link
+              href={withLocalePath("/iletisim", locale)}
+              className="inline-flex w-full shrink-0 items-center justify-center rounded-xl bg-primary px-7 py-4 font-display text-sm font-semibold uppercase tracking-[0.22em] text-white transition-colors hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:w-auto"
+            >
+              {locale === "en" ? "Contact" : "İletişime Geç"}
+            </Link>
+            <Link
+              href={withLocalePath("/projeler", locale)}
+              className="inline-flex w-full shrink-0 items-center justify-center rounded-xl border border-border bg-white px-7 py-4 font-display text-sm font-semibold uppercase tracking-[0.22em] text-primary transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:w-auto"
+            >
+              {locale === "en" ? "View Projects" : "Projeleri Gör"}
+            </Link>
+          </div>
         </motion.div>
       </motion.section>
     </div>

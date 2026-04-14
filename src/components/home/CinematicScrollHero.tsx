@@ -141,7 +141,8 @@ export function CinematicScrollHero() {
       setSize();
 
       let raf = 0;
-      const clock = new THREE.Clock();
+      // Avoid THREE.Clock (deprecated). Use a simple RAF timer.
+      let startMs = performance.now();
 
       // Cylinder + atlas (reference "images scroll as one")
       const radius = isMobile ? 3.85 : 4.25;
@@ -285,7 +286,7 @@ export function CinematicScrollHero() {
       const tick = () => {
         raf = window.requestAnimationFrame(tick);
         if (!inView.v) return;
-        const time = clock.getElapsedTime();
+        const time = (performance.now() - startMs) / 1000;
         windTime.t = time;
 
         if (cylinder) {

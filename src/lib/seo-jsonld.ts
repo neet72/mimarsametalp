@@ -90,11 +90,28 @@ export function projectJsonLd(input: {
   description?: string | null;
   path: `/${string}`;
   imageUrls?: string[];
+  category?: string | null;
+  status?: string | null;
   location?: string | null;
   year?: number | null;
+  areaM2?: number | null;
 }) {
   const base = getSiteUrl();
   const images = (input.imageUrls ?? []).map((u) => (u.startsWith("http") ? u : `${base}${u}`));
+  const additionalProperty = [
+    input.category
+      ? { "@type": "PropertyValue", name: "Category", value: input.category }
+      : null,
+    input.status ? { "@type": "PropertyValue", name: "Status", value: input.status } : null,
+    input.areaM2 != null
+      ? {
+          "@type": "PropertyValue",
+          name: "Area",
+          value: input.areaM2,
+          unitText: "m²",
+        }
+      : null,
+  ].filter(Boolean);
   return {
     "@context": "https://schema.org",
     // Mimarlık işleri için Project iyi bir genel tip; gerekirse CreativeWork'a düşer.
@@ -103,6 +120,7 @@ export function projectJsonLd(input: {
     description: input.description ?? undefined,
     url: `${base}${input.path}`,
     ...(images.length ? { image: images } : {}),
+    ...(additionalProperty.length ? { additionalProperty } : {}),
     ...(input.location ? { location: input.location } : {}),
     ...(input.year ? { temporalCoverage: String(input.year) } : {}),
   } satisfies JsonLd;

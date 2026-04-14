@@ -84,8 +84,11 @@ export default async function ProjectDetailPageEn({ params }: PageProps) {
             description: project.description,
             path: `/en/projeler/${project.slug}`,
             imageUrls: project.imageUrls,
+            category: project.category,
+            status: project.status,
             location: project.location,
             year: project.year,
+            areaM2: project.areaM2,
           }),
         )}
       />

@@ -8,6 +8,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { usePathname } from "next/navigation";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
+import { CONTACT_SOCIAL_WHATSAPP } from "@/content/contact-page";
 
 type ProjectDetailClientProps = {
   project: {
@@ -237,12 +238,34 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
                 ) : null}
               </dl>
 
-              <Link
-                href={withLocalePath("/projeler", locale)}
-                className="mt-8 inline-flex w-full items-center justify-center rounded-xl bg-primary px-5 py-3 font-display text-sm font-semibold uppercase tracking-[0.22em] text-white transition-colors hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-              >
-                {locale === "en" ? "Back to Projects" : "Projeler Sayfasına Dön"}
-              </Link>
+              <div className="mt-8 grid gap-3">
+                <Link
+                  href={CONTACT_SOCIAL_WHATSAPP}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex w-full items-center justify-center rounded-xl bg-primary px-5 py-3 font-display text-sm font-semibold uppercase tracking-[0.22em] text-white transition-colors hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                >
+                  {locale === "en" ? "WhatsApp" : "WhatsApp"}
+                </Link>
+                <Link
+                  href={withLocalePath("/iletisim", locale)}
+                  className="inline-flex w-full items-center justify-center rounded-xl border border-border bg-white px-5 py-3 font-display text-sm font-semibold uppercase tracking-[0.22em] text-primary transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                >
+                  {locale === "en" ? "Get a Quote" : "Teklif Al / İletişim"}
+                </Link>
+                <Link
+                  href={withLocalePath("/hizmetlerimiz", locale)}
+                  className="inline-flex w-full items-center justify-center rounded-xl border border-border bg-transparent px-5 py-3 font-display text-xs font-semibold uppercase tracking-[0.22em] text-primary/80 transition-colors hover:border-primary/25 hover:bg-primary/[0.03] hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                >
+                  {locale === "en" ? "View Services" : "Hizmetlerimizi Gör"}
+                </Link>
+                <Link
+                  href={withLocalePath("/projeler", locale)}
+                  className="inline-flex w-full items-center justify-center rounded-xl border border-border bg-transparent px-5 py-3 font-display text-xs font-semibold uppercase tracking-[0.22em] text-primary/80 transition-colors hover:border-primary/25 hover:bg-primary/[0.03] hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                >
+                  {locale === "en" ? "Back to Projects" : "Projeler Sayfasına Dön"}
+                </Link>
+              </div>
             </div>
           </aside>
         </div>
@@ -337,7 +360,7 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
                       fill
                       sizes="(max-width: 768px) 92vw, 1200px"
                       className="object-contain object-center"
-                      priority
+                      priority={false}
                     />
                   </motion.div>
                 </AnimatePresence>

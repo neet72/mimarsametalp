@@ -91,7 +91,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
               alt={project.title}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              priority={index < 3}
+              priority={index === 0}
               className={cn(
                 "object-cover object-center transition-[filter] duration-700 ease-out",
                 "group-hover:brightness-[1.03] motion-reduce:group-hover:brightness-100",
