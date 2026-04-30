@@ -2,9 +2,11 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 
-/** Adana merkez civarı — embed, API anahtarı gerektirmez */
-const ADANA_MAP_EMBED =
-  "https://maps.google.com/maps?q=36.9914,35.3213&hl=tr&z=12&output=embed";
+/** Embed, API anahtarı gerektirmez */
+const OFFICE_ADDRESS = "Güzelevler, 2067/2 SK A blok no:32/3, 01220 Yüreğir/Adana";
+const OFFICE_MAP_EMBED = `https://maps.google.com/maps?q=${encodeURIComponent(
+  OFFICE_ADDRESS,
+)}&hl=tr&z=16&output=embed`;
 
 export function ContactMapSection() {
   const reduceMotion = useReducedMotion();
@@ -16,14 +18,14 @@ export function ContactMapSection() {
       whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: false, amount: 0.2 }}
       transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-      aria-label="Adana konumu haritası"
+      aria-label="Ofis konumu haritası"
     >
       <div
         className="relative h-[min(52vh,440px)] w-full min-h-[280px] overflow-hidden grayscale contrast-[1.15] brightness-[0.94] transition-[filter] duration-700 ease-out hover:grayscale-[0.35] hover:brightness-[0.98] motion-reduce:grayscale-0 motion-reduce:contrast-100 motion-reduce:brightness-100"
       >
         <iframe
-          title="Adana haritası"
-          src={ADANA_MAP_EMBED}
+          title="Ofis haritası"
+          src={OFFICE_MAP_EMBED}
           className="absolute inset-0 h-full w-full border-0"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
