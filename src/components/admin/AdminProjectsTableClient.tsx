@@ -40,21 +40,25 @@ export function AdminProjectsTableClient({ items }: { items: Row[] }) {
   const sorted = useMemo(() => {
     const next = [...items];
     next.sort((a, b) => {
-      let av: any;
-      let bv: any;
       if (sortKey === "createdAt") {
-        av = new Date(a.createdAt).getTime();
-        bv = new Date(b.createdAt).getTime();
+        const av = new Date(a.createdAt).getTime();
+        const bv = new Date(b.createdAt).getTime();
+        if (av < bv) return sortDir === "asc" ? -1 : 1;
+        if (av > bv) return sortDir === "asc" ? 1 : -1;
+        return 0;
       } else if (sortKey === "title") {
-        av = a.title.toLocaleLowerCase("tr");
-        bv = b.title.toLocaleLowerCase("tr");
+        const av = a.title.toLocaleLowerCase("tr");
+        const bv = b.title.toLocaleLowerCase("tr");
+        if (av < bv) return sortDir === "asc" ? -1 : 1;
+        if (av > bv) return sortDir === "asc" ? 1 : -1;
+        return 0;
       } else {
-        av = a.sortOrder ?? 0;
-        bv = b.sortOrder ?? 0;
+        const av = a.sortOrder ?? 0;
+        const bv = b.sortOrder ?? 0;
+        if (av < bv) return sortDir === "asc" ? -1 : 1;
+        if (av > bv) return sortDir === "asc" ? 1 : -1;
+        return 0;
       }
-      if (av < bv) return sortDir === "asc" ? -1 : 1;
-      if (av > bv) return sortDir === "asc" ? 1 : -1;
-      return 0;
     });
     return next;
   }, [items, sortDir, sortKey]);

@@ -50,7 +50,15 @@ export async function uploadToCloudinary(opts: {
   const folder = isVideo ? "samet-alp/videos" : "samet-alp/images";
   const publicId = `${folder}/${crypto.randomUUID()}`;
 
-  const res = await new Promise<any>((resolve, reject) => {
+  type CloudinaryEagerItem = { secure_url?: string };
+  type CloudinaryUploadApiResponse = {
+    secure_url?: string;
+    public_id?: string;
+    resource_type?: "image" | "video" | "raw";
+    eager?: CloudinaryEagerItem[];
+  };
+
+  const res = await new Promise<CloudinaryUploadApiResponse>((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder,
@@ -75,7 +83,7 @@ export async function uploadToCloudinary(opts: {
       },
       (error, result) => {
         if (error) reject(error);
-        else resolve(result);
+        else resolve((result ?? {}) as CloudinaryUploadApiResponse);
       },
     );
     stream.end(opts.buffer);

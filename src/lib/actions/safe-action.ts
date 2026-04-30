@@ -17,6 +17,12 @@ type ActionCtx = {
   actor?: string;
 };
 
+function actorFromAuthorizeResult(v: unknown): string | undefined {
+  if (!v || typeof v !== "object") return undefined;
+  const actor = (v as Record<string, unknown>).actor;
+  return typeof actor === "string" ? actor : undefined;
+}
+
 export class ActionError extends Error {
   userMessage: string;
   constructor(userMessage: string) {
@@ -55,7 +61,7 @@ export function createSafeAction<TSchema extends z.ZodTypeAny, TData, TFieldErro
     try {
       if (opts.authorize) {
         const authz = await opts.authorize();
-        actor = (authz as any)?.actor;
+        actor = actorFromAuthorizeResult(authz);
       }
     } catch (e) {
       if (e instanceof Error && e.message === "RATE_LIMITED") {

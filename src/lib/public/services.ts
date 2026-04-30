@@ -47,8 +47,16 @@ function toPublicService(row: {
   const faqRaw = safeParseJson<Array<Record<string, unknown>>>(row.faq, []);
   const faq = faqRaw
     .map((x) => ({
-      question: String((x as any).question ?? (x as any).q ?? "").trim(),
-      answer: String((x as any).answer ?? (x as any).a ?? "").trim(),
+      question: String(
+        (typeof (x as Record<string, unknown>).question === "string" && (x as Record<string, unknown>).question) ||
+          (typeof (x as Record<string, unknown>).q === "string" && (x as Record<string, unknown>).q) ||
+          "",
+      ).trim(),
+      answer: String(
+        (typeof (x as Record<string, unknown>).answer === "string" && (x as Record<string, unknown>).answer) ||
+          (typeof (x as Record<string, unknown>).a === "string" && (x as Record<string, unknown>).a) ||
+          "",
+      ).trim(),
     }))
     .filter((x) => x.question.length > 0 || x.answer.length > 0);
 

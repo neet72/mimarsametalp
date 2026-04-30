@@ -44,14 +44,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       type: "website",
       locale: "tr_TR",
-      title: `${title} · Samet Alp Mimarlık`,
+      title: `${title} | Samet Alp Mimarlık`,
       description,
       url: `/hizmetlerimiz/${service.slug}`,
       images: img ? [{ url: img }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title: `${title} · Samet Alp Mimarlık`,
+      title: `${title} | Samet Alp Mimarlık`,
       description,
       images: img ? [img] : undefined,
     },

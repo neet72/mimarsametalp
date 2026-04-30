@@ -144,8 +144,7 @@ export default function ProjectForm({
           const res = mode === "create" ? await createProject(fd) : await updateProject(fd);
           if (!res.ok) {
             setError(res.error ?? "İşlem başarısız.");
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const fe = (res as any).fieldErrors as Record<string, string[] | undefined> | undefined;
+            const fe = "fieldErrors" in res ? (res.fieldErrors as Record<string, string[] | undefined> | undefined) : undefined;
             if (fe) {
               const cleaned: Record<string, string[]> = {};
               for (const [k, v] of Object.entries(fe)) {

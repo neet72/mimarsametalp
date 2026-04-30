@@ -172,7 +172,7 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
                 >
                   <Image
                     src={src}
-                    alt={`${project.title} · ${locale === "en" ? "Gallery image" : "Galeri görseli"} ${index + 1}`}
+                    alt={`${project.title} | ${locale === "en" ? "Gallery image" : "Galeri görseli"} ${index + 1}`}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover object-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02]"
