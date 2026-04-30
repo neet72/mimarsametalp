@@ -14,6 +14,7 @@ export default function ContactPageEn() {
   return (
     <>
       <script
+        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Home", path: "/en" },

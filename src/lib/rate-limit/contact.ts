@@ -1,7 +1,7 @@
 import { rateLimit } from "@/lib/security/rate-limit";
 
 const WINDOW_MS = 60_000;
-const MAX_REQUESTS = 5;
+const MAX_REQUESTS = 3;
 
 export function checkContactRateLimit(ip: string): { ok: true } | { ok: false; retryAfterSec: number } {
   const rl = rateLimit(`contact:${ip}`, MAX_REQUESTS, WINDOW_MS);

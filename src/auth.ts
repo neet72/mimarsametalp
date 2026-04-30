@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import authConfig from "./auth.config";
 import { rateLimit } from "@/lib/security/rate-limit";
+import { logger } from "@/lib/observability/logger";
 
 function stripEnvQuotes(value: string): string {
   const t = value.trim();
@@ -26,13 +27,19 @@ function resolveAdminPasswordHash(): string | null {
     } catch {
       /* ignore */
     }
-    console.error("[auth] ADMIN_PASSWORD_HASH_B64 geçersiz (base64 veya bcrypt formatı).");
+    logger.error({
+      msg: "ADMIN_PASSWORD_HASH_B64 geçersiz (base64 veya bcrypt formatı).",
+      scope: "auth.env",
+    });
     return null;
   }
 
   const raw = process.env.ADMIN_PASSWORD_HASH?.trim();
   if (!raw) {
-    console.error("[auth] ADMIN_PASSWORD_HASH_B64 veya ADMIN_PASSWORD_HASH tanımlı değil.");
+    logger.error({
+      msg: "ADMIN_PASSWORD_HASH_B64 veya ADMIN_PASSWORD_HASH tanımlı değil.",
+      scope: "auth.env",
+    });
     return null;
   }
   return stripEnvQuotes(raw);
@@ -41,6 +48,41 @@ function resolveAdminPasswordHash(): string | null {
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
   secret: process.env.AUTH_SECRET ?? authConfig.secret,
+  useSecureCookies: process.env.NODE_ENV === "production",
+  cookies: (() => {
+    const secure = process.env.NODE_ENV === "production";
+    const cookiePrefix = secure ? "__Secure-" : "";
+    const hostPrefix = secure ? "__Host-" : "";
+    return {
+      sessionToken: {
+        name: `${cookiePrefix}authjs.session-token`,
+        options: {
+          httpOnly: true,
+          sameSite: "strict",
+          path: "/",
+          secure,
+        },
+      },
+      csrfToken: {
+        name: `${hostPrefix}authjs.csrf-token`,
+        options: {
+          httpOnly: true,
+          sameSite: "strict",
+          path: "/",
+          secure,
+        },
+      },
+      callbackUrl: {
+        name: `${cookiePrefix}authjs.callback-url`,
+        options: {
+          httpOnly: true,
+          sameSite: "strict",
+          path: "/",
+          secure,
+        },
+      },
+    };
+  })(),
   providers: [
     Credentials({
       id: "credentials",
@@ -75,7 +117,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             email: adminEmail,
           };
         } catch (e) {
-          console.error("[auth] authorize:", e);
+          logger.error({
+            msg: "authorize failed",
+            scope: "auth.authorize",
+            error: e instanceof Error ? { name: e.name, message: e.message, stack: e.stack } : String(e),
+          });
           return null;
         }
       },

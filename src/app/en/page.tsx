@@ -5,6 +5,7 @@ import { ServicesSection } from "@/components/home/ServicesSection";
 import { VisionIntro } from "@/components/home/VisionIntro";
 import { SocialGallery } from "@/components/home/SocialGallery";
 import { pageMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
 export const metadata: Metadata = pageMetadata({
   title: "Home",
@@ -16,6 +17,14 @@ export const metadata: Metadata = pageMetadata({
 export default function HomePageEn() {
   return (
     <>
+      <script
+        key="jsonld-breadcrumb"
+        {...jsonLdScriptProps(
+          breadcrumbJsonLd([
+            { name: "Home", path: "/en" },
+          ]),
+        )}
+      />
       <CinematicScrollHero />
       <div id="home-content-start" aria-hidden className="h-px w-full" />
       <VisionIntro />

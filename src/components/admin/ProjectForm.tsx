@@ -57,7 +57,7 @@ export default function ProjectForm({
   const [location, setLocation] = useState(project?.location ?? "");
   const [areaM2, setAreaM2] = useState(project?.areaM2 ? String(project.areaM2) : "");
   const [imageUrlsRaw, setImageUrlsRaw] = useState(
-    project?.imageUrls ? formatImageUrls(project.imageUrls) : "/images/hero-1.webp",
+    project?.imageUrls ? formatImageUrls(project.imageUrls) : "",
   );
   const [published, setPublished] = useState(project?.published ?? false);
   const [sortOrder, setSortOrder] = useState(String(project?.sortOrder ?? 0));
@@ -100,14 +100,21 @@ export default function ProjectForm({
         fd.set("file", f);
         const json = await uploadAdminMedia(fd);
         if (!json.ok || !json.data?.url) {
-          const msg = json.ok ? "Yükleme başarısız." : json.error;
+          const fieldMsg =
+            !json.ok && json.fieldErrors && "file" in json.fieldErrors
+              ? (json.fieldErrors as Record<string, string[] | undefined>).file?.[0]
+              : undefined;
+          const msg = json.ok ? "Yükleme başarısız." : fieldMsg || json.error;
           throw new Error(msg || "Yükleme başarısız.");
         }
         urls.push(json.data.url);
       }
       setImageUrlsRaw((prev) => {
         const current = parseLines(prev);
-        return toLines([...current, ...urls]);
+        const isPlaceholderOnly =
+          current.length === 1 && (current[0] === "/images/hero-1.webp" || current[0].endsWith("/images/hero-1.webp"));
+        const base = current.length === 0 || isPlaceholderOnly ? [] : current;
+        return toLines([...base, ...urls]);
       });
     } catch (e) {
       setUploadError(e instanceof Error ? e.message : "Yükleme başarısız.");

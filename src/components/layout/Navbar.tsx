@@ -174,7 +174,7 @@ export function Navbar() {
       <div className={cn(shellClass, "relative z-[120]")}>
         <Link
           href={withLocalePath("/", locale)}
-          className="touch-manipulation min-w-0 max-md:max-w-[calc(100%-7rem)] max-md:truncate py-2 font-display text-[0.6875rem] font-semibold uppercase leading-tight tracking-[0.22em] text-primary transition-colors hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:py-0 sm:text-[0.75rem] sm:tracking-[0.24em] md:max-w-none md:justify-self-start md:overflow-visible md:whitespace-normal md:text-[0.8125rem] md:tracking-[0.26em]"
+          className="touch-manipulation min-w-0 max-md:max-w-[calc(100%-7rem)] max-md:truncate py-2 font-display text-[0.6875rem] font-semibold uppercase leading-tight tracking-[0.24em] text-primary transition-colors hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:py-0 sm:text-[0.75rem] sm:tracking-[0.26em] md:max-w-none md:justify-self-start md:overflow-visible md:whitespace-normal md:text-[0.8125rem] md:tracking-[0.3em]"
         >
           Samet Alp Mimarlık
         </Link>
@@ -183,16 +183,21 @@ export function Navbar() {
           aria-label="Ana menü"
           className="hidden min-w-0 md:flex md:items-center md:justify-center md:justify-self-center md:px-6 lg:px-10 xl:px-14"
         >
-          <div className="flex items-center gap-6 md:gap-8 lg:gap-10 xl:gap-12">
-            {navItems.map((item) => {
-              const href = withLocalePath(item.href, locale);
-              const active = pathname === href;
-              return (
-                <NavUnderlineLink key={item.href} href={href} active={active}>
-                  {item.label}
-                </NavUnderlineLink>
-              );
-            })}
+          {/* Keep a stable wrapper to avoid dev hydration mismatch on tag swaps. */}
+          <div className="flex items-center">
+            <ul className="flex items-center gap-8 md:gap-10 lg:gap-12 xl:gap-14">
+              {navItems.map((item) => {
+                const href = withLocalePath(item.href, locale);
+                const active = pathname === href;
+                return (
+                  <li key={item.href}>
+                    <NavUnderlineLink href={href} active={active}>
+                      {item.label}
+                    </NavUnderlineLink>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </nav>
 
@@ -295,7 +300,7 @@ export function Navbar() {
                 aria-label="Mobil sayfa bağlantıları"
                 className="flex min-h-0 flex-1 flex-col items-center justify-start gap-2 overflow-y-auto px-6 py-10 [-webkit-overflow-scrolling:touch] sm:px-8"
               >
-                <motion.div
+                <motion.ul
                   className="w-full max-w-md space-y-2"
                   variants={reduceMotion ? undefined : mobileList}
                   initial={reduceMotion ? undefined : "hidden"}
@@ -305,7 +310,7 @@ export function Navbar() {
                     const href = withLocalePath(item.href, locale);
                     const active = pathname === href;
                     return (
-                      <motion.div key={item.href} variants={reduceMotion ? undefined : mobileItem}>
+                      <motion.li key={item.href} variants={reduceMotion ? undefined : mobileItem}>
                         <Link
                           href={href}
                           className={cn(
@@ -317,10 +322,10 @@ export function Navbar() {
                         >
                           {item.label}
                         </Link>
-                      </motion.div>
+                      </motion.li>
                     );
                   })}
-                </motion.div>
+                </motion.ul>
               </nav>
             </motion.div>
           </motion.div>

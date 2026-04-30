@@ -8,6 +8,41 @@ import { isAdminEmail } from "@/lib/security/admin";
 export default {
   trustHost: true,
   secret: process.env.AUTH_SECRET,
+  useSecureCookies: process.env.NODE_ENV === "production",
+  cookies: (() => {
+    const secure = process.env.NODE_ENV === "production";
+    const cookiePrefix = secure ? "__Secure-" : "";
+    const hostPrefix = secure ? "__Host-" : "";
+    return {
+      sessionToken: {
+        name: `${cookiePrefix}authjs.session-token`,
+        options: {
+          httpOnly: true,
+          sameSite: "strict",
+          path: "/",
+          secure,
+        },
+      },
+      csrfToken: {
+        name: `${hostPrefix}authjs.csrf-token`,
+        options: {
+          httpOnly: true,
+          sameSite: "strict",
+          path: "/",
+          secure,
+        },
+      },
+      callbackUrl: {
+        name: `${cookiePrefix}authjs.callback-url`,
+        options: {
+          httpOnly: true,
+          sameSite: "strict",
+          path: "/",
+          secure,
+        },
+      },
+    };
+  })(),
   providers: [
     Credentials({
       id: "credentials",

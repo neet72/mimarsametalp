@@ -156,20 +156,20 @@ export function AdminProjectsTableClient({ items }: { items: Row[] }) {
               </td>
               <td className="px-4 py-3 text-right">
                 <ActionMenu label="Proje aksiyonları">
-                  <Link href={`/admin/projects/${p.id}/edit`} className="block">
+                  <Link key="edit" href={`/admin/projects/${p.id}/edit`} className="block">
                     <ActionMenuItem>
                       <Pencil className="h-4 w-4 text-zinc-300" aria-hidden />
                       Düzenle
                     </ActionMenuItem>
                   </Link>
-                  <a href={`/projeler/${p.slug}`} target="_blank" rel="noreferrer" className="block">
+                  <a key="public" href={`/projeler/${p.slug}`} target="_blank" rel="noreferrer" className="block">
                     <ActionMenuItem>
                       <ExternalLink className="h-4 w-4 text-zinc-300" aria-hidden />
                       Public’te gör
                     </ActionMenuItem>
                   </a>
-                  <div className="border-t border-zinc-800" />
-                  <div className="px-3 py-2">
+                  <div key="divider" className="border-t border-zinc-800" />
+                  <div key="delete" className="px-3 py-2">
                     <div className="flex items-center gap-2 text-xs font-semibold text-red-300">
                       <Trash2 className="h-4 w-4" aria-hidden />
                       Sil

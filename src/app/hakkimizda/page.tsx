@@ -14,6 +14,7 @@ export default function HakkimizdaPage() {
   return (
     <>
       <script
+        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Ana Sayfa", path: "/" },

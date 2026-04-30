@@ -7,8 +7,15 @@ const services =
 const address =
   "Güzelevler Mahallesi 2067/2 Sokak A blok No: 32/2 Adana / Türkiye";
 
-export function Footer() {
+export function Footer({ locale = "tr" }: { locale?: "tr" | "en" }) {
   const year = new Date().getFullYear();
+  const t = locale === "en";
+  const servicesText = t
+    ? "Architecture, Interior Architecture, Decoration, Turnkey Projects, Architectural Consulting, Renovation & Remodeling"
+    : services;
+  const addressText = t
+    ? "Güzelevler District, 2067/2 Street A Block No: 32/2, Adana / Türkiye"
+    : address;
   return (
     <footer className="mt-auto border-t border-border bg-surface pb-[max(0px,env(safe-area-inset-bottom,0px))]">
       <div className={cn("relative py-10 sm:py-12", pageContainerClass)}>
@@ -17,22 +24,23 @@ export function Footer() {
             <p className="font-display text-lg font-semibold uppercase tracking-[0.14em] text-primary">
               Samet Alp Mimarlık
             </p>
-            <p className="max-w-sm text-sm leading-relaxed text-muted">{services}</p>
+            <p className="max-w-sm text-sm leading-relaxed text-muted">{servicesText}</p>
           </div>
           <div className="space-y-3">
             <h2 className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-              Konum
+              {t ? "Location" : "Konum"}
             </h2>
-            <p className="text-sm leading-relaxed text-muted">{address}</p>
+            <p className="text-sm leading-relaxed text-muted">{addressText}</p>
           </div>
           <div className="space-y-3">
             <h2 className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-              İletişim
+              {t ? "Contact" : "İletişim"}
             </h2>
             <ul className="space-y-2 text-sm text-muted">
               <li>
                 <a
                   href="mailto:info@mimarsametalp.com"
+                  title={t ? "Send email: info@mimarsametalp.com" : "E-posta gönder: info@mimarsametalp.com"}
                   className="touch-manipulation inline-flex min-h-[44px] items-center py-1 transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-h-0"
                 >
                   info@mimarsametalp.com
@@ -41,6 +49,7 @@ export function Footer() {
               <li>
                 <a
                   href="tel:+905414267644"
+                  title={t ? "Call: 0 (541) 426 76 44" : "Telefon ile ara: 0 (541) 426 76 44"}
                   className="touch-manipulation inline-flex min-h-[44px] items-center py-1 transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-h-0"
                 >
                   0 (541) 426 76 44
@@ -51,6 +60,7 @@ export function Footer() {
                   href="https://wa.me/905414267644?text=Merhaba%20Samet%20Alp%20Mimarl%C4%B1k%2C%20bilgi%20almak%20istiyorum."
                   target="_blank"
                   rel="noopener noreferrer"
+                  title={t ? "Message on WhatsApp" : "WhatsApp üzerinden yaz"}
                   className="touch-manipulation inline-flex min-h-[44px] items-center py-1 font-medium transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-h-0"
                 >
                   WhatsApp
@@ -61,6 +71,7 @@ export function Footer() {
                   href="https://www.linkedin.com/in/samet-alp-714851232/"
                   target="_blank"
                   rel="noopener noreferrer"
+                  title={t ? "Open LinkedIn profile" : "LinkedIn profilini aç"}
                   className="touch-manipulation inline-flex min-h-[44px] items-center py-1 font-medium transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-h-0"
                 >
                   LinkedIn
@@ -92,7 +103,7 @@ export function Footer() {
 
         <div className="mt-8 border-t border-border/60 pt-6 text-center">
           <p className="text-xs tracking-wide text-muted">
-            © {year} Samet Alp Mimarlık. Tüm hakları saklıdır.
+            © {year} Samet Alp Mimarlık. {t ? "All rights reserved." : "Tüm hakları saklıdır."}
           </p>
         </div>
       </div>

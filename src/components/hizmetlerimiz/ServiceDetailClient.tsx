@@ -263,12 +263,14 @@ export function ServiceDetailClient({ service }: Props) {
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
             <Link
               href={withLocalePath("/iletisim", locale)}
+              title={locale === "en" ? "Go to contact page" : "İletişim sayfasına git"}
               className="inline-flex w-full shrink-0 items-center justify-center rounded-xl bg-primary px-7 py-4 font-display text-sm font-semibold uppercase tracking-[0.22em] text-white transition-colors hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:w-auto"
             >
               {locale === "en" ? "Contact" : "İletişime Geç"}
             </Link>
             <Link
               href={withLocalePath("/projeler", locale)}
+              title={locale === "en" ? "View projects" : "Projeleri görüntüle"}
               className="inline-flex w-full shrink-0 items-center justify-center rounded-xl border border-border bg-white px-7 py-4 font-display text-sm font-semibold uppercase tracking-[0.22em] text-primary transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:w-auto"
             >
               {locale === "en" ? "View Projects" : "Projeleri Gör"}

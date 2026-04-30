@@ -57,6 +57,7 @@ export default async function ProjeDetayPage({ params }: PageProps) {
   return (
     <>
       <script
+        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Ana Sayfa", path: "/" },
@@ -66,6 +67,7 @@ export default async function ProjeDetayPage({ params }: PageProps) {
         )}
       />
       <script
+        key="jsonld-project"
         {...jsonLdScriptProps(
           projectJsonLd({
             name: project.title,

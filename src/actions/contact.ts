@@ -48,6 +48,16 @@ export async function submitContactForm(data: unknown): Promise<ContactSubmitRes
     };
   }
 
+  // Honeypot: bots fill hidden field. We respond "success" but drop the request.
+  if (parsed.data.company && parsed.data.company.trim().length > 0) {
+    logger.info({
+      msg: "honeypot triggered; dropping contact submit",
+      scope: "public.contact.honeypot",
+      ipHash: ip !== "unknown" ? hashIp(ip) : null,
+    });
+    return { ok: true, message: "Mesajınız alındı. En kısa sürede size dönüş yapacağız." };
+  }
+
   const emailResult = await sendContactNotification({
     firstName: parsed.data.firstName,
     lastName: parsed.data.lastName,

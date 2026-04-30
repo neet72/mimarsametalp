@@ -102,17 +102,50 @@ export function websiteJsonLd(input?: { inLanguage?: string; path?: `/${string}`
   } satisfies JsonLd;
 }
 
-export function breadcrumbJsonLd(items: Array<{ name: string; path: `/${string}` }>) {
+export function siteNavigationJsonLd(input: {
+  inLanguage: string;
+  pathPrefix?: "" | "/en";
+}) {
+  const base = getSiteUrl();
+  const p = input.pathPrefix ?? "";
+  const items = [
+    { name: input.inLanguage.startsWith("en") ? "Home" : "Ana Sayfa", path: `${p || "/"}` },
+    { name: input.inLanguage.startsWith("en") ? "Projects" : "Projeler", path: `${p}/projeler` },
+    { name: input.inLanguage.startsWith("en") ? "Services" : "Hizmetlerimiz", path: `${p}/hizmetlerimiz` },
+    { name: input.inLanguage.startsWith("en") ? "About" : "Hakkımızda", path: `${p}/hakkimizda` },
+    { name: input.inLanguage.startsWith("en") ? "Contact" : "İletişim", path: `${p}/iletisim` },
+  ].map((it) => ({
+    "@type": "SiteNavigationElement",
+    name: it.name,
+    url: `${base}${it.path === "/" ? "" : it.path}`,
+  }));
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: input.inLanguage.startsWith("en") ? "Site Navigation" : "Site Navigasyonu",
+    inLanguage: input.inLanguage,
+    itemListElement: items,
+  } satisfies JsonLd;
+}
+
+export function breadcrumbJsonLd(
+  items: Array<{ name: string; url: string } | { name: string; path: `/${string}` }>,
+) {
   const base = getSiteUrl();
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: items.map((it, idx) => ({
+    itemListElement: items.map((it, idx) => {
+      const raw = "url" in it ? it.url : it.path;
+      const url = raw.startsWith("http") ? raw : `${base}${raw}`;
+      return {
       "@type": "ListItem",
       position: idx + 1,
       name: it.name,
-      item: `${base}${it.path}`,
-    })),
+        item: url,
+      };
+    }),
   } satisfies JsonLd;
 }
 

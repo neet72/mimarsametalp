@@ -10,8 +10,30 @@ import {
 import { useEffect } from "react";
 import { ProjectCard } from "./ProjectCard";
 import { fadeUpSoft } from "@/lib/motion";
+import { usePathname } from "next/navigation";
+import { localeFromPathname } from "@/lib/locale";
 
 const ease = [0.22, 1, 0.36, 1] as const;
+
+const cardReveal: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 34,
+    rotate: -0.35,
+    scale: 0.985,
+    filter: "blur(10px)",
+    clipPath: "inset(10% 12% 18% 12% round 16px)",
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+    rotate: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    clipPath: "inset(0% 0% 0% 0% round 16px)",
+    transition: { duration: 0.82, ease },
+  },
+};
 
 const headerContainer: Variants = {
   hidden: {},
@@ -51,6 +73,8 @@ export type ProjectsPortfolioProject = {
 
 export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioProject[] }) {
   const reduceMotion = useReducedMotion();
+  const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
 
   useEffect(() => {
     if (reduceMotion) return;
@@ -80,7 +104,12 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
     };
   }, [reduceMotion]);
 
-  const title = "Projeler";
+  const title = locale === "en" ? "Projects" : "Projeler";
+  const kicker = locale === "en" ? "PORTFOLIO" : "PORTFOLYO";
+  const description =
+    locale === "en"
+      ? "A curated selection of architectural and interior projects. Residential, commercial, and transformation works—from concept to execution."
+      : "Seçili mimari ve iç mekân çalışmalarımızdan oluşan portfolyo seçkisi. Konut, ticari ve dönüşüm projelerinde tasarım ve uygulama süreçlerimizden örnekler.";
 
   return (
     <div className="relative w-full overflow-hidden bg-surface">
@@ -100,7 +129,7 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
             variants={headerItem}
             className="font-display text-[11px] font-semibold uppercase tracking-[0.32em] text-primary/55 sm:text-xs sm:tracking-[0.34em]"
           >
-            PORTFOLYO
+            {kicker}
           </motion.p>
 
           <motion.h1
@@ -124,9 +153,7 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
             variants={reduceMotion ? headerItem : fadeUpSoft}
             className="mt-6 max-w-3xl text-pretty text-lg leading-relaxed text-primary/65 sm:text-xl sm:leading-relaxed md:text-2xl md:leading-relaxed"
           >
-            Seçili mimari ve iç mekân çalışmalarımızdan oluşan portfolyo seçkisi.
-            Konut, ticari ve dönüşüm projelerinde tasarım ve uygulama süreçlerimizden
-            örnekler.
+            {description}
           </motion.p>
         </motion.header>
 
@@ -134,21 +161,13 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
           {projects.map((project, index) => (
             <motion.div
               key={project.slug}
-              initial={
-                reduceMotion
-                  ? false
-                  : { opacity: 0, y: 28, filter: "blur(6px)" }
-              }
-              whileInView={
-                reduceMotion
-                  ? undefined
-                  : { opacity: 1, y: 0, filter: "blur(0px)" }
-              }
-              viewport={{ once: false, margin: "0px 0px -12% 0px" }}
+              variants={reduceMotion ? undefined : cardReveal}
+              initial={reduceMotion ? false : "hidden"}
+              whileInView={reduceMotion ? undefined : "show"}
+              viewport={{ once: false, margin: "0px 0px -12% 0px", amount: 0.14 }}
               transition={{
-                delay: reduceMotion ? 0 : Math.min(index * 0.07, 0.42),
-                duration: 0.68,
-                ease,
+                // Awwwards-like domino timing
+                delay: reduceMotion ? 0 : Math.min(index * 0.08, 0.64),
               }}
             >
               <ProjectCard project={project} index={index} />

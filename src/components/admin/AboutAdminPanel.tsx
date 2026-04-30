@@ -65,7 +65,8 @@ export function AboutAdminPanel({
     if (!json.ok || !json.data?.url) {
       throw new Error("Yükleme başarısız.");
     }
-    setDraft((v) => ({ ...v, portraitImageUrl: json.data?.url ?? "" }));
+    // `json.data` is narrowed by the guard above.
+    setDraft((v) => ({ ...v, portraitImageUrl: json.data!.url ?? "" }));
   }
 
   return (

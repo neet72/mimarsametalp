@@ -3,6 +3,7 @@ import "server-only";
 import { render } from "@react-email/render";
 import { Resend } from "resend";
 import ContactFormEmail from "@/emails/ContactFormEmail";
+import { logger } from "@/lib/observability/logger";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -17,9 +18,10 @@ export async function sendContactNotification(input: {
 }): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!resend) {
     if (process.env.NODE_ENV === "development") {
-      console.warn(
-        "[email] RESEND_API_KEY tanımlı değil; geliştirme modunda e-posta atlanıyor.",
-      );
+      logger.warn({
+        msg: "RESEND_API_KEY tanımlı değil; geliştirme modunda e-posta atlanıyor.",
+        scope: "email.resend",
+      });
       return { ok: true };
     }
     return { ok: false, error: "E-posta sunucusu yapılandırılmamış." };
@@ -46,12 +48,16 @@ export async function sendContactNotification(input: {
   });
 
   if (error) {
-    console.error("[email] Resend:", error);
+    logger.error({
+      msg: "resend send failed",
+      scope: "email.resend",
+      error,
+    });
     return { ok: false, error: "E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin." };
   }
 
   if (process.env.NODE_ENV === "development") {
-    console.info("[email] Gönderildi:", data?.id);
+    logger.info({ msg: "email sent", scope: "email.resend", id: data?.id });
   }
 
   return { ok: true };

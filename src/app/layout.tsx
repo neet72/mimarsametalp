@@ -3,7 +3,7 @@ import { Inter, Outfit } from "next/font/google";
 import { headers } from "next/headers";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { metadataBase, siteName } from "@/lib/seo";
-import { jsonLdScriptProps, localBusinessJsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo-jsonld";
+import { jsonLdScriptProps, localBusinessJsonLd, organizationJsonLd, siteNavigationJsonLd, websiteJsonLd } from "@/lib/seo-jsonld";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
@@ -93,15 +93,22 @@ export default async function RootLayout({
 }>) {
   const h = await headers();
   const locale = (h.get("x-locale") ?? "") === "en" ? "en" : "tr";
+  const pathname = h.get("x-pathname") ?? "";
+  const isAdmin = pathname.startsWith("/admin");
   return (
-    <html lang={locale === "en" ? "en" : "tr"} className={`${inter.variable} ${outfit.variable}`}>
+    <html
+      lang={locale === "en" ? "en" : "tr"}
+      data-scroll-behavior="smooth"
+      className={`${inter.variable} ${outfit.variable}`}
+    >
       <body
         className="font-sans [--font-display:var(--font-outfit)] [--font-sans:var(--font-inter)]"
         suppressHydrationWarning
       >
-        <script {...jsonLdScriptProps(organizationJsonLd())} />
-        <script {...jsonLdScriptProps(localBusinessJsonLd())} />
+        <script key="jsonld-org" {...jsonLdScriptProps(organizationJsonLd())} />
+        <script key="jsonld-local" {...jsonLdScriptProps(localBusinessJsonLd())} />
         <script
+          key="jsonld-website"
           {...jsonLdScriptProps(
             websiteJsonLd({
               inLanguage: locale === "en" ? "en-US" : "tr-TR",
@@ -109,8 +116,20 @@ export default async function RootLayout({
             }),
           )}
         />
-        <MainLayout>{children}</MainLayout>
-        <Analytics />
+        <script
+          key="jsonld-nav"
+          {...jsonLdScriptProps(
+            siteNavigationJsonLd({
+              inLanguage: locale === "en" ? "en-US" : "tr-TR",
+              pathPrefix: locale === "en" ? "/en" : "",
+            }),
+          )}
+        />
+        <MainLayout key="main-layout" locale={locale}>
+          {children}
+        </MainLayout>
+        {/* Avoid dev key warnings inside analytics overlay on admin routes */}
+        {isAdmin ? null : <Analytics key="analytics" />}
       </body>
     </html>
   );

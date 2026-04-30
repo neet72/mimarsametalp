@@ -121,6 +121,10 @@ export async function updateProject(formData: FormData) {
       const slug = (input.slug && input.slug.length > 0 ? input.slug : slugify(input.title)).toLowerCase();
 
       try {
+        const prev = await prisma.project.findUnique({
+          where: { id: input.id },
+          select: { slug: true },
+        });
         await prisma.project.update({
           where: { id: input.id },
           data: {
@@ -138,6 +142,15 @@ export async function updateProject(formData: FormData) {
           },
           select: { id: true },
         });
+
+        // Revalidate both previous and current slugs (slug may change).
+        const prevSlug = prev?.slug;
+        const slugs = Array.from(new Set([prevSlug, slug].filter(Boolean))) as string[];
+        for (const s of slugs) {
+          revalidateTag(`public-project:${s}`);
+          revalidatePath(`/projeler/${s}`);
+          revalidatePath(`/en/projeler/${s}`);
+        }
       } catch (e) {
         logger.warn({
           msg: "project update failed",
@@ -159,8 +172,8 @@ export async function updateProject(formData: FormData) {
       revalidatePath("/admin/projects");
       revalidatePath(`/admin/projects/${input.id}/edit`);
       revalidatePath("/projeler");
+      revalidatePath("/en/projeler");
       revalidateTag("public-projects");
-      revalidateTag(`public-project:${slug}`);
       return undefined;
     },
   });

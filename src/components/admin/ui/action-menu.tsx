@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { Children, Fragment, isValidElement, useEffect, useId, useRef, useState } from "react";
 import { MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -62,7 +62,10 @@ export function ActionMenu({
           )}
           onClick={() => setOpen(false)}
         >
-          {children}
+          {Children.toArray(children).map((child, idx) => {
+            const k = isValidElement(child) ? child.key : null;
+            return <Fragment key={k ?? `m-${idx}`}>{child}</Fragment>;
+          })}
         </div>
       ) : null}
     </div>

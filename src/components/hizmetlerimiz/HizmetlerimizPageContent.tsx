@@ -17,17 +17,27 @@ const ease = [0.22, 1, 0.36, 1] as const;
 const gridContainer: Variants = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.18, delayChildren: 0.08 },
+    transition: { staggerChildren: 0.12, delayChildren: 0.05 },
   },
 };
 
 const cardItem: Variants = {
-  hidden: { opacity: 0, y: 28, filter: "blur(6px)" },
+  hidden: {
+    opacity: 0,
+    y: 34,
+    rotate: -0.35,
+    scale: 0.985,
+    filter: "blur(10px)",
+    clipPath: "inset(10% 12% 18% 12% round 18px)",
+  },
   visible: {
     opacity: 1,
     y: 0,
+    rotate: 0,
+    scale: 1,
     filter: "blur(0px)",
-    transition: { duration: 0.7, ease },
+    clipPath: "inset(0% 0% 0% 0% round 18px)",
+    transition: { duration: 0.78, ease },
   },
 };
 
@@ -142,6 +152,7 @@ export function HizmetlerimizPageContent() {
               key={service.title}
               variants={itemVariants}
               className="min-w-0 w-full max-w-full"
+              transition={reduceMotion ? undefined : { delay: Math.min(index * 0.06, 0.36) }}
             >
               <HizmetCard index={index} />
             </motion.div>

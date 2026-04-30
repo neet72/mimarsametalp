@@ -65,6 +65,7 @@ export default async function HizmetDetayPage({ params }: PageProps) {
   return (
     <>
       <script
+        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Ana Sayfa", path: "/" },
@@ -74,6 +75,7 @@ export default async function HizmetDetayPage({ params }: PageProps) {
         )}
       />
       <script
+        key="jsonld-service"
         {...jsonLdScriptProps(
           serviceJsonLd({
             name: service.name,

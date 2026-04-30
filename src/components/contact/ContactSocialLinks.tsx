@@ -77,6 +77,7 @@ export function ContactSocialLinks() {
               href={href}
               target="_blank"
               rel="noopener noreferrer"
+              title={label}
               className={cn(
                 "group relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full",
                 "border border-border/80 bg-surface/60 text-primary/65 shadow-sm backdrop-blur-sm",

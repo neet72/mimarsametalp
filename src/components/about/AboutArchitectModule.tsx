@@ -6,6 +6,7 @@ import {
   useReducedMotion,
   useScroll,
   useTransform,
+  type Variants,
 } from "framer-motion";
 import { useRef } from "react";
 import {
@@ -25,6 +26,26 @@ import { localeFromPathname } from "@/lib/locale";
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const PORTRAIT_SRC = "/images/samet-alp-portrait.jpg";
+
+const portraitReveal = {
+  hidden: {
+    opacity: 0,
+    y: 18,
+    rotate: -0.35,
+    scale: 0.985,
+    filter: "blur(10px)",
+    clipPath: "inset(10% 12% 18% 12% round 10px)",
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+    rotate: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    clipPath: "inset(0% 0% 0% 0% round 10px)",
+    transition: { duration: 0.86, ease },
+  },
+} satisfies Record<"hidden" | "show", Record<string, unknown>>;
 
 export function AboutArchitectModule() {
   const reduceMotion = useReducedMotion();
@@ -65,6 +86,10 @@ export function AboutArchitectModule() {
             <motion.div
               className="relative mx-auto aspect-[3/4] max-w-md overflow-hidden rounded-md bg-border/35 shadow-[var(--shadow-card)] lg:mx-0 lg:max-w-none"
               style={{ y: frameParallaxY }}
+              variants={reduceMotion ? undefined : (portraitReveal as Variants)}
+              initial={reduceMotion ? false : "hidden"}
+              whileInView={reduceMotion ? undefined : "show"}
+              viewport={{ once: false, amount: 0.35, margin: "-6% 0px" }}
               whileHover={
                 reduceMotion
                   ? undefined
@@ -78,6 +103,10 @@ export function AboutArchitectModule() {
               <motion.div
                 className="absolute inset-0 will-change-transform"
                 style={{ y: innerImageY }}
+                initial={reduceMotion ? false : { scale: 1.035 }}
+                whileInView={reduceMotion ? undefined : { scale: 1 }}
+                viewport={{ once: false, amount: 0.35, margin: "-6% 0px" }}
+                transition={reduceMotion ? undefined : { duration: 1.05, ease }}
               >
                 <Image
                   src={PORTRAIT_SRC}

@@ -24,6 +24,12 @@ export function ScrollManager() {
     // rAF avoids fighting with layout/transition frames.
     const id = window.requestAnimationFrame(() => {
       window.scrollTo(0, 0);
+      // Some in-view animations can miss the first measurement during soft navigations
+      // (especially on locale switches). Nudge observers on the next frame.
+      window.requestAnimationFrame(() => {
+        window.dispatchEvent(new Event("scroll"));
+        window.dispatchEvent(new Event("resize"));
+      });
     });
     return () => window.cancelAnimationFrame(id);
   }, [pathname]);

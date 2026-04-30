@@ -243,24 +243,28 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
                   href={CONTACT_SOCIAL_WHATSAPP}
                   target="_blank"
                   rel="noopener noreferrer"
+                  title={locale === "en" ? "Open WhatsApp chat" : "WhatsApp sohbetini aç"}
                   className="inline-flex w-full items-center justify-center rounded-xl bg-primary px-5 py-3 font-display text-sm font-semibold uppercase tracking-[0.22em] text-white transition-colors hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                 >
                   {locale === "en" ? "WhatsApp" : "WhatsApp"}
                 </Link>
                 <Link
                   href={withLocalePath("/iletisim", locale)}
+                  title={locale === "en" ? "Go to contact page" : "İletişim sayfasına git"}
                   className="inline-flex w-full items-center justify-center rounded-xl border border-border bg-white px-5 py-3 font-display text-sm font-semibold uppercase tracking-[0.22em] text-primary transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                 >
                   {locale === "en" ? "Get a Quote" : "Teklif Al / İletişim"}
                 </Link>
                 <Link
                   href={withLocalePath("/hizmetlerimiz", locale)}
+                  title={locale === "en" ? "View services" : "Hizmetlerimizi görüntüle"}
                   className="inline-flex w-full items-center justify-center rounded-xl border border-border bg-transparent px-5 py-3 font-display text-xs font-semibold uppercase tracking-[0.22em] text-primary/80 transition-colors hover:border-primary/25 hover:bg-primary/[0.03] hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                 >
                   {locale === "en" ? "View Services" : "Hizmetlerimizi Gör"}
                 </Link>
                 <Link
                   href={withLocalePath("/projeler", locale)}
+                  title={locale === "en" ? "Back to projects" : "Projeler sayfasına dön"}
                   className="inline-flex w-full items-center justify-center rounded-xl border border-border bg-transparent px-5 py-3 font-display text-xs font-semibold uppercase tracking-[0.22em] text-primary/80 transition-colors hover:border-primary/25 hover:bg-primary/[0.03] hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                 >
                   {locale === "en" ? "Back to Projects" : "Projeler Sayfasına Dön"}

@@ -32,10 +32,30 @@ export function AboutSection() {
         <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16 xl:gap-20 2xl:gap-24">
           <motion.div
             className="relative lg:col-span-5"
-            initial={reduceMotion ? false : { opacity: 0, x: xImage, filter: "blur(6px)" }}
-            whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-            viewport={{ once: false, margin: "-10% 0px" }}
-            transition={{ duration: 0.78, ease }}
+            initial={
+              reduceMotion
+                ? false
+                : {
+                    opacity: 0,
+                    x: xImage,
+                    y: 10,
+                    rotate: -0.35,
+                    scale: 0.985,
+                    filter: "blur(10px)",
+                    clipPath: "inset(10% 12% 18% 12% round 20px)",
+                  }
+            }
+            whileInView={{
+              opacity: 1,
+              x: 0,
+              y: 0,
+              rotate: 0,
+              scale: 1,
+              filter: "blur(0px)",
+              clipPath: "inset(0% 0% 0% 0% round 20px)",
+            }}
+            viewport={{ once: false, margin: "-10% 0px", amount: 0.22 }}
+            transition={{ duration: 0.86, ease }}
           >
             <div
               className={cn(
@@ -50,7 +70,7 @@ export function AboutSection() {
                   reduceMotion
                     ? undefined
                     : {
-                        scale: [1.03, 1.06, 1.03],
+                        scale: [1.025, 1.06, 1.025],
                         x: [0, -12, 0],
                         y: [0, 10, 0],
                       }

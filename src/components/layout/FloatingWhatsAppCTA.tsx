@@ -97,6 +97,7 @@ export function FloatingWhatsAppCTA() {
         href={CONTACT_SOCIAL_WHATSAPP}
         target="_blank"
         rel="noopener noreferrer"
+        title="WhatsApp"
         className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-primary px-3 py-2 text-[12px] font-semibold text-surface shadow-[0_14px_50px_-18px_rgb(15_23_42/0.6)] backdrop-blur-sm transition-[transform,box-shadow,background-color] hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_18px_70px_-22px_rgb(15_23_42/0.65)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:gap-3 sm:px-4 sm:py-3 sm:text-sm"
         aria-label="WhatsApp ile iletişime geç"
       >

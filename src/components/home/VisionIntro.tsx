@@ -52,6 +52,7 @@ export function VisionIntro() {
             </Link>
             <Link
               href={withLocalePath("/projeler", locale)}
+              title={locale === "en" ? "Go to projects page" : "Projeler sayfasına git"}
               className="inline-flex min-h-11 min-w-[10.5rem] items-center justify-center rounded-full border border-border bg-transparent px-8 py-2.5 font-display text-[11px] font-medium uppercase tracking-[0.26em] text-primary transition duration-300 hover:border-primary/35 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               {locale === "en" ? "PROJECTS" : "PROJELER"}
