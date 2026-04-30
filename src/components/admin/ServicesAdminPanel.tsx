@@ -80,7 +80,10 @@ function ServiceRow({ row }: { row: Row }) {
       const fd = new FormData();
       fd.set("file", f);
       const json = await uploadAdminMedia(fd);
-      if (!json.ok || !json.data?.url) throw new Error(json.error || "Yükleme başarısız.");
+      if (!json.ok || !json.data?.url) {
+        const msg = json.ok ? "Yükleme başarısız." : json.error;
+        throw new Error(msg || "Yükleme başarısız.");
+      }
       setHeroImageUrl(json.data.url);
     } catch (e) {
       setUploadError(e instanceof Error ? e.message : "Yükleme başarısız.");

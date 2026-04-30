@@ -100,7 +100,8 @@ export default function ProjectForm({
         fd.set("file", f);
         const json = await uploadAdminMedia(fd);
         if (!json.ok || !json.data?.url) {
-          throw new Error(json.error || "Yükleme başarısız.");
+          const msg = json.ok ? "Yükleme başarısız." : json.error;
+          throw new Error(msg || "Yükleme başarısız.");
         }
         urls.push(json.data.url);
       }
