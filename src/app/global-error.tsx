@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
 import { logger } from "@/lib/observability/logger";
 
@@ -36,12 +37,12 @@ export default function GlobalError({
               >
                 Tekrar dene
               </button>
-              <a
+              <Link
                 href="/"
                 className="inline-flex items-center justify-center rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-muted/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 Ana sayfaya dön
-              </a>
+              </Link>
             </div>
           </div>
         </div>

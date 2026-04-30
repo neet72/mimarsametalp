@@ -89,9 +89,15 @@ export function useAdminToast() {
   const ctx = useContext(ToastCtx);
   if (!ctx) {
     return {
-      success: (_: { title: string; description?: string }) => {},
-      error: (_: { title: string; description?: string }) => {},
-      info: (_: { title: string; description?: string }) => {},
+      success: (x: { title: string; description?: string }) => {
+        void x;
+      },
+      error: (x: { title: string; description?: string }) => {
+        void x;
+      },
+      info: (x: { title: string; description?: string }) => {
+        void x;
+      },
     };
   }
   return {

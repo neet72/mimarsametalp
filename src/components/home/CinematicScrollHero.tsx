@@ -68,6 +68,7 @@ export function CinematicScrollHero() {
   const sources = useMemo(() => [...HERO_IMAGES], []);
 
   const [isDragging, setIsDragging] = useState(false);
+  const isDraggingRef = useRef(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const activeSrc = lightboxIndex == null ? null : sources[lightboxIndex];
   const canPrev = lightboxIndex != null && lightboxIndex > 0;
@@ -118,6 +119,10 @@ export function CinematicScrollHero() {
     const idx = Math.max(0, Math.min(n - 1, Math.floor(u * n)));
     setLightboxIndex(idx);
   }, [isDragging, sources.length]);
+
+  useEffect(() => {
+    isDraggingRef.current = isDragging;
+  }, [isDragging]);
 
   useEffect(() => {
     if (lightboxIndex == null) return;
@@ -370,7 +375,7 @@ export function CinematicScrollHero() {
         if (lastSpinMsRef.current == null) lastSpinMsRef.current = nowMs;
         const dt = Math.min(0.05, (nowMs - lastSpinMsRef.current) / 1000);
         lastSpinMsRef.current = nowMs;
-        if (!isDragging && Math.abs(spinVelRef.current) > 0.0005) {
+        if (!isDraggingRef.current && Math.abs(spinVelRef.current) > 0.0005) {
           dragOffsetRadRef.current += spinVelRef.current * dt;
           spinVelRef.current *= Math.pow(0.02, dt); // exponential decay to near-zero in ~1s
         }
@@ -660,7 +665,7 @@ export function CinematicScrollHero() {
             window.setTimeout(() => setIsDragging(false), 120);
           }}
           onClick={() => {
-            if (isDragging) return;
+            if (isDraggingRef.current) return;
             openLightboxFromCurrent();
           }}
         />

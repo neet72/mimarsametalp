@@ -171,7 +171,6 @@ export function ServicesSection() {
                 animate="visible"
               >
                 {loopItems.map((service, index) => {
-                  const href = `/${locale === "en" ? "en/" : ""}hizmetlerimiz/${service.slug}` as const;
                   return (
                     <motion.div
                       key={`${service.slug}-${index}`}
