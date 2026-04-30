@@ -167,7 +167,6 @@ export async function POST(req: Request) {
   const uploaded = await uploadToCloudinary({
     buffer: bytes,
     mimeType: file.type,
-    folder: "samet-alp/media",
     actor: email,
   });
 
