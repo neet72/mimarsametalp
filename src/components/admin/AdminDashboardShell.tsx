@@ -1,5 +1,7 @@
 "use client";
 
+import "@/components/admin/admin-dev-console-filter";
+
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

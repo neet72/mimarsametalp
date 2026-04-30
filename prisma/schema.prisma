@@ -22,7 +22,7 @@ model Project {
   location    String?
   areaM2      Int?
   /// JSON dizi: ["https://.../a.webp","..."]
-  imageUrls   String   @default("[]")
+  imageUrls   String   @db.LongText @default("[]")
   published   Boolean  @default(false)
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())

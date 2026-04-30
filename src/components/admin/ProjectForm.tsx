@@ -114,7 +114,8 @@ export default function ProjectForm({
         const isPlaceholderOnly =
           current.length === 1 && (current[0] === "/images/hero-1.webp" || current[0].endsWith("/images/hero-1.webp"));
         const base = current.length === 0 || isPlaceholderOnly ? [] : current;
-        return toLines([...base, ...urls]);
+        // Put newly uploaded images to the front so cover updates immediately.
+        return toLines([...urls, ...base]);
       });
     } catch (e) {
       setUploadError(e instanceof Error ? e.message : "Yükleme başarısız.");

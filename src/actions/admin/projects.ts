@@ -81,6 +81,9 @@ export async function createProject(formData: FormData) {
 
       revalidatePath("/admin/projects");
       revalidatePath("/projeler");
+      revalidatePath("/en/projeler");
+      revalidatePath(`/projeler/${slug}`);
+      revalidatePath(`/en/projeler/${slug}`);
       revalidateTag("public-projects");
       revalidateTag(`public-project:${slug}`);
       return undefined;
