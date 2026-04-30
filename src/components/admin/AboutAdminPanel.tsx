@@ -63,8 +63,7 @@ export function AboutAdminPanel({
     fd.set("file", f);
     const json = await uploadAdminMedia(fd);
     if (!json.ok || !json.data?.url) {
-      const msg = json.ok ? "Yükleme başarısız." : json.error;
-      throw new Error(msg || "Yükleme başarısız.");
+      throw new Error("Yükleme başarısız.");
     }
     setDraft((v) => ({ ...v, portraitImageUrl: json.data.url ?? "" }));
   }
