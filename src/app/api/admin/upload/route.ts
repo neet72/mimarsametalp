@@ -1,38 +1,21 @@
 import { NextResponse } from "next/server";
-import path from "node:path";
-import fs from "node:fs/promises";
-import crypto from "node:crypto";
 import { auth } from "@/auth";
 import { isAdminEmail } from "@/lib/security/admin";
+import { uploadToCloudinary } from "@/lib/storage/cloudinary";
+import { logger } from "@/lib/observability/logger";
 
 export const runtime = "nodejs";
 
-const MAX_BYTES = 8 * 1024 * 1024; // 8MB / file
-const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
+const MAX_VIDEO_BYTES = 50 * 1024 * 1024; // 50MB
+const IMAGE_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
+const VIDEO_MIME = new Set(["video/mp4", "video/webm"]);
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT_MAX = 20; // per window (per admin+ip)
 
 type RateEntry = { count: number; resetAt: number };
 const rate = new Map<string, RateEntry>();
-
-const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME ?? "";
-const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY ?? "";
-const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET ?? "";
-
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "projects");
-
-function isCloudinaryConfigured() {
-  return Boolean(CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET);
-}
-
-function safeExtFromType(type: string): string {
-  if (type === "image/jpeg") return ".jpg";
-  if (type === "image/png") return ".png";
-  if (type === "image/webp") return ".webp";
-  if (type === "image/avif") return ".avif";
-  return "";
-}
 
 function getClientIp(req: Request): string {
   const h = req.headers;
@@ -107,20 +90,6 @@ function matchesMagic(type: string, bytes: Buffer) {
   return false;
 }
 
-function safePublicId() {
-  const id = crypto.randomBytes(16).toString("hex");
-  return `samet-alp/projects/${Date.now()}-${id}`;
-}
-
-function signCloudinary(params: Record<string, string>) {
-  // Cloudinary signature = sha1(param1=value1&param2=value2... + api_secret)
-  const base = Object.keys(params)
-    .sort()
-    .map((k) => `${k}=${params[k]}`)
-    .join("&");
-  return crypto.createHash("sha1").update(base + CLOUDINARY_API_SECRET).digest("hex");
-}
-
 export async function POST(req: Request) {
   const session = await auth();
   const email = session?.user?.email ?? null;
@@ -131,6 +100,7 @@ export async function POST(req: Request) {
   const ip = getClientIp(req);
   const limiter = rateLimit(`${email}:${ip}`);
   if (!limiter.ok) {
+    logger.warn({ msg: "upload rate limited", scope: "api.admin.upload", actor: email, ip });
     return NextResponse.json(
       {
         ok: false,
@@ -144,90 +114,72 @@ export async function POST(req: Request) {
   const form = await req.formData();
   const file = form.get("file");
   if (!(file instanceof File)) {
+    logger.warn({ msg: "upload missing file", scope: "api.admin.upload", actor: email, ip });
     return NextResponse.json({ ok: false, error: "Dosya bulunamadı." }, { status: 400 });
   }
 
-  if (!ALLOWED_MIME.has(file.type)) {
+  const isImage = IMAGE_MIME.has(file.type);
+  const isVideo = VIDEO_MIME.has(file.type);
+  if (!isImage && !isVideo) {
+    logger.warn({ msg: "upload invalid mime", scope: "api.admin.upload", actor: email, ip, mime: file.type });
     return NextResponse.json(
-      { ok: false, error: "Desteklenmeyen dosya türü. (jpg/png/webp/avif)" },
+      { ok: false, error: "Desteklenmeyen dosya türü. (jpg/png/webp/avif/mp4/webm)" },
       { status: 400 },
     );
   }
 
-  if (file.size > MAX_BYTES) {
-    return NextResponse.json({ ok: false, error: "Dosya çok büyük (max 8MB)." }, { status: 400 });
+  const max = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
+  if (file.size > max) {
+    logger.warn({
+      msg: "upload too large",
+      scope: "api.admin.upload",
+      actor: email,
+      ip,
+      mime: file.type,
+      size: file.size,
+      max,
+    });
+    return NextResponse.json(
+      { ok: false, error: isVideo ? "Video çok büyük (max 50MB)." : "Görsel çok büyük (max 5MB)." },
+      { status: 400 },
+    );
   }
 
   const arrayBuffer = await file.arrayBuffer();
   const bytes = Buffer.from(arrayBuffer);
   const head = bytes.subarray(0, 32);
-  if (!matchesMagic(file.type, head)) {
+  if (isImage && !matchesMagic(file.type, head)) {
+    logger.warn({
+      msg: "upload magic bytes mismatch",
+      scope: "api.admin.upload",
+      actor: email,
+      ip,
+      mime: file.type,
+    });
     return NextResponse.json(
       { ok: false, error: "Dosya doğrulanamadı. Lütfen farklı bir görsel deneyin." },
       { status: 400 },
     );
   }
 
-  // On Vercel, local disk is ephemeral. If Cloudinary isn't configured, fail fast.
-  if (process.env.VERCEL === "1" && !isCloudinaryConfigured()) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          "Upload için Cloudinary gerekli. Vercel üzerinde yerel dosya yükleme kalıcı değildir. (CLOUDINARY_* değişkenlerini ayarla)",
-      },
-      { status: 503 },
-    );
-  }
+  logger.info({ msg: "upload attempt", scope: "api.admin.upload", actor: email, ip, mime: file.type, size: file.size });
 
-  // Prefer Cloudinary if configured; otherwise fallback to local disk (not persistent on Vercel).
-  if (isCloudinaryConfigured()) {
-    const timestamp = String(Math.floor(Date.now() / 1000));
-    const public_id = safePublicId();
-    const paramsToSign = { public_id, timestamp, folder: "samet-alp/projects" };
-    const signature = signCloudinary(paramsToSign);
+  const uploaded = await uploadToCloudinary({
+    buffer: bytes,
+    mimeType: file.type,
+    folder: "samet-alp/media",
+    actor: email,
+  });
 
-    const blob = new Blob([arrayBuffer], { type: file.type });
+  logger.info({
+    msg: "upload ok",
+    scope: "api.admin.upload",
+    actor: email,
+    ip,
+    publicId: uploaded.publicId,
+    resourceType: uploaded.resourceType,
+  });
 
-    const fd = new FormData();
-    fd.set("file", blob, file.name);
-    fd.set("api_key", CLOUDINARY_API_KEY);
-    fd.set("timestamp", timestamp);
-    fd.set("public_id", public_id);
-    fd.set("folder", "samet-alp/projects");
-    fd.set("signature", signature);
-
-    const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
-    const res = await fetch(uploadUrl, { method: "POST", body: fd });
-    const json = (await res.json()) as { secure_url?: string; error?: { message?: string } };
-
-    if (!res.ok || !json.secure_url) {
-      return NextResponse.json(
-        { ok: false, error: json.error?.message ?? "Upload başarısız." },
-        { status: 400 },
-      );
-    }
-
-    return NextResponse.json({ ok: true, url: json.secure_url });
-  }
-
-  const ext = safeExtFromType(file.type);
-  if (!ext) {
-    return NextResponse.json({ ok: false, error: "Desteklenmeyen dosya türü." }, { status: 400 });
-  }
-
-  await fs.mkdir(UPLOAD_DIR, { recursive: true });
-  const id = crypto.randomBytes(16).toString("hex");
-  const filename = `${Date.now()}-${id}${ext}`;
-  const fullPath = path.join(UPLOAD_DIR, filename);
-
-  await fs.writeFile(fullPath, bytes);
-
-  const url = `/uploads/projects/${filename}`;
-  const warning =
-    process.env.VERCEL === "1"
-      ? "Vercel üzerinde yerel dosya yükleme kalıcı değildir. Kalıcı olması için Cloudinary/R2 gibi storage kullanın."
-      : undefined;
-  return NextResponse.json({ ok: true, url, warning });
+  return NextResponse.json({ ok: true, url: uploaded.secureUrl });
 }
 

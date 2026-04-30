@@ -3,10 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { setProjectPublished, setProjectSortOrder } from "@/actions/admin/projects";
+import { useAdminToast } from "@/components/admin/ui/toast";
 
 export function ProjectPublishedToggle({ id, published }: { id: string; published: boolean }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const toast = useAdminToast();
 
   return (
     <button
@@ -14,7 +16,12 @@ export function ProjectPublishedToggle({ id, published }: { id: string; publishe
       disabled={pending}
       onClick={() => {
         startTransition(async () => {
-          await setProjectPublished(id, !published);
+          const r = await setProjectPublished(id, !published);
+          if (!r.ok) {
+            toast.error({ title: "Güncelleme başarısız", description: r.error });
+          } else {
+            toast.success({ title: "Yayın durumu güncellendi" });
+          }
           router.refresh();
         });
       }}
@@ -33,6 +40,7 @@ export function ProjectSortOrderInput({ id, value }: { id: string; value: number
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [v, setV] = useState(String(value ?? 0));
+  const toast = useAdminToast();
 
   useEffect(() => setV(String(value ?? 0)), [value]);
 
@@ -51,7 +59,9 @@ export function ProjectSortOrderInput({ id, value }: { id: string; value: number
           const n = Number(v);
           if (!Number.isFinite(n)) return;
           startTransition(async () => {
-            await setProjectSortOrder(id, n);
+            const r = await setProjectSortOrder(id, n);
+            if (!r.ok) toast.error({ title: "Kaydedilemedi", description: r.error });
+            else toast.success({ title: "Sıralama güncellendi" });
             router.refresh();
           });
         }}

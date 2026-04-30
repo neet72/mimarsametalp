@@ -4,6 +4,7 @@ import { ServiceDetailClient } from "@/components/hizmetlerimiz/ServiceDetailCli
 import { pageMetadata } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps, serviceJsonLd } from "@/lib/seo-jsonld";
 import { SERVICES_DETAIL } from "@/content/services-detail.en";
+import { getPublicServiceBySlug } from "@/lib/public/services";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -22,7 +23,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = service.name;
   const description = service.shortDescription.slice(0, 180);
-  const img = service.heroImageUrl;
+  // Prefer DB-backed cached hero image (Cloudinary), fallback to in-code content image.
+  const key = String(slug ?? "").trim().toLowerCase();
+  const db = key ? await getPublicServiceBySlug(key) : null;
+  const img = db?.heroImageUrl ?? service.heroImageUrl;
 
   return {
     ...pageMetadata({

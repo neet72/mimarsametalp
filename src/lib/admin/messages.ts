@@ -38,6 +38,15 @@ export async function getAdminMessages(query: AdminMessagesQuery) {
       orderBy: { createdAt: "desc" },
       skip,
       take: pageSize,
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        body: true,
+        read: true,
+        createdAt: true,
+      },
     }),
   ]);
 

@@ -71,6 +71,44 @@
     overscroll-behavior: contain;
   }
 
+  /* Hide native scrollbars (carousel strips) */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE/Edge legacy */
+    scrollbar-width: none; /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
+  /* Auto-moving marquee strip (infinite) */
+  .marquee {
+    position: relative;
+    overflow: hidden;
+  }
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee var(--marquee-duration, 38s) linear infinite;
+    will-change: transform;
+  }
+  .marquee-track[data-paused="true"] {
+    animation-play-state: paused;
+  }
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none !important;
+      transform: none !important;
+    }
+  }
+
   /* Desktop-only: mouse position tilt (JS sets --rx/--ry/--glow-x/--glow-y) */
   @media (hover: hover) and (pointer: fine) {
     .tilt-card {

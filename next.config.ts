@@ -45,6 +45,11 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname),
   poweredByHeader: false,
   serverExternalPackages: ["bcryptjs"],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "50mb",
+    },
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [

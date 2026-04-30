@@ -34,20 +34,26 @@ export function pageMetadata({ title, description, path }: PageMetaInput): Metad
   const isEn = path === "/en" || path.startsWith("/en/");
   const trPath = toTrPath(path);
   const enPath = toEnPath(path);
-  const fullTitle = `${title} · ${siteName}`;
+  const fullTitle = `${title} | ${siteName}`;
   const ogTitle = encodeURIComponent(fullTitle.slice(0, 72));
   const ogDesc = encodeURIComponent(description.slice(0, 120));
   const ogPath = isEn ? "/en/opengraph-image" : "/opengraph-image";
   const ogUrl = `${ogPath}?title=${ogTitle}&desc=${ogDesc}`;
+  const base = getSiteUrl();
+
+  const abs = (p: string) => `${base}${p === "/" ? "/" : p}`;
 
   return {
     title,
     description,
     alternates: {
-      canonical: url,
+      canonical: abs(url),
       languages: {
-        "tr-TR": trPath,
-        "en-US": enPath,
+        "tr-TR": abs(trPath),
+        tr: abs(trPath),
+        "en-US": abs(enPath),
+        en: abs(enPath),
+        "x-default": abs(trPath),
       },
     },
     openGraph: {
@@ -56,7 +62,7 @@ export function pageMetadata({ title, description, path }: PageMetaInput): Metad
       siteName,
       title: fullTitle,
       description,
-      url,
+      url: abs(url),
       images: [{ url: ogUrl }],
     },
     twitter: {

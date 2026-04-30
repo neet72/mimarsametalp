@@ -3,7 +3,8 @@ import { Inter, Outfit } from "next/font/google";
 import { headers } from "next/headers";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { metadataBase, siteName } from "@/lib/seo";
-import { jsonLdScriptProps, organizationJsonLd, websiteJsonLd } from "@/lib/seo-jsonld";
+import { jsonLdScriptProps, localBusinessJsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo-jsonld";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const inter = Inter({
@@ -35,10 +36,20 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase,
   title: {
-    default: siteName,
-    template: `%s · ${siteName}`,
+    default: "Samet Alp Mimarlık | Lüks ve Fonksiyonel Tasarım",
+    template: `%s | ${siteName}`,
   },
   description: defaultDescription,
+  keywords: [
+    "mimarlık",
+    "iç mimarlık",
+    "anahtar teslim proje",
+    "mimari tasarım",
+    "ruhsat",
+    "tadilat",
+    "Adana mimarlık ofisi",
+    "Samet Alp Mimarlık",
+  ],
   applicationName: siteName,
   authors: [{ name: siteName, url: metadataBase.toString() }],
   creator: siteName,
@@ -59,7 +70,7 @@ export const metadata: Metadata = {
     locale: "tr_TR",
     url: "/",
     siteName,
-    title: siteName,
+    title: "Samet Alp Mimarlık | Lüks ve Fonksiyonel Tasarım",
     description: defaultDescription,
     images: [{ url: "/opengraph-image" }],
   },
@@ -89,6 +100,7 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <script {...jsonLdScriptProps(organizationJsonLd())} />
+        <script {...jsonLdScriptProps(localBusinessJsonLd())} />
         <script
           {...jsonLdScriptProps(
             websiteJsonLd({
@@ -98,6 +110,7 @@ export default async function RootLayout({
           )}
         />
         <MainLayout>{children}</MainLayout>
+        <Analytics />
       </body>
     </html>
   );

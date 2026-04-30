@@ -4,11 +4,13 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { createProject, updateProject } from "@/actions/admin/projects";
+import { uploadAdminMedia } from "@/actions/admin/upload";
 import { ADMIN_PROJECT_CATEGORIES } from "@/lib/admin/project-categories";
 import type { Project } from "@prisma/client";
 import { slugify } from "@/lib/slugify";
 import { ArrowDown, ArrowUp, ExternalLink, ImagePlus, Trash2, UploadCloud } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { RichTextLite } from "@/components/admin/ui/rich-text-lite";
 
 function formatImageUrls(raw: string): string {
   try {
@@ -62,6 +64,8 @@ export default function ProjectForm({
   const [newImageUrl, setNewImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
 
   useEffect(() => {
     if (mode === "edit") setSlugTouched(true);
@@ -76,6 +80,15 @@ export default function ProjectForm({
   const imageUrls = useMemo(() => parseLines(imageUrlsRaw), [imageUrlsRaw]);
   const coverUrl = imageUrls[0] ?? "/images/hero-1.webp";
 
+  function moveImage(from: number, to: number) {
+    if (from === to) return;
+    const next = [...imageUrls];
+    const [item] = next.splice(from, 1);
+    if (!item) return;
+    next.splice(to, 0, item);
+    setImageUrlsRaw(toLines(next));
+  }
+
   async function uploadFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
     setUploadError(null);
@@ -85,13 +98,11 @@ export default function ProjectForm({
       for (const f of Array.from(files)) {
         const fd = new FormData();
         fd.set("file", f);
-        const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-        const json = (await res.json()) as { ok: boolean; url?: string; error?: string; warning?: string };
-        if (!res.ok || !json.ok || !json.url) {
+        const json = await uploadAdminMedia(fd);
+        if (!json.ok || !json.data?.url) {
           throw new Error(json.error || "Yükleme başarısız.");
         }
-        if (json.warning) setUploadError(json.warning);
-        urls.push(json.url);
+        urls.push(json.data.url);
       }
       setImageUrlsRaw((prev) => {
         const current = parseLines(prev);
@@ -257,14 +268,11 @@ export default function ProjectForm({
 
           <div className="space-y-2 sm:col-span-2">
             <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Açıklama</label>
-            <textarea
+            <RichTextLite
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={7}
-              className={cn(
-                "w-full rounded-lg border bg-zinc-950 px-3 py-2 text-sm text-zinc-100",
-                fieldErrors.description ? "border-red-800/70" : "border-zinc-700",
-              )}
+              onChangePlain={setDescription}
+              storageKey={`admin:project:desc:${mode}:${project?.id ?? "new"}`}
+              invalid={Boolean(fieldErrors.description)}
             />
             {fieldErrors.description?.[0] ? (
               <p className="text-xs text-red-300">{fieldErrors.description[0]}</p>
@@ -354,7 +362,20 @@ export default function ProjectForm({
           </div>
 
           <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="space-y-3">
+            <div
+              className="space-y-3"
+              onDragOver={(e) => {
+                // allow drop
+                e.preventDefault();
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const files = e.dataTransfer?.files;
+                if (files && files.length > 0) {
+                  void uploadFiles(files);
+                }
+              }}
+            >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
                   URL ile ekle veya cihazdan yükle
@@ -375,6 +396,9 @@ export default function ProjectForm({
                   />
                 </label>
               </div>
+              <p className="text-xs text-zinc-500">
+                İpucu: Dosyaları bu alana sürükleyip bırakabilirsin.
+              </p>
 
               {uploadError ? (
                 <p className="rounded-md border border-red-900/50 bg-red-950/30 px-3 py-2 text-xs text-red-300">
@@ -445,7 +469,31 @@ export default function ProjectForm({
 
               <div className="grid grid-cols-3 gap-3">
                 {imageUrls.slice(0, 9).map((src, idx) => (
-                  <div key={`${src}-${idx}`} className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950">
+                  <div
+                    key={`${src}-${idx}`}
+                    className={cn(
+                      "group relative aspect-[4/3] overflow-hidden rounded-lg border bg-zinc-950",
+                      dragOverIdx === idx ? "border-[rgb(166,124,82)]/60" : "border-zinc-800",
+                    )}
+                    draggable
+                    onDragStart={() => setDragIdx(idx)}
+                    onDragEnd={() => {
+                      setDragIdx(null);
+                      setDragOverIdx(null);
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      if (dragIdx == null) return;
+                      setDragOverIdx(idx);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (dragIdx == null) return;
+                      moveImage(dragIdx, idx);
+                      setDragIdx(null);
+                      setDragOverIdx(null);
+                    }}
+                  >
                     <Image src={src} alt="" fill sizes="140px" className="object-cover object-center" />
                     <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/35" />
                     <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">

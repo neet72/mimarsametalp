@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { Plus, Save, Trash2, ChevronDown } from "lucide-react";
 import { upsertService } from "@/actions/admin/services";
+import { uploadAdminMedia } from "@/actions/admin/upload";
 import { SERVICES_GALLERY as SERVICES_GALLERY_TR } from "@/content/services-gallery";
 import { SERVICES_GALLERY as SERVICES_GALLERY_EN } from "@/content/services-gallery.en";
 
@@ -78,13 +79,9 @@ function ServiceRow({ row }: { row: Row }) {
       if (!f) return;
       const fd = new FormData();
       fd.set("file", f);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      const json = (await res.json()) as { ok: boolean; url?: string; error?: string; warning?: string };
-      if (!res.ok || !json.ok || !json.url) {
-        throw new Error(json.error || "Yükleme başarısız.");
-      }
-      if (json.warning) setUploadError(json.warning);
-      setHeroImageUrl(json.url);
+      const json = await uploadAdminMedia(fd);
+      if (!json.ok || !json.data?.url) throw new Error(json.error || "Yükleme başarısız.");
+      setHeroImageUrl(json.data.url);
     } catch (e) {
       setUploadError(e instanceof Error ? e.message : "Yükleme başarısız.");
     } finally {

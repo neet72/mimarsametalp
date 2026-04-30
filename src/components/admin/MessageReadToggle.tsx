@@ -3,10 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { setMessageRead } from "@/actions/admin/messages";
+import { useAdminToast } from "@/components/admin/ui/toast";
 
 export function MessageReadToggle({ id, read }: { id: string; read: boolean }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const toast = useAdminToast();
 
   return (
     <button
@@ -14,7 +16,9 @@ export function MessageReadToggle({ id, read }: { id: string; read: boolean }) {
       disabled={pending}
       onClick={() => {
         startTransition(async () => {
-          await setMessageRead(id, !read);
+          const r = await setMessageRead(id, !read);
+          if (!r.ok) toast.error({ title: "Güncelleme başarısız", description: r.error });
+          else toast.success({ title: read ? "Okunmamış" : "Okundu işaretlendi" });
           router.refresh();
         });
       }}

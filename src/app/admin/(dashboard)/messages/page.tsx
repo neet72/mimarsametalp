@@ -1,6 +1,6 @@
-import { MessageReadToggle } from "@/components/admin/MessageReadToggle";
 import Link from "next/link";
 import { getAdminMessages } from "@/lib/admin/messages";
+import { AdminMessagesListClient } from "@/components/admin/AdminMessagesListClient";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -78,41 +78,13 @@ export default async function AdminMessagesPage({ searchParams }: PageProps) {
         </button>
       </form>
 
-      <div className="space-y-4">
-        {items.length === 0 ? (
-          <p className="rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-12 text-center text-zinc-500">
-            Henüz mesaj yok veya veritabanı bağlı değil.
-          </p>
-        ) : (
-          items.map((m) => (
-            <article
-              key={m.id}
-              className={`rounded-xl border p-5 ${
-                m.read ? "border-zinc-800 bg-zinc-950/30" : "border-[rgb(166,124,82)]/25 bg-zinc-950/60"
-              }`}
-            >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="font-medium text-zinc-100">
-                    {m.firstName} {m.lastName}
-                  </p>
-                  <a
-                    href={`mailto:${m.email}`}
-                    className="text-sm text-[rgb(200,170,130)] hover:underline"
-                  >
-                    {m.email}
-                  </a>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    {m.createdAt.toLocaleString("tr-TR", { dateStyle: "short", timeStyle: "short" })}
-                  </p>
-                </div>
-                <MessageReadToggle id={m.id} read={m.read} />
-              </div>
-              <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">{m.body}</p>
-            </article>
-          ))
-        )}
-      </div>
+      {items.length === 0 ? (
+        <p className="rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-12 text-center text-zinc-500">
+          Henüz mesaj yok veya veritabanı bağlı değil.
+        </p>
+      ) : (
+        <AdminMessagesListClient items={items} />
+      )}
 
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-zinc-500">
         <p>

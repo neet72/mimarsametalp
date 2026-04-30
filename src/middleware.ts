@@ -5,6 +5,18 @@ import { isAdminEmail } from "@/lib/security/admin";
 
 const { auth } = NextAuth(authConfig);
 
+function applySecurityHeaders(res: NextResponse) {
+  // Baseline security headers (safe defaults, non-breaking).
+  res.headers.set("X-Frame-Options", "DENY");
+  res.headers.set("X-Content-Type-Options", "nosniff");
+  res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.headers.set("X-DNS-Prefetch-Control", "off");
+  res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  // Strict-Transport-Security is only meaningful on HTTPS; setting it is safe behind TLS.
+  res.headers.set("Strict-Transport-Security", "max-age=15552000; includeSubDomains");
+  return res;
+}
+
 export default auth((req) => {
   const { pathname } = req.nextUrl;
   const isLoggedIn = !!req.auth;
@@ -15,7 +27,7 @@ export default auth((req) => {
   if (pathname === "/favicon.ico") {
     const url = req.nextUrl.clone();
     url.pathname = "/icon.svg";
-    return NextResponse.redirect(url);
+    return applySecurityHeaders(NextResponse.redirect(url));
   }
 
   // Pass locale to Server Components (root layout) without breaking routing.
@@ -24,18 +36,18 @@ export default auth((req) => {
 
   if (pathname === "/admin/login") {
     if (isLoggedIn && isAdmin) {
-      return NextResponse.redirect(new URL("/admin", req.nextUrl.origin));
+      return applySecurityHeaders(NextResponse.redirect(new URL("/admin", req.nextUrl.origin)));
     }
-    return NextResponse.next({ request: { headers: requestHeaders } });
+    return applySecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }));
   }
 
   if (pathname.startsWith("/admin")) {
     if (!isLoggedIn || !isAdmin) {
-      return NextResponse.redirect(new URL("/admin/login", req.nextUrl.origin));
+      return applySecurityHeaders(NextResponse.redirect(new URL("/admin/login", req.nextUrl.origin)));
     }
   }
 
-  return NextResponse.next({ request: { headers: requestHeaders } });
+  return applySecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }));
 });
 
 export const config = {

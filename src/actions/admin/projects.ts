@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/db/prisma";
 import { slugify } from "@/lib/slugify";
+import { ActionError, createSafeAction } from "@/lib/actions/safe-action";
+import { logger } from "@/lib/observability/logger";
+import { z } from "zod";
 import {
   adminProjectCreateSchema,
   adminProjectUpdateSchema,
@@ -13,17 +16,6 @@ import { auditAdmin } from "@/lib/observability/audit";
 import { requireAdmin } from "./guard";
 
 export async function createProject(formData: FormData) {
-  let actor = "unknown";
-  try {
-    const session = await requireAdmin();
-    actor = session.user.email ?? "unknown";
-  } catch (e) {
-    if (e instanceof Error && e.message === "RATE_LIMITED") {
-      return { ok: false as const, error: "Çok fazla istek. Lütfen biraz sonra tekrar deneyin." };
-    }
-    throw e;
-  }
-
   const raw = {
     title: String(formData.get("title") ?? ""),
     slug: String(formData.get("slug") ?? "").trim() || undefined,
@@ -38,61 +30,67 @@ export async function createProject(formData: FormData) {
     sortOrder: Number(formData.get("sortOrder") ?? 0),
   };
 
-  const parsed = adminProjectCreateSchema.safeParse(raw);
-  if (!parsed.success) {
-    return { ok: false as const, error: "Geçersiz veri.", fieldErrors: parsed.error.flatten().fieldErrors };
-  }
+  const action = createSafeAction({
+    scope: "admin.project.create",
+    schema: adminProjectCreateSchema,
+    authorize: async () => {
+      const session = await requireAdmin();
+      return { actor: session.user.email ?? "unknown" };
+    },
+    toFieldErrors: (err) => err.flatten().fieldErrors,
+    invalidMessage: "Geçersiz veri.",
+    failureMessage: "Kayıt oluşturulamadı.",
+    handler: async (input, ctx) => {
+      const urls = parseImageUrls(input.imageUrlsText);
+      const slug = (input.slug && input.slug.length > 0 ? input.slug : slugify(input.title)).toLowerCase();
 
-  const urls = parseImageUrls(parsed.data.imageUrlsText);
-  const slug = (parsed.data.slug && parsed.data.slug.length > 0 ? parsed.data.slug : slugify(parsed.data.title)).toLowerCase();
+      try {
+        await prisma.project.create({
+          data: {
+            title: input.title,
+            slug,
+            category: input.category || null,
+            description: input.description || null,
+            status: input.status || null,
+            year: input.year ?? null,
+            location: input.location || null,
+            areaM2: input.areaM2 ?? null,
+            imageUrls: JSON.stringify(urls),
+            published: input.published ?? false,
+            sortOrder: input.sortOrder ?? 0,
+          },
+          select: { id: true },
+        });
+      } catch (e) {
+        logger.warn({
+          msg: "project create failed",
+          scope: "admin.project.create",
+          actor: ctx.actor,
+          error: e instanceof Error ? { name: e.name, message: e.message } : String(e),
+        });
+        throw new ActionError("Kayıt oluşturulamadı (slug benzersiz mi?).");
+      }
 
-  try {
-    await prisma.project.create({
-      data: {
-        title: parsed.data.title,
-        slug,
-        category: parsed.data.category || null,
-        description: parsed.data.description || null,
-        status: parsed.data.status || null,
-        year: parsed.data.year ?? null,
-        location: parsed.data.location || null,
-        areaM2: parsed.data.areaM2 ?? null,
-        imageUrls: JSON.stringify(urls),
-        published: parsed.data.published ?? false,
-        sortOrder: parsed.data.sortOrder ?? 0,
-      },
-    });
-    await auditAdmin({
-      actor,
-      action: "project.create",
-      entity: "Project",
-      entityId: slug,
-      meta: { published: Boolean(parsed.data.published), sortOrder: parsed.data.sortOrder ?? 0 },
-    });
-  } catch (e) {
-    console.error("[createProject]", e);
-    return { ok: false as const, error: "Kayıt oluşturulamadı (slug benzersiz mi?)." };
-  }
+      await auditAdmin({
+        actor: ctx.actor ?? "unknown",
+        action: "project.create",
+        entity: "Project",
+        entityId: slug,
+        meta: { published: Boolean(input.published), sortOrder: input.sortOrder ?? 0 },
+      });
 
-  revalidatePath("/admin/projects");
-  revalidatePath("/projeler");
-  revalidateTag("public-projects");
-  revalidateTag(`public-project:${slug}`);
-  return { ok: true as const };
+      revalidatePath("/admin/projects");
+      revalidatePath("/projeler");
+      revalidateTag("public-projects");
+      revalidateTag(`public-project:${slug}`);
+      return undefined;
+    },
+  });
+
+  return action(raw);
 }
 
 export async function updateProject(formData: FormData) {
-  let actor = "unknown";
-  try {
-    const session = await requireAdmin();
-    actor = session.user.email ?? "unknown";
-  } catch (e) {
-    if (e instanceof Error && e.message === "RATE_LIMITED") {
-      return { ok: false as const, error: "Çok fazla istek. Lütfen biraz sonra tekrar deneyin." };
-    }
-    throw e;
-  }
-
   const raw = {
     id: String(formData.get("id") ?? ""),
     title: String(formData.get("title") ?? ""),
@@ -108,162 +106,160 @@ export async function updateProject(formData: FormData) {
     sortOrder: Number(formData.get("sortOrder") ?? 0),
   };
 
-  const parsed = adminProjectUpdateSchema.safeParse(raw);
-  if (!parsed.success) {
-    return { ok: false as const, error: "Geçersiz veri.", fieldErrors: parsed.error.flatten().fieldErrors };
-  }
+  const action = createSafeAction({
+    scope: "admin.project.update",
+    schema: adminProjectUpdateSchema,
+    authorize: async () => {
+      const session = await requireAdmin();
+      return { actor: session.user.email ?? "unknown" };
+    },
+    toFieldErrors: (err) => err.flatten().fieldErrors,
+    invalidMessage: "Geçersiz veri.",
+    failureMessage: "Güncelleme başarısız.",
+    handler: async (input, ctx) => {
+      const urls = parseImageUrls(input.imageUrlsText);
+      const slug = (input.slug && input.slug.length > 0 ? input.slug : slugify(input.title)).toLowerCase();
 
-  const urls = parseImageUrls(parsed.data.imageUrlsText);
-  const slug = (parsed.data.slug && parsed.data.slug.length > 0 ? parsed.data.slug : slugify(parsed.data.title)).toLowerCase();
+      try {
+        await prisma.project.update({
+          where: { id: input.id },
+          data: {
+            title: input.title,
+            slug,
+            category: input.category || null,
+            description: input.description || null,
+            status: input.status || null,
+            year: input.year ?? null,
+            location: input.location || null,
+            areaM2: input.areaM2 ?? null,
+            imageUrls: JSON.stringify(urls),
+            published: input.published ?? false,
+            sortOrder: input.sortOrder ?? 0,
+          },
+          select: { id: true },
+        });
+      } catch (e) {
+        logger.warn({
+          msg: "project update failed",
+          scope: "admin.project.update",
+          actor: ctx.actor,
+          error: e instanceof Error ? { name: e.name, message: e.message } : String(e),
+        });
+        throw new ActionError("Güncelleme başarısız.");
+      }
 
-  try {
-    await prisma.project.update({
-      where: { id: parsed.data.id },
-      data: {
-        title: parsed.data.title,
-        slug,
-        category: parsed.data.category || null,
-        description: parsed.data.description || null,
-        status: parsed.data.status || null,
-        year: parsed.data.year ?? null,
-        location: parsed.data.location || null,
-        areaM2: parsed.data.areaM2 ?? null,
-        imageUrls: JSON.stringify(urls),
-        published: parsed.data.published ?? false,
-        sortOrder: parsed.data.sortOrder ?? 0,
-      },
-    });
-    await auditAdmin({
-      actor,
-      action: "project.update",
-      entity: "Project",
-      entityId: parsed.data.id,
-      meta: { slug, published: Boolean(parsed.data.published), sortOrder: parsed.data.sortOrder ?? 0 },
-    });
-  } catch (e) {
-    console.error("[updateProject]", e);
-    return { ok: false as const, error: "Güncelleme başarısız." };
-  }
+      await auditAdmin({
+        actor: ctx.actor ?? "unknown",
+        action: "project.update",
+        entity: "Project",
+        entityId: input.id,
+        meta: { slug, published: Boolean(input.published), sortOrder: input.sortOrder ?? 0 },
+      });
 
-  revalidatePath("/admin/projects");
-  revalidatePath(`/admin/projects/${parsed.data.id}/edit`);
-  revalidatePath("/projeler");
-  revalidateTag("public-projects");
-  revalidateTag(`public-project:${slug}`);
-  return { ok: true as const };
+      revalidatePath("/admin/projects");
+      revalidatePath(`/admin/projects/${input.id}/edit`);
+      revalidatePath("/projeler");
+      revalidateTag("public-projects");
+      revalidateTag(`public-project:${slug}`);
+      return undefined;
+    },
+  });
+
+  return action(raw);
 }
 
 export async function deleteProject(id: string) {
-  let actor = "unknown";
-  try {
-    const session = await requireAdmin();
-    actor = session.user.email ?? "unknown";
-  } catch (e) {
-    if (e instanceof Error && e.message === "RATE_LIMITED") {
-      return { ok: false as const, error: "Çok fazla istek. Lütfen biraz sonra tekrar deneyin." };
-    }
-    throw e;
-  }
-  if (!id) return { ok: false as const, error: "Geçersiz id." };
+  const action = createSafeAction({
+    scope: "admin.project.delete",
+    schema: z.object({ id: z.string().min(1) }),
+    authorize: async () => {
+      const session = await requireAdmin();
+      return { actor: session.user.email ?? "unknown" };
+    },
+    invalidMessage: "Geçersiz id.",
+    failureMessage: "Silinemedi.",
+    handler: async (input, ctx) => {
+      await prisma.project.delete({ where: { id: input.id }, select: { id: true } });
+      await auditAdmin({
+        actor: ctx.actor ?? "unknown",
+        action: "project.delete",
+        entity: "Project",
+        entityId: input.id,
+      });
+      revalidatePath("/admin/projects");
+      revalidatePath("/projeler");
+      revalidateTag("public-projects");
+      return undefined;
+    },
+  });
 
-  try {
-    await prisma.project.delete({ where: { id } });
-    await auditAdmin({
-      actor,
-      action: "project.delete",
-      entity: "Project",
-      entityId: id,
-    });
-  } catch (e) {
-    console.error("[deleteProject]", e);
-    return { ok: false as const, error: "Silinemedi." };
-  }
-
-  revalidatePath("/admin/projects");
-  revalidatePath("/projeler");
-  revalidateTag("public-projects");
-  return { ok: true as const };
+  return action({ id });
 }
 
 export async function setProjectPublished(id: string, published: boolean) {
-  let actor = "unknown";
-  try {
-    const session = await requireAdmin();
-    actor = session.user.email ?? "unknown";
-  } catch (e) {
-    if (e instanceof Error && e.message === "RATE_LIMITED") {
-      return { ok: false as const, error: "Çok fazla istek." };
-    }
-    throw e;
-  }
+  const action = createSafeAction({
+    scope: "admin.project.setPublished",
+    schema: z.object({ id: z.string().min(1), published: z.boolean() }),
+    authorize: async () => {
+      const session = await requireAdmin();
+      return { actor: session.user.email ?? "unknown" };
+    },
+    invalidMessage: "Geçersiz id.",
+    failureMessage: "Güncellenemedi.",
+    handler: async (input, ctx) => {
+      const updated = await prisma.project.update({
+        where: { id: input.id },
+        data: { published: Boolean(input.published) },
+        select: { id: true, slug: true, published: true },
+      });
+      await auditAdmin({
+        actor: ctx.actor ?? "unknown",
+        action: "project.setPublished",
+        entity: "Project",
+        entityId: input.id,
+        meta: { published: updated.published },
+      });
+      revalidatePath("/admin/projects");
+      revalidatePath("/projeler");
+      revalidateTag("public-projects");
+      revalidateTag(`public-project:${updated.slug}`);
+      return undefined;
+    },
+  });
 
-  if (!id) return { ok: false as const, error: "Geçersiz id." };
-
-  let updated;
-  try {
-    updated = await prisma.project.update({
-      where: { id },
-      data: { published: Boolean(published) },
-      select: { id: true, slug: true, published: true },
-    });
-    await auditAdmin({
-      actor,
-      action: "project.setPublished",
-      entity: "Project",
-      entityId: id,
-      meta: { published: updated.published },
-    });
-  } catch (e) {
-    console.error("[setProjectPublished]", e);
-    return { ok: false as const, error: "Güncellenemedi." };
-  }
-
-  revalidatePath("/admin/projects");
-  revalidatePath("/projeler");
-  revalidateTag("public-projects");
-  revalidateTag(`public-project:${updated.slug}`);
-  return { ok: true as const };
+  return action({ id, published: Boolean(published) });
 }
 
 export async function setProjectSortOrder(id: string, sortOrder: number) {
-  let actor = "unknown";
-  try {
-    const session = await requireAdmin();
-    actor = session.user.email ?? "unknown";
-  } catch (e) {
-    if (e instanceof Error && e.message === "RATE_LIMITED") {
-      return { ok: false as const, error: "Çok fazla istek." };
-    }
-    throw e;
-  }
+  const action = createSafeAction({
+    scope: "admin.project.setSortOrder",
+    schema: z.object({ id: z.string().min(1), sortOrder: z.number().int().min(0).max(999_999) }),
+    authorize: async () => {
+      const session = await requireAdmin();
+      return { actor: session.user.email ?? "unknown" };
+    },
+    invalidMessage: "Geçersiz veri.",
+    failureMessage: "Güncellenemedi.",
+    handler: async (input, ctx) => {
+      const updated = await prisma.project.update({
+        where: { id: input.id },
+        data: { sortOrder: Math.trunc(input.sortOrder) },
+        select: { id: true, slug: true, sortOrder: true },
+      });
+      await auditAdmin({
+        actor: ctx.actor ?? "unknown",
+        action: "project.setSortOrder",
+        entity: "Project",
+        entityId: input.id,
+        meta: { sortOrder: updated.sortOrder },
+      });
+      revalidatePath("/admin/projects");
+      revalidatePath("/projeler");
+      revalidateTag("public-projects");
+      revalidateTag(`public-project:${updated.slug}`);
+      return undefined;
+    },
+  });
 
-  if (!id) return { ok: false as const, error: "Geçersiz id." };
-  if (!Number.isFinite(sortOrder) || sortOrder < 0 || sortOrder > 999_999) {
-    return { ok: false as const, error: "Geçersiz sıra." };
-  }
-
-  let updated;
-  try {
-    updated = await prisma.project.update({
-      where: { id },
-      data: { sortOrder: Math.trunc(sortOrder) },
-      select: { id: true, slug: true, sortOrder: true },
-    });
-    await auditAdmin({
-      actor,
-      action: "project.setSortOrder",
-      entity: "Project",
-      entityId: id,
-      meta: { sortOrder: updated.sortOrder },
-    });
-  } catch (e) {
-    console.error("[setProjectSortOrder]", e);
-    return { ok: false as const, error: "Güncellenemedi." };
-  }
-
-  revalidatePath("/admin/projects");
-  revalidatePath("/projeler");
-  revalidateTag("public-projects");
-  revalidateTag(`public-project:${updated.slug}`);
-  return { ok: true as const };
+  return action({ id, sortOrder: Number(sortOrder) });
 }

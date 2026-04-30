@@ -8,6 +8,7 @@ const address =
   "Güzelevler Mahallesi 2067/2 Sokak A blok No: 32/2 Adana / Türkiye";
 
 export function Footer() {
+  const year = new Date().getFullYear();
   return (
     <footer className="mt-auto border-t border-border bg-surface pb-[max(0px,env(safe-area-inset-bottom,0px))]">
       <div className={cn("relative py-10 sm:py-12", pageContainerClass)}>
@@ -87,6 +88,12 @@ export function Footer() {
               vectorEffect="non-scaling-stroke"
             />
           </svg>
+        </div>
+
+        <div className="mt-8 border-t border-border/60 pt-6 text-center">
+          <p className="text-xs tracking-wide text-muted">
+            © {year} Samet Alp Mimarlık. Tüm hakları saklıdır.
+          </p>
         </div>
       </div>
     </footer>

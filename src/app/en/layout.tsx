@@ -7,15 +7,18 @@ const defaultDescription =
 export const metadata: Metadata = {
   metadataBase,
   title: {
-    default: `${siteName} (EN)`,
-    template: `%s · ${siteName}`,
+    default: "Samet Alp Architecture | Luxury & Functional Design",
+    template: `%s | ${siteName}`,
   },
   description: defaultDescription,
   alternates: {
     canonical: "/en",
     languages: {
       "tr-TR": "/",
+      tr: "/",
       "en-US": "/en",
+      en: "/en",
+      "x-default": "/",
     },
   },
   openGraph: {
@@ -23,13 +26,13 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "/en",
     siteName,
-    title: siteName,
+    title: "Samet Alp Architecture | Luxury & Functional Design",
     description: defaultDescription,
     images: [{ url: "/en/opengraph-image" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: siteName,
+    title: "Samet Alp Architecture | Luxury & Functional Design",
     description: defaultDescription,
     images: ["/en/opengraph-image"],
   },

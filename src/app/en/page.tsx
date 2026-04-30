@@ -17,7 +17,7 @@ export default function HomePageEn() {
   return (
     <>
       <CinematicScrollHero />
-      <div id="home-content-start" />
+      <div id="home-content-start" aria-hidden className="h-px w-full" />
       <VisionIntro />
       <ServicesSection />
       <AboutSection />

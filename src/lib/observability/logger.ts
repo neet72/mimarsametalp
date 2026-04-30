@@ -1,5 +1,3 @@
-import "server-only";
-
 type LogLevel = "debug" | "info" | "warn" | "error";
 
 type LogPayload = Record<string, unknown> & {

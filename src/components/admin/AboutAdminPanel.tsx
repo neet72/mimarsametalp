@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { Save } from "lucide-react";
 import { upsertSiteContent } from "@/actions/admin/site-content";
+import { uploadAdminMedia } from "@/actions/admin/upload";
 
 type Locale = "tr" | "en";
 
@@ -60,10 +61,9 @@ export function AboutAdminPanel({
     if (!f) return;
     const fd = new FormData();
     fd.set("file", f);
-    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-    const json = (await res.json()) as { ok: boolean; url?: string; error?: string; warning?: string };
-    if (!res.ok || !json.ok || !json.url) throw new Error(json.error || "Yükleme başarısız.");
-    setDraft((v) => ({ ...v, portraitImageUrl: json.url ?? "" }));
+    const json = await uploadAdminMedia(fd);
+    if (!json.ok || !json.data?.url) throw new Error(json.error || "Yükleme başarısız.");
+    setDraft((v) => ({ ...v, portraitImageUrl: json.data.url ?? "" }));
   }
 
   return (

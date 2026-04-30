@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db/prisma";
 import { sendContactNotification } from "@/lib/email/send-contact-notification";
 import { checkContactRateLimit } from "@/lib/rate-limit/contact";
 import { contactFormSchema, flattenContactErrors } from "@/lib/validations/contact";
+import { logger } from "@/lib/observability/logger";
 
 function hashIp(ip: string): string {
   return crypto.createHash("sha256").update(ip, "utf8").digest("hex").slice(0, 48);
@@ -67,9 +68,14 @@ export async function submitContactForm(data: unknown): Promise<ContactSubmitRes
         body: parsed.data.message,
         ipHash: ip !== "unknown" ? hashIp(ip) : null,
       },
+      select: { id: true },
     });
   } catch (e) {
-    console.warn("[contact] Message DB yazılamadı:", e);
+    logger.warn({
+      msg: "contact message db write failed",
+      scope: "public.contact.submit",
+      error: e instanceof Error ? { name: e.name, message: e.message } : String(e),
+    });
   }
 
   return { ok: true, message: "Mesajınız alındı. En kısa sürede size dönüş yapacağız." };

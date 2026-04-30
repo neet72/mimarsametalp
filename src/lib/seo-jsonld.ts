@@ -26,7 +26,7 @@ export function organizationJsonLd() {
     "@type": "Organization",
     name: siteName,
     url: base,
-    logo: `${base}/favicon.ico`,
+    logo: `${base}/icon.svg`,
     email: CONTACT_EMAIL,
     telephone: CONTACT_PHONE_TEL,
     sameAs: [CONTACT_SOCIAL_INSTAGRAM, CONTACT_SOCIAL_WHATSAPP, CONTACT_SOCIAL_LINKEDIN].filter(Boolean),
@@ -37,6 +37,54 @@ export function organizationJsonLd() {
         telephone: CONTACT_PHONE_TEL,
         email: CONTACT_EMAIL,
         availableLanguage: ["tr-TR", "en-US"],
+      },
+    ],
+  } satisfies JsonLd;
+}
+
+export function localBusinessJsonLd() {
+  const base = getSiteUrl();
+  return {
+    "@context": "https://schema.org",
+    // Mimarlık ofisi için en doğru genel tiplerden biri
+    "@type": "ProfessionalService",
+    name: siteName,
+    url: base,
+    image: `${base}/opengraph-image`,
+    logo: `${base}/icon.svg`,
+    telephone: CONTACT_PHONE_TEL,
+    email: CONTACT_EMAIL,
+    sameAs: [CONTACT_SOCIAL_INSTAGRAM, CONTACT_SOCIAL_WHATSAPP, CONTACT_SOCIAL_LINKEDIN].filter(Boolean),
+    areaServed: {
+      "@type": "Country",
+      name: "Türkiye",
+    },
+    // Local SEO (mock — sonra kolayca güncelleyebilmen için)
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Güzelevler, 2067/2 SK A blok no:32/3",
+      addressLocality: "Yüreğir",
+      addressRegion: "Adana",
+      postalCode: "01220",
+      addressCountry: "TR",
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: 37.0,
+      longitude: 35.32,
+    },
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        opens: "09:00",
+        closes: "18:00",
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: ["Saturday"],
+        opens: "10:00",
+        closes: "15:00",
       },
     ],
   } satisfies JsonLd;

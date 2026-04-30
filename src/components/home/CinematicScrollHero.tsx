@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import NextImage from "next/image";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -58,10 +61,83 @@ export function CinematicScrollHero() {
   const windTopRef = useRef<HTMLCanvasElement | null>(null);
   const windBottomRef = useRef<HTMLCanvasElement | null>(null);
 
+  const reduceMotion = useReducedMotion();
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
 
   const sources = useMemo(() => [...HERO_IMAGES], []);
+
+  const [isDragging, setIsDragging] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const activeSrc = lightboxIndex == null ? null : sources[lightboxIndex];
+  const canPrev = lightboxIndex != null && lightboxIndex > 0;
+  const canNext = lightboxIndex != null && lightboxIndex < sources.length - 1;
+
+  // Drag adds a temporary rotation offset (radians) on top of GSAP.
+  const dragOffsetRadRef = useRef(0);
+  const spinVelRef = useRef(0); // rad/s
+  const lastSpinMsRef = useRef<number | null>(null);
+  const progressRef = useRef(0); // ScrollTrigger progress 0..1
+  const effectiveRotYRef = useRef(0); // radians (GSAP rotation + drag)
+
+  const closeLightbox = useCallback(() => setLightboxIndex(null), []);
+  const [lightboxDir, setLightboxDir] = useState<-1 | 0 | 1>(0);
+  const prevLightbox = useCallback(() => {
+    setLightboxDir(-1);
+    setLightboxIndex((i) => (i == null ? i : Math.max(0, i - 1)));
+  }, []);
+  const nextLightbox = useCallback(() => {
+    setLightboxDir(1);
+    setLightboxIndex((i) => (i == null ? i : Math.min(sources.length - 1, i + 1)));
+  }, [sources.length]);
+
+  const onLightboxDragEnd = useCallback(
+    (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
+      // Mobile-friendly swipe: low threshold with velocity assist.
+      const swipe = info.offset.x + info.velocity.x * 0.18;
+      if (swipe < -120) nextLightbox();
+      else if (swipe > 120) prevLightbox();
+    },
+    [nextLightbox, prevLightbox],
+  );
+
+  const openLightboxFromCurrent = useCallback(() => {
+    if (isDragging) return;
+    setLightboxDir(0);
+    // Use real-time effective rotation to pick the front-most image deterministically.
+    const TWO_PI = Math.PI * 2;
+    const n = sources.length;
+    if (!n) return;
+
+    // Normalize angle to [0, 1)
+    const ang = ((effectiveRotYRef.current % TWO_PI) + TWO_PI) % TWO_PI;
+    const phase = ang / TWO_PI;
+
+    // Sample the "center" of a panel rather than its edge.
+    const u = (phase + 0.5 / n) % 1;
+    const idx = Math.max(0, Math.min(n - 1, Math.floor(u * n)));
+    setLightboxIndex(idx);
+  }, [isDragging, sources.length]);
+
+  useEffect(() => {
+    if (lightboxIndex == null) return;
+    // Mobile-first: prevent background scroll while the lightbox is open.
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") prevLightbox();
+      if (e.key === "ArrowRight") nextLightbox();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+    };
+  }, [lightboxIndex, closeLightbox, prevLightbox, nextLightbox]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -168,7 +244,7 @@ export function CinematicScrollHero() {
           sources.map(
             (src, idx) =>
               new Promise<void>((resolve, reject) => {
-                const img = new Image();
+                const img = new window.Image();
                 img.decoding = "async";
                 img.onload = () => {
                   imgs[idx] = img;
@@ -206,7 +282,7 @@ export function CinematicScrollHero() {
       const windBottomCtx = initWindCanvas(windBottomRef.current);
 
       type Streak = { x: number; y: number; len: number; speed: number; a: number; w: number };
-      const STRIP_TURNS = 4.5; // must match cylinder rotation turns in GSAP timeline
+      const STRIP_TURNS = 2.0; // must match cylinder rotation turns in GSAP timeline
       const makeStreaks = (count: number, heightPx: number): Streak[] => {
         const arr: Streak[] = [];
         for (let i = 0; i < count; i++) {
@@ -289,6 +365,20 @@ export function CinematicScrollHero() {
         const time = (performance.now() - startMs) / 1000;
         windTime.t = time;
 
+        // Inertial spin after drag: decays smoothly.
+        const nowMs = performance.now();
+        if (lastSpinMsRef.current == null) lastSpinMsRef.current = nowMs;
+        const dt = Math.min(0.05, (nowMs - lastSpinMsRef.current) / 1000);
+        lastSpinMsRef.current = nowMs;
+        if (!isDragging && Math.abs(spinVelRef.current) > 0.0005) {
+          dragOffsetRadRef.current += spinVelRef.current * dt;
+          spinVelRef.current *= Math.pow(0.02, dt); // exponential decay to near-zero in ~1s
+        }
+        // Keep offset bounded.
+        if (Math.abs(dragOffsetRadRef.current) > Math.PI * 4) {
+          dragOffsetRadRef.current = ((dragOffsetRadRef.current % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+        }
+
         if (cylinder) {
           // Keep the cylinder breathing subtly
           cylinder.position.y = (isMobile ? 0.42 : 0.55) + Math.sin(time * 0.35) * (isMobile ? 0.014 : 0.02);
@@ -322,7 +412,8 @@ export function CinematicScrollHero() {
           const curveAmt = h * (isMobile ? 0.26 : 0.34);
           const edgeMargin = h * (isMobile ? 0.18 : 0.14);
           const edgeRange = h * (isMobile ? 0.34 : 0.42);
-          const phaseShift = windPhase.p * STRIP_TURNS; // keep in sync with strip rotation
+          const dragTurns = dragOffsetRadRef.current / (Math.PI * 2);
+          const phaseShift = windPhase.p * STRIP_TURNS + dragTurns; // keep in sync with strip rotation + drag
 
           const edgeY = (xPx: number) => {
             const nx = (xPx / w - 0.5) * 2; // -1..1
@@ -399,7 +490,16 @@ export function CinematicScrollHero() {
         focusLight.target.position.set(state.target.x, state.target.y, state.target.z);
         focusLight.intensity = (isMobile ? 2.8 : 3.4) + intensity * (isMobile ? 0.85 : 1.05);
 
-        renderer.render(scene, camera);
+        // Apply drag rotation offset without fighting GSAP: render with offset, then restore.
+        if (cylinder) {
+          const baseRot = cylinder.rotation.y;
+          effectiveRotYRef.current = baseRot + dragOffsetRadRef.current;
+          cylinder.rotation.y = effectiveRotYRef.current;
+          renderer.render(scene, camera);
+          cylinder.rotation.y = baseRot;
+        } else {
+          renderer.render(scene, camera);
+        }
       };
       tick();
 
@@ -417,12 +517,14 @@ export function CinematicScrollHero() {
               trigger: stageEl,
               start: "top top",
               end: `+=${scrollLen}`,
-              scrub: 1,
+              // Higher scrub = slower, silkier response to scroll (without adding extra spacer distance).
+              scrub: isMobile ? 5.2 : 4.2,
               pin: stageEl,
               pinSpacing: true,
               anticipatePin: 1,
               invalidateOnRefresh: true,
               onUpdate: (self) => {
+                progressRef.current = self.progress;
                 // Use ScrollTrigger velocity to drive wind presence
                 const v = Math.abs(self.getVelocity ? self.getVelocity() : 0);
                 lastVel = lastVel * 0.85 + v * 0.15;
@@ -464,7 +566,7 @@ export function CinematicScrollHero() {
           if (cylinder) {
             tl.to(
               cylinder.rotation,
-              { y: `+=${Math.PI * 2 * 4.5}`, duration: 8.5, ease: "none" },
+              { y: `+=${Math.PI * 2 * 2.0}`, duration: 8.5, ease: "none" },
               0,
             );
           }
@@ -522,6 +624,7 @@ export function CinematicScrollHero() {
 
   return (
     <section
+      id="home-hero"
       ref={(el) => {
         wrapperRef.current = el;
       }}
@@ -538,6 +641,29 @@ export function CinematicScrollHero() {
         )}
       >
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
+        {/* Drag overlay (does not block buttons) */}
+        <motion.div
+          aria-label={locale === "en" ? "Drag to rotate" : "Döndürmek için sürükle"}
+          className="absolute inset-0 z-[3]"
+          drag={reduceMotion ? false : "x"}
+          // Keep overlay in place; we only use drag events (no "wall" feel).
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0}
+          onDragStart={() => setIsDragging(true)}
+          onDrag={(_, info) => {
+            // Accumulate rotation freely (no clamp). deltaX -> radians
+            dragOffsetRadRef.current += -info.delta.x * 0.0042;
+          }}
+          onDragEnd={(_, info) => {
+            // Momentum: px/s -> rad/s
+            spinVelRef.current = -info.velocity.x * 0.0042;
+            window.setTimeout(() => setIsDragging(false), 120);
+          }}
+          onClick={() => {
+            if (isDragging) return;
+            openLightboxFromCurrent();
+          }}
+        />
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/28 via-transparent to-transparent"
@@ -580,6 +706,136 @@ export function CinematicScrollHero() {
 
       {/* Scroll spacer: pin burada bitecek, sayfa akacak */}
       <div ref={scrollSpaceRef} aria-hidden className="h-[18vh]" />
+
+      <AnimatePresence>
+        {activeSrc ? (
+          <motion.div
+            key="hero-lightbox"
+            className="fixed inset-0 z-[500] flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduceMotion ? 0.01 : 0.22, ease: [0.22, 1, 0.36, 1] }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={locale === "en" ? "Image viewer" : "Görsel görüntüleyici"}
+          >
+            <button
+              type="button"
+              className="absolute inset-0 bg-black/90 backdrop-blur-md"
+              onClick={closeLightbox}
+              aria-label={locale === "en" ? "Close" : "Kapat"}
+            />
+
+            <button
+              type="button"
+              onClick={closeLightbox}
+              className={cn(
+                "touch-manipulation absolute right-4 top-4 z-10 inline-flex h-12 w-12 items-center justify-center rounded-full sm:right-5 sm:top-5",
+                "border border-white/15 bg-white/5 text-white/90 backdrop-blur-sm",
+                "transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+              )}
+              style={{
+                top: "max(1rem, env(safe-area-inset-top))",
+                right: "max(1rem, env(safe-area-inset-right))",
+              }}
+              aria-label={locale === "en" ? "Close" : "Kapat"}
+            >
+              <X className="h-5 w-5" strokeWidth={1.8} />
+            </button>
+
+            <button
+              type="button"
+              onClick={prevLightbox}
+              disabled={!canPrev}
+              className={cn(
+                "touch-manipulation absolute left-3 top-1/2 z-10 -translate-y-1/2 inline-flex h-12 w-12 items-center justify-center rounded-full sm:left-4",
+                "border border-white/15 bg-white/5 text-white/90 backdrop-blur-sm",
+                "transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                !canPrev && "pointer-events-none opacity-0",
+              )}
+              style={{ left: "max(0.75rem, env(safe-area-inset-left))" }}
+              aria-label={locale === "en" ? "Previous image" : "Önceki görsel"}
+            >
+              <ChevronLeft className="h-5 w-5" strokeWidth={1.8} />
+            </button>
+
+            <button
+              type="button"
+              onClick={nextLightbox}
+              disabled={!canNext}
+              className={cn(
+                "touch-manipulation absolute right-3 top-1/2 z-10 -translate-y-1/2 inline-flex h-12 w-12 items-center justify-center rounded-full sm:right-4",
+                "border border-white/15 bg-white/5 text-white/90 backdrop-blur-sm",
+                "transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                !canNext && "pointer-events-none opacity-0",
+              )}
+              style={{ right: "max(0.75rem, env(safe-area-inset-right))" }}
+              aria-label={locale === "en" ? "Next image" : "Sonraki görsel"}
+            >
+              <ChevronRight className="h-5 w-5" strokeWidth={1.8} />
+            </button>
+
+            <motion.div
+              className="relative z-[1] mx-auto w-[min(1200px,92vw)]"
+              initial={reduceMotion ? false : { opacity: 0, scale: 0.98, y: 8 }}
+              animate={reduceMotion ? undefined : { opacity: 1, scale: 1, y: 0 }}
+              exit={reduceMotion ? undefined : { opacity: 0, scale: 0.98, y: 8 }}
+              transition={{ duration: reduceMotion ? 0.01 : 0.24, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div
+                className={cn(
+                  "relative h-[80vh] w-full overflow-hidden rounded-2xl border border-white/10 bg-black/20 sm:h-[78vh]",
+                  "shadow-[0_18px_70px_-22px_rgb(0_0_0/0.7)]",
+                  // Better gesture handling on mobile (we handle swipe ourselves).
+                  "touch-none",
+                )}
+              >
+                <AnimatePresence initial={false} mode="popLayout">
+                  <motion.div
+                    key={activeSrc}
+                    className="absolute inset-0"
+                    drag={reduceMotion ? false : "x"}
+                    dragConstraints={{ left: 0, right: 0 }}
+                    dragElastic={0.08}
+                    dragMomentum={true}
+                    onDragEnd={reduceMotion ? undefined : onLightboxDragEnd}
+                    initial={
+                      reduceMotion
+                        ? false
+                        : {
+                            opacity: 0,
+                            x: lightboxDir === 0 ? 0 : lightboxDir > 0 ? 28 : -28,
+                            scale: lightboxDir === 0 ? 0.985 : 1,
+                          }
+                    }
+                    animate={reduceMotion ? undefined : { opacity: 1, x: 0, scale: 1 }}
+                    exit={
+                      reduceMotion
+                        ? undefined
+                        : {
+                            opacity: 0,
+                            x: lightboxDir === 0 ? 0 : lightboxDir > 0 ? -28 : 28,
+                            scale: 0.995,
+                          }
+                    }
+                    transition={{ duration: reduceMotion ? 0.01 : 0.26, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <NextImage
+                      src={activeSrc}
+                      alt="Hero image"
+                      fill
+                      sizes="(max-width: 768px) 92vw, 1200px"
+                      className="object-contain object-center"
+                      priority={false}
+                    />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </section>
   );
 }
