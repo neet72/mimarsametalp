@@ -138,7 +138,17 @@ export function AdminProjectsTableClient({ items }: { items: Row[] }) {
               <td className="px-4 py-3">
                 <div className="flex items-center gap-3">
                   <div className="relative h-10 w-14 overflow-hidden rounded-md border border-zinc-800 bg-zinc-950">
-                    <Image src={coverFromImageUrls(p.imageUrls)} alt="" fill sizes="64px" className="object-cover object-center" />
+                    <Image
+                      src={coverFromImageUrls(p.imageUrls)}
+                      alt={
+                        p.category?.trim()
+                          ? `${p.title} — ${p.category.trim()} — kapak önizleme`
+                          : `${p.title} — kapak önizleme`
+                      }
+                      fill
+                      sizes="64px"
+                      className="object-cover object-center"
+                    />
                   </div>
                   <div className="min-w-0">
                     <p className="truncate font-medium text-zinc-200">{p.title}</p>

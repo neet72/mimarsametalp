@@ -80,6 +80,12 @@ export default function ProjectForm({
   const imageUrls = useMemo(() => parseLines(imageUrlsRaw), [imageUrlsRaw]);
   const coverUrl = imageUrls[0] ?? "/images/hero-1.webp";
 
+  const previewLabel = useMemo(() => {
+    const label = title.trim() || project?.title?.trim() || "Proje";
+    const cat = category.trim() || project?.category?.trim();
+    return cat ? `${label} — ${cat}` : label;
+  }, [title, category, project?.title, project?.category]);
+
   function moveImage(from: number, to: number) {
     if (from === to) return;
     const next = [...imageUrls];
@@ -502,7 +508,13 @@ export default function ProjectForm({
                       setDragOverIdx(null);
                     }}
                   >
-                    <Image src={src} alt="" fill sizes="140px" className="object-cover object-center" />
+                    <Image
+                      src={src}
+                      alt={`${previewLabel} — galeri ${idx + 1} (önizleme)`}
+                      fill
+                      sizes="140px"
+                      className="object-cover object-center"
+                    />
                     <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/35" />
                     <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
                       <button
@@ -586,7 +598,13 @@ export default function ProjectForm({
           <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Önizleme</p>
           <div className="mt-4 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
             <div className="relative aspect-video">
-              <Image src={coverUrl} alt="" fill sizes="420px" className="object-cover object-center" />
+              <Image
+                src={coverUrl}
+                alt={`${previewLabel} — kapak görseli (sağ özet)`}
+                fill
+                sizes="420px"
+                className="object-cover object-center"
+              />
               <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-4">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70">

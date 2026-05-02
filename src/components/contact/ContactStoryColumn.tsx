@@ -70,7 +70,7 @@ export function ContactStoryColumn() {
       </motion.p>
 
       <motion.h2
-        className="mt-12 font-display text-sm font-semibold uppercase tracking-[0.2em] text-primary/50 sm:text-[0.8125rem]"
+        className="mt-12 font-display text-sm font-semibold uppercase tracking-[0.2em] text-primary/80 sm:text-[0.8125rem]"
         initial={reduceMotion ? false : { opacity: 0, y: 10 }}
         whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
         viewport={{ once: false }}

@@ -4,13 +4,14 @@ import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import { useReducedMotion } from "framer-motion";
 import { useEffect } from "react";
+import type { AboutCmsDraft } from "@/lib/site-content/about-cms";
 import { AboutArchitectModule } from "./AboutArchitectModule";
 import { AboutVisionModule } from "./AboutVisionModule";
 
 /**
  * Hakkımızda — Lenis ile yumuşak kaydırma; modüller scroll + motion ile güçlendirildi.
  */
-export function AboutPageExperience() {
+export function AboutPageExperience({ aboutCms }: { aboutCms?: AboutCmsDraft | null }) {
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
@@ -48,8 +49,8 @@ export function AboutPageExperience() {
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_70%_at_50%_-10%,rgb(var(--color-accent-rgb)/0.05),transparent_45%),radial-gradient(ellipse_55%_45%_at_0%_60%,rgb(var(--color-primary-rgb)/0.03),transparent_50%)]"
       />
       <div className="relative overflow-x-hidden">
-        <AboutVisionModule />
-        <AboutArchitectModule />
+        <AboutVisionModule aboutCms={aboutCms} />
+        <AboutArchitectModule aboutCms={aboutCms} />
       </div>
     </div>
   );

@@ -46,6 +46,10 @@ export async function upsertSiteContent(formData: FormData) {
 
       revalidatePath("/admin/about");
       revalidatePath("/admin/contact");
+      if (input.key === "about") {
+        revalidatePath("/hakkimizda");
+        revalidatePath("/en/hakkimizda");
+      }
       revalidateTag(`site-content:${input.key}:${input.locale}`);
       return undefined;
     },

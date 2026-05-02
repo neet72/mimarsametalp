@@ -53,7 +53,11 @@ export function ServiceDetailClient({ service }: Props) {
       <section className="relative h-[50vh] w-full overflow-hidden bg-border/30">
         <Image
           src={service.heroImageUrl}
-          alt={service.name}
+          alt={
+            locale === "en"
+              ? `${service.name} — service hero image, Samet Alp Architecture`
+              : `${service.name} — hizmet kapak görseli, Samet Alp Mimarlık`
+          }
           fill
           priority
           sizes="100vw"

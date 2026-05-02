@@ -17,6 +17,7 @@ import {
   ABOUT_VISION_BODY as ABOUT_VISION_BODY_EN,
   ABOUT_VISION_TITLE as ABOUT_VISION_TITLE_EN,
 } from "@/content/about-page.en";
+import type { AboutCmsDraft } from "@/lib/site-content/about-cms";
 import { pageContainerClass } from "@/lib/page-layout";
 import { cn } from "@/lib/cn";
 import { usePathname } from "next/navigation";
@@ -24,12 +25,22 @@ import { localeFromPathname } from "@/lib/locale";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-export function AboutVisionModule() {
+export function AboutVisionModule({ aboutCms }: { aboutCms?: AboutCmsDraft | null }) {
   const reduceMotion = useReducedMotion() === true;
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
-  const title = locale === "en" ? ABOUT_VISION_TITLE_EN : ABOUT_VISION_TITLE;
-  const body = locale === "en" ? ABOUT_VISION_BODY_EN : ABOUT_VISION_BODY;
+  const title =
+    typeof aboutCms?.visionTitle === "string" && aboutCms.visionTitle.trim().length > 0
+      ? aboutCms.visionTitle.trim()
+      : locale === "en"
+        ? ABOUT_VISION_TITLE_EN
+        : ABOUT_VISION_TITLE;
+  const body =
+    typeof aboutCms?.visionBody === "string" && aboutCms.visionBody.trim().length > 0
+      ? aboutCms.visionBody.trim()
+      : locale === "en"
+        ? ABOUT_VISION_BODY_EN
+        : ABOUT_VISION_BODY;
   const sectionRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({

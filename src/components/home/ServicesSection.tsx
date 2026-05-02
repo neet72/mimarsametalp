@@ -205,7 +205,11 @@ export function ServicesSection() {
                           <div className="relative aspect-video w-full min-w-0 overflow-hidden">
                             <Image
                               src={service.imageUrl}
-                              alt={service.title}
+                              alt={
+                                locale === "en"
+                                  ? `${service.title} — home services gallery, Samet Alp Architecture`
+                                  : `${service.title} — ana sayfa hizmet galerisi, Samet Alp Mimarlık`
+                              }
                               fill
                               sizes="(max-width: 768px) 85vw, (max-width: 1200px) 400px, 450px"
                               priority={index === 0}
@@ -289,7 +293,11 @@ export function ServicesSection() {
             <div className="relative h-[78vh] w-full overflow-hidden rounded-2xl border border-white/10 bg-black/20 shadow-[0_18px_70px_-22px_rgb(0_0_0/0.7)]">
               <Image
                 src={lightbox.src}
-                alt={lightbox.title}
+                alt={
+                  locale === "en"
+                    ? `${lightbox.title} — enlarged service image`
+                    : `${lightbox.title} — büyütülmüş hizmet görseli`
+                }
                 fill
                 sizes="(max-width: 768px) 92vw, 1200px"
                 className="object-contain object-center"

@@ -88,7 +88,11 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           >
             <Image
               src={project.imageUrl}
-              alt={project.title}
+              alt={
+                locale === "en"
+                  ? `${project.title} — project cover image, Samet Alp Architecture`
+                  : `${project.title} — proje kapak görseli, Samet Alp Mimarlık`
+              }
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               priority={index === 0}

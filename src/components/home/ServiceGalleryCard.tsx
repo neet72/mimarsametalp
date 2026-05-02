@@ -62,7 +62,11 @@ export function ServiceGalleryCard({ service, index }: ServiceGalleryCardProps) 
         <div className="relative aspect-video w-full min-w-0 overflow-hidden">
           <Image
             src={service.imageUrl}
-            alt={service.title}
+            alt={
+              locale === "en"
+                ? `${service.title} — architectural service preview, Samet Alp Architecture`
+                : `${service.title} — mimarlık hizmet görseli, Samet Alp Mimarlık`
+            }
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority={index === 0}

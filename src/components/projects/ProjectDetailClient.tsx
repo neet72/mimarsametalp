@@ -26,13 +26,30 @@ type ProjectDetailClientProps = {
 
 const easeInOut = [0.42, 0, 0.58, 1] as const;
 
+function projectPhotoAlt(
+  locale: "tr" | "en",
+  project: ProjectDetailClientProps["project"],
+  kind: "cover" | "thumb" | "lightbox",
+  index: number,
+) {
+  const cat = project.category?.trim();
+  const base = cat ? `${project.title} — ${cat}` : project.title;
+  if (kind === "cover") {
+    return locale === "en" ? `${base} — cover photo` : `${base} — kapak görseli`;
+  }
+  if (kind === "lightbox") {
+    return locale === "en" ? `${base} — gallery photo ${index + 1}` : `${base} — galeri fotoğrafı ${index + 1}`;
+  }
+  return locale === "en" ? `${base} — gallery thumbnail ${index + 1}` : `${base} — galeri küçük görsel ${index + 1}`;
+}
+
 export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
   const reduceMotion = useReducedMotion();
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
 
   const gallery = useMemo(() => {
-    return Array.from(new Set([project.imageUrl, ...project.gallery])).slice(0, 6);
+    return Array.from(new Set([project.imageUrl, ...project.gallery]));
   }, [project.gallery, project.imageUrl]);
 
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
@@ -127,7 +144,7 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
       <section className="relative h-[50vh] w-full overflow-hidden bg-border/30">
         <Image
           src={project.imageUrl}
-          alt={project.title}
+          alt={projectPhotoAlt(locale, project, "cover", 0)}
           fill
           priority
           sizes="100vw"
@@ -360,7 +377,11 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
                   >
                     <Image
                       src={activeSrc}
-                      alt={project.title}
+                      alt={
+                        selectedImageIndex == null
+                          ? project.title
+                          : projectPhotoAlt(locale, project, "lightbox", selectedImageIndex)
+                      }
                       fill
                       sizes="(max-width: 768px) 92vw, 1200px"
                       className="object-contain object-center"

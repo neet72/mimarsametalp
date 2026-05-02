@@ -7,13 +7,14 @@ import { InstagramGlyph } from "@/components/icons/InstagramGlyph";
 import { usePathname } from "next/navigation";
 import { SOCIAL_GALLERY_IMAGES as SOCIAL_GALLERY_IMAGES_TR } from "@/content/home-copy";
 import { SOCIAL_GALLERY_IMAGES as SOCIAL_GALLERY_IMAGES_EN } from "@/content/home-copy.en";
+import { CONTACT_SOCIAL_INSTAGRAM } from "@/content/contact-page";
 import { cn } from "@/lib/cn";
 import { pageContainerClass } from "@/lib/page-layout";
 import { localeFromPathname } from "@/lib/locale";
 import { easePremium, fadeUpSoft, stagger } from "@/lib/motion";
 
 const instagramHref =
-  process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "https://www.instagram.com/";
+  process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? CONTACT_SOCIAL_INSTAGRAM;
 
 const container = stagger({ stagger: 0.07, delay: 0.06 });
 const tile = fadeUpSoft;
@@ -73,8 +74,8 @@ export function SocialGallery() {
                   src={src}
                   alt={
                     locale === "en"
-                      ? `Social media image ${index + 1}`
-                      : `Sosyal medya görseli ${index + 1}`
+                      ? `Samet Alp Architecture — portfolio photo ${index + 1} (social grid)`
+                      : `Samet Alp Mimarlık — portföy fotoğrafı ${index + 1} (sosyal ızgara)`
                   }
                   fill
                   sizes="(max-width: 768px) 50vw, 25vw"

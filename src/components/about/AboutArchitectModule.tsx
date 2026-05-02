@@ -19,13 +19,14 @@ import {
   ABOUT_ARCHITECT_NAME as ABOUT_ARCHITECT_NAME_EN,
   ABOUT_ARCHITECT_ROLE as ABOUT_ARCHITECT_ROLE_EN,
 } from "@/content/about-page.en";
+import type { AboutCmsDraft } from "@/lib/site-content/about-cms";
 import { cn } from "@/lib/cn";
 import { usePathname } from "next/navigation";
 import { localeFromPathname } from "@/lib/locale";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-const PORTRAIT_SRC = "/images/samet-alp-portrait.jpg";
+const PORTRAIT_FALLBACK = "/images/samet-alp-portrait.webp";
 
 const portraitReveal = {
   hidden: {
@@ -47,13 +48,29 @@ const portraitReveal = {
   },
 } satisfies Record<"hidden" | "show", Record<string, unknown>>;
 
-export function AboutArchitectModule() {
+export function AboutArchitectModule({ aboutCms }: { aboutCms?: AboutCmsDraft | null }) {
   const reduceMotion = useReducedMotion();
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
-  const name = locale === "en" ? ABOUT_ARCHITECT_NAME_EN : ABOUT_ARCHITECT_NAME;
-  const role = locale === "en" ? ABOUT_ARCHITECT_ROLE_EN : ABOUT_ARCHITECT_ROLE;
-  const bio = locale === "en" ? ABOUT_ARCHITECT_BIO_EN : ABOUT_ARCHITECT_BIO;
+  const staticName = locale === "en" ? ABOUT_ARCHITECT_NAME_EN : ABOUT_ARCHITECT_NAME;
+  const staticRole = locale === "en" ? ABOUT_ARCHITECT_ROLE_EN : ABOUT_ARCHITECT_ROLE;
+  const staticBio = locale === "en" ? ABOUT_ARCHITECT_BIO_EN : ABOUT_ARCHITECT_BIO;
+  const portraitSrc =
+    typeof aboutCms?.portraitImageUrl === "string" && aboutCms.portraitImageUrl.trim().length > 0
+      ? aboutCms.portraitImageUrl.trim()
+      : PORTRAIT_FALLBACK;
+  const name =
+    typeof aboutCms?.architectName === "string" && aboutCms.architectName.trim().length > 0
+      ? aboutCms.architectName.trim()
+      : staticName;
+  const role =
+    typeof aboutCms?.architectRole === "string" && aboutCms.architectRole.trim().length > 0
+      ? aboutCms.architectRole.trim()
+      : staticRole;
+  const bio =
+    typeof aboutCms?.architectBio === "string" && aboutCms.architectBio.trim().length > 0
+      ? aboutCms.architectBio.trim()
+      : staticBio;
   const sectionRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -109,7 +126,7 @@ export function AboutArchitectModule() {
                 transition={reduceMotion ? undefined : { duration: 1.05, ease }}
               >
                 <Image
-                  src={PORTRAIT_SRC}
+                  src={portraitSrc}
                   alt={locale === "en" ? `${name} portrait` : `${name} portre`}
                   fill
                   className={cn(

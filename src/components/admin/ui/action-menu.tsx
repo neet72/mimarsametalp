@@ -1,8 +1,21 @@
 "use client";
 
-import { Children, Fragment, isValidElement, useEffect, useId, useRef, useState } from "react";
+import {
+  Children,
+  Fragment,
+  isValidElement,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { createPortal } from "react-dom";
 import { MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/cn";
+
+const MENU_MIN_W_PX = 176;
+const EDGE = 10;
 
 export function ActionMenu({
   label = "Aksiyonlar",
@@ -16,12 +29,91 @@ export function ActionMenu({
   const [open, setOpen] = useState(false);
   const btnId = useId();
   const ref = useRef<HTMLDivElement | null>(null);
+  const menuElRef = useRef<HTMLDivElement | null>(null);
+  const [menuRect, setMenuRect] = useState<{
+    left: number;
+    top?: number;
+    bottom?: number;
+    maxHeight: number;
+    width: number;
+    openUp: boolean;
+  } | null>(null);
+
+  function computeMenuPlacement() {
+    const trigger = ref.current?.querySelector("button") as HTMLButtonElement | null;
+    const menuEl = menuElRef.current;
+    if (!trigger || !menuEl) return;
+
+    const r = trigger.getBoundingClientRect();
+    const h = menuEl.offsetHeight || 260;
+    const vw = typeof window !== "undefined" ? window.innerWidth : 0;
+    const vh = typeof window !== "undefined" ? window.innerHeight : 0;
+
+    let left = align === "end" ? Math.round(r.right - MENU_MIN_W_PX) : Math.round(r.left);
+    left = Math.max(EDGE, Math.min(left, vw - MENU_MIN_W_PX - EDGE));
+
+    const spaceBelow = vh - r.bottom - EDGE;
+    const spaceAbove = r.top - EDGE;
+
+    let openUp = false;
+    if (spaceBelow < Math.min(h, 220) && spaceAbove > spaceBelow) openUp = true;
+
+    const maxHeight = openUp
+      ? Math.max(140, Math.min(420, spaceAbove))
+      : Math.max(140, Math.min(420, spaceBelow));
+
+    if (openUp) {
+      setMenuRect({
+        left,
+        bottom: Math.round(vh - r.top + 8),
+        maxHeight,
+        width: MENU_MIN_W_PX,
+        openUp: true,
+      });
+    } else {
+      setMenuRect({
+        left,
+        top: Math.round(r.bottom + 8),
+        maxHeight,
+        width: MENU_MIN_W_PX,
+        openUp: false,
+      });
+    }
+  }
+
+  useLayoutEffect(() => {
+    if (!open) {
+      setMenuRect(null);
+      return;
+    }
+    // Two-pass: measure after first paint then refine maxHeight using real height.
+    requestAnimationFrame(() => {
+      computeMenuPlacement();
+      requestAnimationFrame(() => computeMenuPlacement());
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, align, children]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const onScrollOrResize = () => computeMenuPlacement();
+    window.addEventListener("scroll", onScrollOrResize, { passive: true });
+    window.addEventListener("resize", onScrollOrResize);
+    return () => {
+      window.removeEventListener("scroll", onScrollOrResize);
+      window.removeEventListener("resize", onScrollOrResize);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent) => {
-      if (!ref.current) return;
-      if (ref.current.contains(e.target as Node)) return;
+      const target = e.target as Node | null;
+      if (!target) return;
+      if (ref.current?.contains(target)) return;
+      if (menuElRef.current?.contains(target)) return;
       setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
@@ -52,22 +144,47 @@ export function ActionMenu({
         <MoreHorizontal className="h-4 w-4" aria-hidden />
       </button>
 
-      {open ? (
-        <div
-          role="menu"
-          aria-labelledby={btnId}
-          className={cn(
-            "absolute top-11 z-50 min-w-44 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 shadow-[0_18px_70px_-22px_rgb(0_0_0/0.65)]",
-            align === "end" ? "right-0" : "left-0",
-          )}
-          onClick={() => setOpen(false)}
-        >
-          {Children.toArray(children).map((child, idx) => {
-            const k = isValidElement(child) ? child.key : null;
-            return <Fragment key={k ?? `m-${idx}`}>{child}</Fragment>;
-          })}
-        </div>
-      ) : null}
+      {open && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              ref={menuElRef}
+              role="menu"
+              aria-labelledby={btnId}
+              style={
+                menuRect
+                  ? menuRect.openUp
+                    ? {
+                        position: "fixed",
+                        left: menuRect.left,
+                        bottom: menuRect.bottom,
+                        width: menuRect.width,
+                        maxHeight: menuRect.maxHeight,
+                        zIndex: 3000,
+                      }
+                    : {
+                        position: "fixed",
+                        left: menuRect.left,
+                        top: menuRect.top,
+                        width: menuRect.width,
+                        maxHeight: menuRect.maxHeight,
+                        zIndex: 3000,
+                      }
+                  : { position: "fixed", left: -9999, top: -9999, zIndex: 3000, opacity: 0, pointerEvents: "none" }
+              }
+              className={cn(
+                "overflow-y-auto overflow-x-hidden rounded-xl border border-zinc-800 bg-zinc-950 shadow-[0_18px_70px_-22px_rgb(0_0_0/0.65)]",
+                "pointer-events-auto",
+              )}
+              onClick={() => setOpen(false)}
+            >
+              {Children.toArray(children).map((child, idx) => {
+                const k = isValidElement(child) ? child.key : null;
+                return <Fragment key={k ?? `m-${idx}`}>{child}</Fragment>;
+              })}
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

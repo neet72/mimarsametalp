@@ -71,6 +71,15 @@ export function CinematicScrollHero() {
   const isDraggingRef = useRef(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const activeSrc = lightboxIndex == null ? null : sources[lightboxIndex];
+
+  const lightboxImageAlt = useMemo(() => {
+    if (lightboxIndex == null) return "";
+    const i = lightboxIndex + 1;
+    const n = sources.length;
+    return locale === "en"
+      ? `Samet Alp Architecture — portfolio render ${i} of ${n}`
+      : `Samet Alp Mimarlık — portföy render görseli ${i} / ${n}`;
+  }, [lightboxIndex, locale, sources.length]);
   const canPrev = lightboxIndex != null && lightboxIndex > 0;
   const canNext = lightboxIndex != null && lightboxIndex < sources.length - 1;
 
@@ -648,7 +657,13 @@ export function CinematicScrollHero() {
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
         {/* Drag overlay (does not block buttons) */}
         <motion.div
-          aria-label={locale === "en" ? "Drag to rotate" : "Döndürmek için sürükle"}
+          role="region"
+          tabIndex={-1}
+          aria-label={
+            locale === "en"
+              ? "Interactive 3D project ribbon — drag sideways to rotate, click to enlarge"
+              : "Etkileşimli 3D proje şeridi — yatay sürükleyerek döndürün, büyütmek için tıklayın"
+          }
           className="absolute inset-0 z-[3]"
           drag={reduceMotion ? false : "x"}
           // Keep overlay in place; we only use drag events (no "wall" feel).
@@ -828,7 +843,7 @@ export function CinematicScrollHero() {
                   >
                     <NextImage
                       src={activeSrc}
-                      alt="Hero image"
+                      alt={lightboxImageAlt || (locale === "en" ? "Hero image" : "Ana sayfa görseli")}
                       fill
                       sizes="(max-width: 768px) 92vw, 1200px"
                       className="object-contain object-center"

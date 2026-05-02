@@ -3,8 +3,10 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
+import { localeFromPathname } from "@/lib/locale";
 
 const HERO_IMAGES = [
   "/images/hero-1.webp",
@@ -22,6 +24,8 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 export function HeroSlider() {
   const reduceMotion = useReducedMotion();
+  const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
   const [slide, setSlide] = useState(0);
   const total = HERO_IMAGES.length;
 
@@ -59,7 +63,11 @@ export function HeroSlider() {
             >
               <Image
                 src={HERO_IMAGES[slide]}
-                alt={`Seçili proje görseli ${slide + 1}`}
+                alt={
+                  locale === "en"
+                    ? `Samet Alp Architecture — featured project visual ${slide + 1} of ${total}`
+                    : `Samet Alp Mimarlık — öne çıkan proje görseli ${slide + 1} / ${total}`
+                }
                 fill
                 priority={slide === 0}
                 sizes="(max-width: 1440px) 100vw, 1440px"

@@ -20,7 +20,7 @@ const outfit = Outfit({
 });
 
 const defaultDescription =
-  "Konut, ticari ve iç mimarlık projelerinde mimari tasarım, ruhsat ve anahtar teslim uygulama. Adana merkezli Samet Alp Mimarlık portföyü ve iletişim.";
+  "Modern mimari tasarımlar, 3D görselleştirme ve kentsel planlama projeleri üreten profesyonel mimarlık ofisi. Samet Alp Mimarlık — Adana.";
 
 /** Mobil tarayıcılar, notch ve PWA çubuğu için */
 export const viewport: Viewport = {

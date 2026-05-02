@@ -4,17 +4,11 @@ import { useMemo, useState, useTransition } from "react";
 import { Save } from "lucide-react";
 import { upsertSiteContent } from "@/actions/admin/site-content";
 import { uploadAdminMedia } from "@/actions/admin/upload";
+import type { AboutCmsDraft } from "@/lib/site-content/about-cms";
 
 type Locale = "tr" | "en";
 
-type AboutDraft = {
-  visionTitle: string;
-  visionBody: string;
-  architectName: string;
-  architectRole: string;
-  architectBio: string;
-  portraitImageUrl: string;
-};
+type AboutDraft = AboutCmsDraft;
 
 const emptyDraft: AboutDraft = {
   visionTitle: "",
@@ -74,10 +68,11 @@ export function AboutAdminPanel({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h2 className="font-display text-lg font-semibold tracking-tight text-zinc-100">
-            Hakkımızda Paneli (Yeni)
+            Hakkımızda
           </h2>
           <p className="mt-1 text-sm text-zinc-500">
-            Mevcut sayfayı değiştirmez; sadece içerik kaydı yapar. Sonra bağlarız.
+            Metinleri ve portre görselini kaydedin; /hakkimizda ve /en/hakkimizda sayfalarında canlı
+            görünür. Boş bıraktığınız alanlar sitedeki varsayılan metinleri kullanır.
           </p>
         </div>
         <div className="flex items-center gap-2">
