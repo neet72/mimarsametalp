@@ -7,12 +7,19 @@ import { SocialGallery } from "@/components/home/SocialGallery";
 import { pageMetadata } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
-export const metadata: Metadata = pageMetadata({
-  title: "Ana Sayfa",
-  description:
-    "Samet Alp Mimarlık: mimarlık, iç mimarlık ve anahtar teslim projelerde çağdaş ve sürdürülebilir tasarım.",
-  path: "/",
-});
+const pageTitle = "Samet Alp Mimarlık | Ana Sayfa";
+const pageDescription =
+  "Adana merkezli mimarlık ofisi Samet Alp Mimarlık: mimari tasarım, iç mimarlık, 3D görselleştirme, kentsel planlama ve anahtar teslim projeler.";
+
+export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "Ana Sayfa",
+    description: pageDescription,
+    path: "/",
+  }),
+  title: { absolute: pageTitle },
+  description: pageDescription,
+};
 
 export default function HomePage() {
   return (

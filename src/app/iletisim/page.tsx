@@ -3,12 +3,19 @@ import { ContactPageExperience } from "@/components/contact/ContactPageExperienc
 import { pageMetadata } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
-export const metadata: Metadata = pageMetadata({
-  title: "İletişim",
-  description:
-    "Samet Alp Mimarlık ile ilk danışma, proje taslağı ve yer ziyareti adımlarında yanınızdayız. E-posta ve telefon üzerinden bize ulaşın.",
-  path: "/iletisim",
-});
+const pageTitle = "İletişim | Samet Alp Mimarlık";
+const pageDescription =
+  "Ofis adresi, harita, telefon ve e-posta ile Samet Alp Mimarlık’a ulaşın; proje görüşmesi için form ile mesaj gönderin. Adana mimarlık ofisi iletişim bilgileri.";
+
+export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "İletişim",
+    description: pageDescription,
+    path: "/iletisim",
+  }),
+  title: { absolute: pageTitle },
+  description: pageDescription,
+};
 
 export default function IletisimPage() {
   return (

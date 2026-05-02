@@ -10,41 +10,72 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+const enBrand = "Samet Alp Architecture";
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const service = SERVICES_DETAIL[slug];
-  if (!service) {
-    return pageMetadata({
-      title: "Service Detail",
-      description: "Service detail.",
-      path: "/en/hizmetlerimiz",
-    });
-  }
-
-  const title = service.name;
-  const description = service.shortDescription.slice(0, 180);
-  // Prefer DB-backed cached hero image (Cloudinary), fallback to in-code content image.
   const key = String(slug ?? "").trim().toLowerCase();
   const db = key ? await getPublicServiceBySlug(key) : null;
-  const img = db?.heroImageUrl ?? service.heroImageUrl;
+  const staticService = SERVICES_DETAIL[slug];
+
+  const merged =
+    staticService != null
+      ? {
+          slug: staticService.slug,
+          name: db?.title ?? staticService.name,
+          shortDescription:
+            (db?.shortDescription && String(db.shortDescription).trim()) || staticService.shortDescription,
+          heroImageUrl: db?.heroImageUrl ?? staticService.heroImageUrl,
+        }
+      : db
+        ? {
+            slug: db.slug,
+            name: db.title,
+            shortDescription: db.shortDescription ?? "Service details — Samet Alp Architecture, Adana.",
+            heroImageUrl: db.heroImageUrl ?? undefined,
+          }
+        : null;
+
+  if (!merged) {
+    const fallbackTitle = `Services | ${enBrand}`;
+    const fallbackDescription =
+      "Explore architecture, interior design, and turnkey services from our Adana studio — Samet Alp Architecture.";
+    return {
+      ...pageMetadata({
+        title: "Services",
+        description: fallbackDescription,
+        path: "/en/hizmetlerimiz",
+      }),
+      title: { absolute: fallbackTitle },
+      description: fallbackDescription,
+    };
+  }
+
+  const title = merged.name;
+  const rawDesc = String(merged.shortDescription ?? "").trim();
+  const description = (rawDesc || `${title} — ${enBrand}, Adana.`).slice(0, 200);
+  const absoluteTitle = `${title} | ${enBrand}`;
+  const img = merged.heroImageUrl;
 
   return {
     ...pageMetadata({
       title,
       description,
-      path: `/en/hizmetlerimiz/${service.slug}`,
+      path: `/en/hizmetlerimiz/${merged.slug}`,
     }),
+    title: { absolute: absoluteTitle },
+    description,
     openGraph: {
       type: "website",
       locale: "en_US",
-      title: `${title} | Samet Alp Architecture`,
+      title: absoluteTitle,
       description,
-      url: `/en/hizmetlerimiz/${service.slug}`,
+      url: `/en/hizmetlerimiz/${merged.slug}`,
       images: img ? [{ url: img }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title: `${title} | Samet Alp Architecture`,
+      title: absoluteTitle,
       description,
       images: img ? [img] : undefined,
     },

@@ -7,9 +7,33 @@ import {
   CONTACT_EMAIL,
   CONTACT_FORM_HEADING,
   CONTACT_FORM_HELPER,
+  CONTACT_FORM_CLIENT_INVALID,
+  CONTACT_FORM_HONEYPOT_LABEL,
+  CONTACT_FORM_LABEL_EMAIL,
+  CONTACT_FORM_LABEL_FIRST_NAME,
+  CONTACT_FORM_LABEL_LAST_NAME,
+  CONTACT_FORM_LABEL_MESSAGE,
+  CONTACT_FORM_SECTION_KICKER,
+  CONTACT_FORM_SUBMIT,
+  CONTACT_FORM_SUBMIT_PENDING,
+  CONTACT_FORM_WA_FALLBACK,
   CONTACT_PHONE_DISPLAY,
   CONTACT_PHONE_TEL,
 } from "@/content/contact-page";
+import {
+  CONTACT_FORM_CLIENT_INVALID as CONTACT_FORM_CLIENT_INVALID_EN,
+  CONTACT_FORM_HEADING as CONTACT_FORM_HEADING_EN,
+  CONTACT_FORM_HELPER as CONTACT_FORM_HELPER_EN,
+  CONTACT_FORM_HONEYPOT_LABEL as CONTACT_FORM_HONEYPOT_LABEL_EN,
+  CONTACT_FORM_LABEL_EMAIL as CONTACT_FORM_LABEL_EMAIL_EN,
+  CONTACT_FORM_LABEL_FIRST_NAME as CONTACT_FORM_LABEL_FIRST_NAME_EN,
+  CONTACT_FORM_LABEL_LAST_NAME as CONTACT_FORM_LABEL_LAST_NAME_EN,
+  CONTACT_FORM_LABEL_MESSAGE as CONTACT_FORM_LABEL_MESSAGE_EN,
+  CONTACT_FORM_SECTION_KICKER as CONTACT_FORM_SECTION_KICKER_EN,
+  CONTACT_FORM_SUBMIT as CONTACT_FORM_SUBMIT_EN,
+  CONTACT_FORM_SUBMIT_PENDING as CONTACT_FORM_SUBMIT_PENDING_EN,
+  CONTACT_FORM_WA_FALLBACK as CONTACT_FORM_WA_FALLBACK_EN,
+} from "@/content/contact-page.en";
 import {
   contactFormSchema,
   flattenContactErrors,
@@ -17,9 +41,14 @@ import {
 } from "@/lib/validations/contact";
 import { ContactSocialLinks } from "./ContactSocialLinks";
 import { ContactUnderlineField } from "./ContactUnderlineField";
+import { usePathname } from "next/navigation";
+import { localeFromPathname } from "@/lib/locale";
 
 export function ContactFormPanel() {
   const reduceMotion = useReducedMotion();
+  const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
+  const isEn = locale === "en";
   const [isPending, startTransition] = useTransition();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -60,7 +89,7 @@ export function ContactFormPanel() {
       const clientParsed = contactFormSchema.safeParse(payload);
       if (!clientParsed.success) {
         setFieldErrors(flattenContactErrors(clientParsed.error));
-        setFormError("Lütfen formu kontrol edin.");
+        setFormError(isEn ? CONTACT_FORM_CLIENT_INVALID_EN : CONTACT_FORM_CLIENT_INVALID);
         return;
       }
 
@@ -78,7 +107,7 @@ export function ContactFormPanel() {
         setFormError(result.error);
       });
     },
-    [email, firstName, honeypot, lastName, message],
+    [email, firstName, honeypot, isEn, lastName, message],
   );
 
   return (
@@ -91,7 +120,7 @@ export function ContactFormPanel() {
     >
       <div className="space-y-1 border-b border-border/60 pb-8">
         <p className="font-display text-[10px] font-semibold uppercase tracking-[0.28em] text-primary/45">
-          İletişim
+          {isEn ? CONTACT_FORM_SECTION_KICKER_EN : CONTACT_FORM_SECTION_KICKER}
         </p>
         <a
           href={`mailto:${CONTACT_EMAIL}`}
@@ -111,16 +140,18 @@ export function ContactFormPanel() {
 
       <div className="mt-10">
         <p className="font-display text-[10px] font-semibold uppercase tracking-[0.28em] text-primary/45">
-          {CONTACT_FORM_HEADING}
+          {isEn ? CONTACT_FORM_HEADING_EN : CONTACT_FORM_HEADING}
         </p>
         <p className="mt-2 max-w-md text-[0.8125rem] leading-relaxed text-primary/55">
-          {CONTACT_FORM_HELPER}
+          {isEn ? CONTACT_FORM_HELPER_EN : CONTACT_FORM_HELPER}
         </p>
       </div>
 
       <form className="relative mt-8 space-y-9" onSubmit={onSubmit} noValidate>
         <div className="absolute -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0" aria-hidden>
-          <label htmlFor="contact-company">Şirket</label>
+          <label htmlFor="contact-company">
+            {isEn ? CONTACT_FORM_HONEYPOT_LABEL_EN : CONTACT_FORM_HONEYPOT_LABEL}
+          </label>
           <input
             id="contact-company"
             name="company"
@@ -135,7 +166,7 @@ export function ContactFormPanel() {
           <ContactUnderlineField
             id="firstName"
             name="firstName"
-            label="Ad"
+            label={isEn ? CONTACT_FORM_LABEL_FIRST_NAME_EN : CONTACT_FORM_LABEL_FIRST_NAME}
             autoComplete="given-name"
             value={firstName}
             onChange={setFirstName}
@@ -144,7 +175,7 @@ export function ContactFormPanel() {
           <ContactUnderlineField
             id="lastName"
             name="lastName"
-            label="Soyad"
+            label={isEn ? CONTACT_FORM_LABEL_LAST_NAME_EN : CONTACT_FORM_LABEL_LAST_NAME}
             autoComplete="family-name"
             value={lastName}
             onChange={setLastName}
@@ -155,7 +186,7 @@ export function ContactFormPanel() {
         <ContactUnderlineField
           id="email"
           name="email"
-          label="E-posta"
+          label={isEn ? CONTACT_FORM_LABEL_EMAIL_EN : CONTACT_FORM_LABEL_EMAIL}
           type="email"
           autoComplete="email"
           value={email}
@@ -166,7 +197,7 @@ export function ContactFormPanel() {
         <ContactUnderlineField
           id="message"
           name="message"
-          label="Mesaj"
+          label={isEn ? CONTACT_FORM_LABEL_MESSAGE_EN : CONTACT_FORM_LABEL_MESSAGE}
           as="textarea"
           rows={6}
           value={message}
@@ -182,7 +213,8 @@ export function ContactFormPanel() {
             <p className="font-medium">{formError}</p>
             {lastPayload ? (
               <p className="mt-1 text-xs text-red-700/80">
-                İstersen WhatsApp üzerinden de yazabilirsin: {lastPayload.firstName} {lastPayload.lastName}
+                {(isEn ? CONTACT_FORM_WA_FALLBACK_EN : CONTACT_FORM_WA_FALLBACK)} {lastPayload.firstName}{" "}
+                {lastPayload.lastName}
               </p>
             ) : null}
           </div>
@@ -204,7 +236,9 @@ export function ContactFormPanel() {
           whileTap={reduceMotion || isPending ? undefined : { scale: 0.995 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
-          {isPending ? "Gönderiliyor…" : "Gönder"}
+          {isPending
+            ? (isEn ? CONTACT_FORM_SUBMIT_PENDING_EN : CONTACT_FORM_SUBMIT_PENDING)
+            : (isEn ? CONTACT_FORM_SUBMIT_EN : CONTACT_FORM_SUBMIT)}
         </motion.button>
       </form>
     </motion.div>

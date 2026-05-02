@@ -5,12 +5,19 @@ import { mergeAboutWithPortraitFallback, parseAboutCms } from "@/lib/site-conten
 import { pageMetadata } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
-export const metadata: Metadata = pageMetadata({
-  title: "About",
-  description:
-    "We shape architecture with a client-first approach—turnkey delivery, consulting, and interior design solutions.",
-  path: "/en/hakkimizda",
-});
+const pageTitle = "About | Samet Alp Architecture";
+const pageDescription =
+  "Meet our Adana architecture studio — client‑first turnkey delivery, consulting, interiors, and a modern approach to every project.";
+
+export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "About",
+    description: pageDescription,
+    path: "/en/hakkimizda",
+  }),
+  title: { absolute: pageTitle },
+  description: pageDescription,
+};
 
 export default async function AboutPageEn() {
   const [rawEn, rawTr] = await Promise.all([getSiteContent("about", "en"), getSiteContent("about", "tr")]);

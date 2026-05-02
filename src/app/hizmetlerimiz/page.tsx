@@ -3,12 +3,20 @@ import { HizmetlerimizPageContent } from "@/components/hizmetlerimiz/Hizmetlerim
 import { pageMetadata } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
-export const metadata: Metadata = pageMetadata({
-  title: "Hizmetlerimiz",
-  description:
-    "İç mimarlık, anahtar teslim proje, mimari kontrolörlük, tasarım ve ruhsat, danışmanlık ile yenileme ve tadilat hizmetleri.",
-  path: "/hizmetlerimiz",
-});
+const pageTitle = "Hizmetlerimiz | Samet Alp Mimarlık";
+const pageDescription =
+  "Adana merkezli mimari tasarım, iç mimarlık, 3D görselleştirme ve kentsel planlama hizmetlerimiz.";
+
+/** absolute: kök layout title şablonuna çift ekleme yapmaması için */
+export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "Hizmetlerimiz",
+    description: pageDescription,
+    path: "/hizmetlerimiz",
+  }),
+  title: { absolute: pageTitle },
+  description: pageDescription,
+};
 
 export default function HizmetlerimizPage() {
   return (

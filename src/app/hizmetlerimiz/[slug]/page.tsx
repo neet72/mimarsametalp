@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ServiceDetailClient } from "@/components/hizmetlerimiz/ServiceDetailClient";
-import { pageMetadata } from "@/lib/seo";
+import { pageMetadata, siteName } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps, serviceJsonLd } from "@/lib/seo-jsonld";
 import { SERVICES_DETAIL } from "@/content/services-detail";
 import { getPublicServiceBySlug } from "@/lib/public/services";
@@ -24,15 +24,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       }
     : SERVICES_DETAIL[slug];
   if (!service) {
-    return pageMetadata({
-      title: "Hizmet Detayı",
-      description: "Hizmet detayı.",
-      path: "/hizmetlerimiz",
-    });
+    const fallbackTitle = `Hizmetlerimiz | ${siteName}`;
+    const fallbackDescription =
+      "Adana mimarlık ofisi Samet Alp Mimarlık: mimari tasarım, iç mimarlık ve anahtar teslim hizmetlerimizi keşfedin.";
+    return {
+      ...pageMetadata({
+        title: "Hizmetlerimiz",
+        description: fallbackDescription,
+        path: "/hizmetlerimiz",
+      }),
+      title: { absolute: fallbackTitle },
+      description: fallbackDescription,
+    };
   }
 
   const title = service.name;
-  const description = service.shortDescription.slice(0, 180);
+  const rawDesc = String(service.shortDescription ?? "").trim();
+  const description = (rawDesc || `${service.name} — ${siteName}, Adana.`).slice(0, 200);
+  const absoluteTitle = `${title} | ${siteName}`;
   const img = service.heroImageUrl;
 
   return {
@@ -41,17 +50,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       path: `/hizmetlerimiz/${service.slug}`,
     }),
+    title: { absolute: absoluteTitle },
+    description,
     openGraph: {
       type: "website",
       locale: "tr_TR",
-      title: `${title} | Samet Alp Mimarlık`,
+      title: absoluteTitle,
       description,
       url: `/hizmetlerimiz/${service.slug}`,
       images: img ? [{ url: img }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title: `${title} | Samet Alp Mimarlık`,
+      title: absoluteTitle,
       description,
       images: img ? [img] : undefined,
     },

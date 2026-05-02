@@ -7,7 +7,7 @@ export const SERVICES_DETAIL: Record<string, ServiceDetailData> = {
     name: "Interior Architecture & Decoration",
     heroImageUrl: "/images/hero-1.webp",
     shortDescription:
-      "We design modern, calm, and timeless interiors by shaping the space’s character through light, materials, and proportion.",
+      "We rethink living spaces with aesthetics and usability in mind—from concept to décor. Modern interior architecture projects with professional coordination in Adana.",
     hizmetKapsami: [
       "Needs analysis and concept definition",
       "Moodboard, color & material selections",

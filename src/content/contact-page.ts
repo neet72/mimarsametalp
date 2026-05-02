@@ -39,3 +39,17 @@ export const CONTACT_SOCIAL_LINKEDIN =
 export const CONTACT_FORM_HEADING = "Mesaj gönderin";
 export const CONTACT_FORM_HELPER =
   "Proje talebi, randevu ve danışmanlık sorularınız için aşağıdaki alanları doldurun; yanıt e-posta ile iletilir.";
+
+export const CONTACT_FORM_SECTION_KICKER = "İletişim";
+export const CONTACT_SOCIAL_HEADING = "Sosyal medya";
+
+export const CONTACT_FORM_LABEL_FIRST_NAME = "Ad";
+export const CONTACT_FORM_LABEL_LAST_NAME = "Soyad";
+export const CONTACT_FORM_LABEL_EMAIL = "E-posta";
+export const CONTACT_FORM_LABEL_MESSAGE = "Mesaj";
+export const CONTACT_FORM_HONEYPOT_LABEL = "Şirket";
+
+export const CONTACT_FORM_SUBMIT = "Gönder";
+export const CONTACT_FORM_SUBMIT_PENDING = "Gönderiliyor…";
+export const CONTACT_FORM_CLIENT_INVALID = "Lütfen formu kontrol edin.";
+export const CONTACT_FORM_WA_FALLBACK = "İstersen WhatsApp üzerinden de yazabilirsin:";

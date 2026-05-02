@@ -35,6 +35,20 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase,
+  /** PWA / tarayıcı ikonları — dosyalar `public/` kökünde olmalı (RealFaviconGenerator çıktısı). */
+  manifest: "/site.webmanifest",
+  appleWebApp: {
+    title: "Mimar Samet Alp",
+    capable: true,
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    shortcut: [{ url: "/favicon.ico" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   title: {
     default: "Samet Alp Mimarlık | Lüks ve Fonksiyonel Tasarım",
     template: `%s | ${siteName}`,
@@ -100,6 +114,7 @@ export default async function RootLayout({
       lang={locale === "en" ? "en" : "tr"}
       data-scroll-behavior="smooth"
       className={`${inter.variable} ${outfit.variable}`}
+      suppressHydrationWarning
     >
       <body
         className="font-sans [--font-display:var(--font-outfit)] [--font-sans:var(--font-inter)]"
@@ -125,7 +140,7 @@ export default async function RootLayout({
             }),
           )}
         />
-        <MainLayout key="main-layout" locale={locale}>
+        <MainLayout key="main-layout">
           {children}
         </MainLayout>
         {/* Avoid dev key warnings inside analytics overlay on admin routes */}

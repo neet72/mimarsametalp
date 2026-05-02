@@ -3,12 +3,19 @@ import { HizmetlerimizPageContent } from "@/components/hizmetlerimiz/Hizmetlerim
 import { pageMetadata } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
-export const metadata: Metadata = pageMetadata({
-  title: "Services",
-  description:
-    "Interior architecture, turnkey projects, architectural supervision, design & permits, consulting, and renovation services.",
-  path: "/en/hizmetlerimiz",
-});
+const pageTitle = "Services | Samet Alp Architecture";
+const pageDescription =
+  "Architecture, interior design, 3D visualization, and urban planning — based in Adana, Turkey.";
+
+export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "Services",
+    description: pageDescription,
+    path: "/en/hizmetlerimiz",
+  }),
+  title: { absolute: pageTitle },
+  description: pageDescription,
+};
 
 export default function ServicesPageEn() {
   return (

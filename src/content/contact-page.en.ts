@@ -37,3 +37,17 @@ export const CONTACT_FORM_HEADING = "Send a message";
 export const CONTACT_FORM_HELPER =
   "For project requests, appointments, and consulting questions, fill out the form below. We’ll respond via email.";
 
+export const CONTACT_FORM_SECTION_KICKER = "Contact";
+export const CONTACT_SOCIAL_HEADING = "Social media";
+
+export const CONTACT_FORM_LABEL_FIRST_NAME = "First name";
+export const CONTACT_FORM_LABEL_LAST_NAME = "Last name";
+export const CONTACT_FORM_LABEL_EMAIL = "Email";
+export const CONTACT_FORM_LABEL_MESSAGE = "Message";
+export const CONTACT_FORM_HONEYPOT_LABEL = "Company";
+
+export const CONTACT_FORM_SUBMIT = "Send";
+export const CONTACT_FORM_SUBMIT_PENDING = "Sending…";
+export const CONTACT_FORM_CLIENT_INVALID = "Please check the form.";
+export const CONTACT_FORM_WA_FALLBACK = "If you prefer, you can also message us on WhatsApp:";
+

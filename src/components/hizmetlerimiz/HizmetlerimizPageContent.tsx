@@ -87,7 +87,7 @@ function HizmetCard({ index }: { index: number }) {
             className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"
           />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 p-4 sm:p-6">
-            <h3
+            <h2
               className={cn(
                 "text-center font-display text-[11px] font-semibold uppercase leading-relaxed text-white drop-shadow-sm",
                 "break-normal text-pretty tracking-[0.1em] sm:text-[11px] sm:tracking-[0.18em] md:text-xs md:tracking-[0.22em] lg:tracking-[0.24em]",
@@ -96,7 +96,7 @@ function HizmetCard({ index }: { index: number }) {
               )}
             >
               {service.title}
-            </h3>
+            </h2>
           </div>
         </div>
       </article>

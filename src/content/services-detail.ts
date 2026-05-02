@@ -7,7 +7,7 @@ export const SERVICES_DETAIL: Record<string, ServiceDetailData> = {
     name: "İç Mimarlık & Dekorasyon",
     heroImageUrl: "/images/hero-1.webp",
     shortDescription:
-      "Mekânın karakterini; ışık, malzeme ve oranlarla birlikte ele alarak modern, sakin ve zamansız iç mekânlar tasarlıyoruz.",
+      "Yaşam alanlarınızı estetik ve işlevsellikle yeniden tasarlıyoruz. Modern iç mimari ve dekorasyon projelerimiz — Adana ve çevresi için konseptten uygulamaya profesyonel destek.",
     hizmetKapsami: [
       "İhtiyaç analizi ve konsept kurgusu",
       "Moodboard, renk & malzeme seçimleri",

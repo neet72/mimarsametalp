@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import Image from "next/image";
 import { Save } from "lucide-react";
 import { upsertSiteContent } from "@/actions/admin/site-content";
 import { uploadAdminMedia } from "@/actions/admin/upload";
@@ -71,8 +72,11 @@ export function AboutAdminPanel({
             Hakkımızda
           </h2>
           <p className="mt-1 text-sm text-zinc-500">
-            Metinleri ve portre görselini kaydedin; /hakkimizda ve /en/hakkimizda sayfalarında canlı
-            görünür. Boş bıraktığınız alanlar sitedeki varsayılan metinleri kullanır.
+            Metinleri ve{" "}
+            <span className="text-zinc-300">mimar portresini</span> kaydedin; /hakkimizda ve
+            /en/hakkimizda sayfalarında canlı görünür. Boş alanlar sitedeki varsayılan metinleri
+            kullanır. Portre için yalnızca TR veya EN sekmesinden bir kez yüklemiş olmanız yeter —
+            diğer dil boşsa aynı görsel iki dilde de kullanılır.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -113,7 +117,7 @@ export function AboutAdminPanel({
         className="space-y-4"
       >
         <div className="grid gap-4 lg:grid-cols-12">
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 lg:col-span-8">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 lg:col-span-12">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
               Firma Hakkında
             </h3>
@@ -134,42 +138,63 @@ export function AboutAdminPanel({
             </div>
           </div>
 
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 lg:col-span-4">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Fotoğraf
-            </h3>
-            <div className="mt-3 space-y-2">
-              <div className="flex gap-2">
-                <input
-                  value={draft.portraitImageUrl}
-                  onChange={(e) => setDraft((v) => ({ ...v, portraitImageUrl: e.target.value }))}
-                  placeholder="Görsel URL"
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
-                />
-                <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-200 hover:bg-zinc-900">
-                  Cihazdan Yükle
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      void uploadSingleImage(e.currentTarget.files).catch((e2) =>
-                        setErr(e2 instanceof Error ? e2.message : "Yükleme başarısız."),
-                      );
-                      e.currentTarget.value = "";
-                    }}
-                    disabled={pending}
-                  />
-                </label>
-              </div>
-            </div>
-          </div>
-
           <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 lg:col-span-12">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Mimar Bilgileri
+              Mimar bilgileri ve portre
             </h3>
-            <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <p className="mt-1 text-xs text-zinc-600">
+              Hakkımızda sayfasında mimar metninin yanındaki büyük fotoğrafı buradan değiştirirsiniz.
+            </p>
+            <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_200px] lg:items-start">
+              <div className="space-y-2">
+                <label className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+                  Portre — URL veya yükleme
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  <input
+                    value={draft.portraitImageUrl}
+                    onChange={(e) => setDraft((v) => ({ ...v, portraitImageUrl: e.target.value }))}
+                    placeholder="https://..."
+                    className="min-w-[12rem] flex-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
+                  />
+                  <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-200 hover:bg-zinc-900">
+                    Cihazdan Yükle
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        void uploadSingleImage(e.currentTarget.files).catch((e2) =>
+                          setErr(e2 instanceof Error ? e2.message : "Yükleme başarısız."),
+                        );
+                        e.currentTarget.value = "";
+                      }}
+                      disabled={pending}
+                    />
+                  </label>
+                </div>
+              </div>
+              <div className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/60">
+                {draft.portraitImageUrl.trim() ? (
+                  <div className="relative mx-auto aspect-[3/4] w-full max-w-[220px] min-h-[200px]">
+                    <Image
+                      src={draft.portraitImageUrl.trim()}
+                      alt="Portre önizleme"
+                      fill
+                      unoptimized
+                      className="object-cover object-[center_22%]"
+                      sizes="220px"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex aspect-[3/4] max-h-52 items-center justify-center p-4 text-center text-[11px] text-zinc-600 lg:max-h-none lg:min-h-[200px]">
+                    Önizleme; URL yapıştırın veya yükleyin
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-3 md:grid-cols-2">
               <input
                 value={draft.architectName}
                 onChange={(e) => setDraft((v) => ({ ...v, architectName: e.target.value }))}

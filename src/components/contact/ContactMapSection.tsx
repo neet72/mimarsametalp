@@ -7,18 +7,25 @@ import { localeFromPathname } from "@/lib/locale";
 
 /** Embed, API anahtarı gerektirmez */
 const OFFICE_ADDRESS = "Güzelevler, 2067/2 SK A blok no:32/3, 01220 Yüreğir/Adana";
-const OFFICE_PLACE_NAME = "MİMAR SAMET ALP";
-const OFFICE_QUERY = `${OFFICE_PLACE_NAME}, ${OFFICE_ADDRESS}`;
-const OFFICE_MAP_EMBED = `https://maps.google.com/maps?q=${encodeURIComponent(
-  OFFICE_QUERY,
-)}&hl=tr&z=16&output=embed`;
-const OFFICE_MAP_OPEN = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(OFFICE_QUERY)}`;
+const OFFICE_PLACE_NAME_TR = "MİMAR SAMET ALP";
+const OFFICE_PLACE_NAME_EN = "Samet Alp Architecture";
+
+function mapEmbedUrl(query: string, lang: "tr" | "en") {
+  return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&hl=${lang}&z=16&output=embed`;
+}
+
+function mapOpenUrl(query: string) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
 
 export function ContactMapSection() {
   const reduceMotion = useReducedMotion();
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
   const isEn = locale === "en";
+  const query = `${isEn ? OFFICE_PLACE_NAME_EN : OFFICE_PLACE_NAME_TR}, ${OFFICE_ADDRESS}`;
+  const embedUrl = mapEmbedUrl(query, isEn ? "en" : "tr");
+  const openUrl = mapOpenUrl(query);
 
   useEffect(() => {
     // Dev / fast-refresh edge case: if this overlay link ends up duplicated, keep only the first.
@@ -40,7 +47,7 @@ export function ContactMapSection() {
         className="relative h-[min(52vh,440px)] w-full min-h-[280px] overflow-hidden grayscale contrast-[1.15] brightness-[0.94] transition-[filter] duration-700 ease-out hover:grayscale-[0.35] hover:brightness-[0.98] motion-reduce:grayscale-0 motion-reduce:contrast-100 motion-reduce:brightness-100"
       >
         <a
-          href={OFFICE_MAP_OPEN}
+          href={openUrl}
           target="_blank"
           rel="noreferrer noopener"
           data-map-open="true"
@@ -50,7 +57,7 @@ export function ContactMapSection() {
         </a>
         <iframe
           title={isEn ? "Office map" : "Ofis haritası"}
-          src={OFFICE_MAP_EMBED}
+          src={embedUrl}
           className="absolute inset-0 h-full w-full border-0"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"

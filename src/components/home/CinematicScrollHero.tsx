@@ -67,6 +67,23 @@ export function CinematicScrollHero() {
 
   const sources = useMemo(() => [...HERO_IMAGES], []);
 
+  /** 3D strip için atlasa basılacak <img>'ler — Next/Image ile yüklendirilir */
+  const atlasImgElsRef = useRef<(HTMLImageElement | null)[]>(sources.map(() => null));
+  const [atlasEpoch, setAtlasEpoch] = useState(0);
+
+  useEffect(() => {
+    atlasImgElsRef.current = sources.map(() => null);
+    setAtlasEpoch((e) => e + 1);
+  }, [sources]);
+
+  const onAtlasImageLoaded = useCallback((index: number, imgEl: HTMLImageElement) => {
+    const slots = atlasImgElsRef.current;
+    slots[index] = imgEl;
+    if (slots.length === sources.length && slots.every((x) => x != null)) {
+      setAtlasEpoch((e) => e + 1);
+    }
+  }, [sources.length]);
+
   const [isDragging, setIsDragging] = useState(false);
   const isDraggingRef = useRef(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -157,6 +174,15 @@ export function CinematicScrollHero() {
     if (typeof window === "undefined") return;
     if (!wrapperRef.current || !stageRef.current || !canvasRef.current || !scrollSpaceRef.current)
       return;
+
+    const atlasSlots = atlasImgElsRef.current;
+    if (
+      atlasSlots.length !== sources.length ||
+      atlasSlots.some((x) => x == null || x.naturalWidth === 0)
+    ) {
+      return;
+    }
+    const imgs: HTMLImageElement[] = atlasSlots as HTMLImageElement[];
 
     gsap.registerPlugin(ScrollTrigger, CustomEase);
     CustomEase.create("cinematicSilk", "0.45, 0.05, 0.55, 0.95");
@@ -251,26 +277,6 @@ export function CinematicScrollHero() {
       atlasCanvas.width = Math.floor(totalWidthOriginal * scale);
       atlasCanvas.height = Math.floor(baseSize * scale);
 
-      const imgs: HTMLImageElement[] = [];
-
-      const loadAll = async () => {
-        await Promise.all(
-          sources.map(
-            (src, idx) =>
-              new Promise<void>((resolve, reject) => {
-                const img = new window.Image();
-                img.decoding = "async";
-                img.onload = () => {
-                  imgs[idx] = img;
-                  resolve();
-                };
-                img.onerror = () => reject(new Error(`Image failed to load: ${src}`));
-                img.src = src;
-              }),
-          ),
-        );
-      };
-
       let atlasTexture: THREE.CanvasTexture | null = null;
       const cylinderMat = new THREE.MeshStandardMaterial({
         roughness: 0.9,
@@ -340,7 +346,7 @@ export function CinematicScrollHero() {
 
       resizeWind();
 
-      const build = () => {
+      const buildCylinder = (): THREE.Mesh => {
         const totalCanvasWidth = atlasCanvas.width;
         const canvasHeight = atlasCanvas.height;
         imgs.forEach((img, i) => {
@@ -366,11 +372,12 @@ export function CinematicScrollHero() {
         cylinderMat.map = atlasTexture;
         cylinderMat.needsUpdate = true;
 
-        cylinder = new THREE.Mesh(cylinderGeo, cylinderMat);
-        cylinder.rotation.y = 0.5;
+        const mesh = new THREE.Mesh(cylinderGeo, cylinderMat);
+        mesh.rotation.y = 0.5;
         // Push slightly up so it doesn't look "stuck" in the middle
-        cylinder.position.y = isMobile ? 0.42 : 0.55;
-        scene.add(cylinder);
+        mesh.position.y = isMobile ? 0.42 : 0.55;
+        scene.add(mesh);
+        return mesh;
       };
 
       const tick = () => {
@@ -519,75 +526,71 @@ export function CinematicScrollHero() {
 
       const scrollLen = Math.max(1, scrollSpaceEl.offsetHeight);
       let tl: gsap.core.Timeline | null = null;
-      let disposed = false;
 
-      loadAll()
-        .then(() => {
-          if (disposed) return;
-          build();
+      try {
+        cylinder = buildCylinder();
 
-          tl = gsap.timeline({
-            scrollTrigger: {
-              trigger: stageEl,
-              start: "top top",
-              end: `+=${scrollLen}`,
-              // Higher scrub = slower, silkier response to scroll (without adding extra spacer distance).
-              scrub: isMobile ? 5.2 : 4.2,
-              pin: stageEl,
-              pinSpacing: true,
-              anticipatePin: 1,
-              invalidateOnRefresh: true,
-              onUpdate: (self) => {
-                progressRef.current = self.progress;
-                // Use ScrollTrigger velocity to drive wind presence
-                const v = Math.abs(self.getVelocity ? self.getVelocity() : 0);
-                lastVel = lastVel * 0.85 + v * 0.15;
-                // Normalize
-                const normalized = Math.min(1, lastVel / 2500);
-                windIntensity.v = 0.18 + normalized * 0.62;
-                windPhase.p = self.progress;
-              },
+        tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: stageEl,
+            start: "top top",
+            end: `+=${scrollLen}`,
+            // Higher scrub = slower, silkier response to scroll (without adding extra spacer distance).
+            scrub: isMobile ? 5.2 : 4.2,
+            pin: stageEl,
+            pinSpacing: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              progressRef.current = self.progress;
+              // Use ScrollTrigger velocity to drive wind presence
+              const v = Math.abs(self.getVelocity ? self.getVelocity() : 0);
+              lastVel = lastVel * 0.85 + v * 0.15;
+              // Normalize
+              const normalized = Math.min(1, lastVel / 2500);
+              windIntensity.v = 0.18 + normalized * 0.62;
+              windPhase.p = self.progress;
             },
-          });
-
-          // Cinematic shots (more dynamic again, but bounded so the strip never disappears)
-          const baseY = state.cam.y;
-          const baseZ = state.cam.z;
-          const baseTY = state.target.y;
-
-          tl.to(state.cam, {
-            x: 0,
-            y: baseY,
-            z: baseZ,
-            duration: 1,
-            ease: "cinematicSilk",
-          })
-            .to(
-              state.target,
-              { x: 0, y: baseTY, z: 0, duration: 1, ease: "none" },
-              0
-            )
-            // More vertical motion (reference-like), still bounded:
-            .to(state.cam, { x: 2.35, y: baseY + 0.95, z: baseZ - 1.05, duration: 1.2, ease: "cinematicFlow" })
-            .to(state.target, { x: 0.45, y: baseTY + 0.35, z: 0, duration: 1.2, ease: "none" }, "<")
-            .to(state.cam, { x: -2.95, y: baseY - 0.75, z: baseZ - 1.55, duration: 2.0, ease: "cinematicLinear" })
-            .to(state.target, { x: -0.55, y: baseTY - 0.25, z: 0, duration: 2.0, ease: "none" }, "<")
-            .to(state.cam, { x: 1.45, y: baseY + 0.35, z: baseZ - 1.15, duration: 3.0, ease: "power1.inOut" })
-            .to(state.target, { x: 0.2, y: baseTY + 0.2, z: 0, duration: 3.0, ease: "none" }, "<")
-            .to(state.cam, { x: -2.05, y: baseY + 0.6, z: baseZ - 0.65, duration: 1.1, ease: "cinematicSmooth" })
-            .to(state.target, { x: -0.25, y: baseTY + 0.25, z: 0, duration: 1.1, ease: "none" }, "<");
-
-          if (cylinder) {
-            tl.to(
-              cylinder.rotation,
-              { y: `+=${Math.PI * 2 * 2.0}`, duration: 8.5, ease: "none" },
-              0,
-            );
-          }
-        })
-        .catch(() => {
-          // ignore, do not break page scroll
+          },
         });
+
+        // Cinematic shots (more dynamic again, but bounded so the strip never disappears)
+        const baseY = state.cam.y;
+        const baseZ = state.cam.z;
+        const baseTY = state.target.y;
+
+        tl.to(state.cam, {
+          x: 0,
+          y: baseY,
+          z: baseZ,
+          duration: 1,
+          ease: "cinematicSilk",
+        })
+          .to(
+            state.target,
+            { x: 0, y: baseTY, z: 0, duration: 1, ease: "none" },
+            0
+          )
+          // More vertical motion (reference-like), still bounded:
+          .to(state.cam, { x: 2.35, y: baseY + 0.95, z: baseZ - 1.05, duration: 1.2, ease: "cinematicFlow" })
+          .to(state.target, { x: 0.45, y: baseTY + 0.35, z: 0, duration: 1.2, ease: "none" }, "<")
+          .to(state.cam, { x: -2.95, y: baseY - 0.75, z: baseZ - 1.55, duration: 2.0, ease: "cinematicLinear" })
+          .to(state.target, { x: -0.55, y: baseTY - 0.25, z: 0, duration: 2.0, ease: "none" }, "<")
+          .to(state.cam, { x: 1.45, y: baseY + 0.35, z: baseZ - 1.15, duration: 3.0, ease: "power1.inOut" })
+          .to(state.target, { x: 0.2, y: baseTY + 0.2, z: 0, duration: 3.0, ease: "none" }, "<")
+          .to(state.cam, { x: -2.05, y: baseY + 0.6, z: baseZ - 0.65, duration: 1.1, ease: "cinematicSmooth" })
+          .to(state.target, { x: -0.25, y: baseTY + 0.25, z: 0, duration: 1.1, ease: "none" }, "<");
+
+        if (cylinder) {
+          tl.to(
+            cylinder.rotation,
+            { y: `+=${Math.PI * 2 * 2.0}`, duration: 8.5, ease: "none" },
+            0,
+          );
+        }
+      } catch {
+        /* atlas / GSAP init — ana sayfa scroll kullanılabilir kalsın */
+      }
 
       const onResize = () => {
         setSize();
@@ -610,7 +613,6 @@ export function CinematicScrollHero() {
       }
 
       return () => {
-        disposed = true;
         window.removeEventListener("resize", onResize);
         io?.disconnect();
         io = null;
@@ -634,7 +636,7 @@ export function CinematicScrollHero() {
     return () => {
       ctx.revert();
     };
-  }, [sources]);
+  }, [sources, atlasEpoch]);
 
   return (
     <section
@@ -655,6 +657,24 @@ export function CinematicScrollHero() {
         )}
       >
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
+        <div aria-hidden className="pointer-events-none absolute left-0 top-0 h-px w-px overflow-hidden [clip-path:inset(50%)]">
+          {sources.map((src, index) => (
+            <NextImage
+              key={src}
+              src={src}
+              alt={
+                locale === "en"
+                  ? `Samet Alp Architecture — homepage render carousel ${index + 1} of ${sources.length}`
+                  : `Samet Alp Mimarlık — ana sayfa şeridi ${index + 1} / ${sources.length}`
+              }
+              width={1920}
+              height={1080}
+              sizes="100vw"
+              priority={index < 3}
+              onLoadingComplete={(el) => onAtlasImageLoaded(index, el)}
+            />
+          ))}
+        </div>
         {/* Drag overlay (does not block buttons) */}
         <motion.div
           role="region"

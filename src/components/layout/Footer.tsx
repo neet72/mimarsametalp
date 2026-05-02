@@ -1,4 +1,8 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
+import { localeFromPathname } from "@/lib/locale";
 import { pageContainerClass } from "@/lib/page-layout";
 
 const services =
@@ -7,9 +11,10 @@ const services =
 const address =
   "Güzelevler Mahallesi 2067/2 Sokak A blok No: 32/2 Adana / Türkiye";
 
-export function Footer({ locale = "tr" }: { locale?: "tr" | "en" }) {
+export function Footer() {
+  const pathname = usePathname();
+  const t = localeFromPathname(pathname) === "en";
   const year = new Date().getFullYear();
-  const t = locale === "en";
   const servicesText = t
     ? "Architecture, Interior Architecture, Decoration, Turnkey Projects, Architectural Consulting, Renovation & Remodeling"
     : services;

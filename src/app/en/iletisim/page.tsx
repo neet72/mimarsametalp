@@ -3,12 +3,19 @@ import { ContactPageExperience } from "@/components/contact/ContactPageExperienc
 import { pageMetadata } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
-export const metadata: Metadata = pageMetadata({
-  title: "Contact",
-  description:
-    "Reach Samet Alp Architecture. We guide you through consultation, project brief, and site visit steps.",
-  path: "/en/iletisim",
-});
+const pageTitle = "Contact | Samet Alp Architecture";
+const pageDescription =
+  "Office location, Google Maps, phone & email — start a consultation or reach our Adana studio. Send a secure message via the contact form.";
+
+export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "Contact",
+    description: pageDescription,
+    path: "/en/iletisim",
+  }),
+  title: { absolute: pageTitle },
+  description: pageDescription,
+};
 
 export default function ContactPageEn() {
   return (

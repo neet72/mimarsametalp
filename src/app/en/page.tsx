@@ -7,12 +7,19 @@ import { SocialGallery } from "@/components/home/SocialGallery";
 import { pageMetadata } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
-export const metadata: Metadata = pageMetadata({
-  title: "Home",
-  description:
-    "Samet Alp Architecture: contemporary, sustainable design across architecture, interior architecture, and turnkey projects.",
-  path: "/en",
-});
+const pageTitle = `Samet Alp Architecture | Home`;
+const pageDescription =
+  "Samet Alp Architecture — Adana: architecture, interior design, 3D visualization, urban planning, and turnkey delivery.";
+
+export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "Home",
+    description: pageDescription,
+    path: "/en",
+  }),
+  title: { absolute: pageTitle },
+  description: pageDescription,
+};
 
 export default function HomePageEn() {
   return (

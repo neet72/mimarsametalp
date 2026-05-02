@@ -7,10 +7,9 @@ import { FloatingWhatsAppCTA } from "./FloatingWhatsAppCTA";
 
 type MainLayoutProps = {
   children: ReactNode;
-  locale?: "tr" | "en";
 };
 
-export function MainLayout({ children, locale = "tr" }: MainLayoutProps) {
+export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="flex min-h-dvh flex-col">
       <ScrollManager />
@@ -20,7 +19,7 @@ export function MainLayout({ children, locale = "tr" }: MainLayoutProps) {
         <PageTransition>{children}</PageTransition>
       </main>
       <FloatingWhatsAppCTA />
-      <Footer locale={locale} />
+      <Footer />
     </div>
   );
 }

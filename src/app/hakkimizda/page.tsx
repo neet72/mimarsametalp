@@ -5,12 +5,19 @@ import { mergeAboutWithPortraitFallback, parseAboutCms } from "@/lib/site-conten
 import { pageMetadata } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
-export const metadata: Metadata = pageMetadata({
-  title: "Hakkımızda",
-  description:
-    "Mimarlık hizmetlerimizi müşteri odaklı yaklaşımla şekillendiriyoruz; anahtar teslim, danışmanlık ve iç dekorasyonda profesyonel çözümler.",
-  path: "/hakkimizda",
-});
+const pageTitle = "Hakkımızda | Samet Alp Mimarlık";
+const pageDescription =
+  "Adana’daki mimarlık ofisimiz: müşteri odaklı mimari tasarım, anahtar teslim, danışmanlık ve iç dekorasyon. Ekibimiz ve yaklaşımımızla tanışın.";
+
+export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "Hakkımızda",
+    description: pageDescription,
+    path: "/hakkimizda",
+  }),
+  title: { absolute: pageTitle },
+  description: pageDescription,
+};
 
 export default async function HakkimizdaPage() {
   const [rawTr, rawEn] = await Promise.all([getSiteContent("about", "tr"), getSiteContent("about", "en")]);

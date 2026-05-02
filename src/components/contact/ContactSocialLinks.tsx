@@ -10,6 +10,10 @@ import { InstagramGlyph } from "@/components/icons/InstagramGlyph";
 import { LinkedinGlyph } from "@/components/icons/LinkedinGlyph";
 import { WhatsAppGlyph } from "@/components/icons/WhatsAppGlyph";
 import { cn } from "@/lib/cn";
+import { usePathname } from "next/navigation";
+import { localeFromPathname } from "@/lib/locale";
+import { CONTACT_SOCIAL_HEADING } from "@/content/contact-page";
+import { CONTACT_SOCIAL_HEADING as CONTACT_SOCIAL_HEADING_EN } from "@/content/contact-page.en";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const spring = { type: "spring" as const, stiffness: 420, damping: 26 };
@@ -51,6 +55,9 @@ const social = [
 
 export function ContactSocialLinks() {
   const reduceMotion = useReducedMotion();
+  const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
+  const isEn = locale === "en";
 
   return (
     <motion.div
@@ -61,7 +68,7 @@ export function ContactSocialLinks() {
       transition={{ duration: 0.5, ease }}
     >
       <p className="font-display text-[10px] font-semibold uppercase tracking-[0.28em] text-primary/40">
-        Sosyal medya
+        {isEn ? CONTACT_SOCIAL_HEADING_EN : CONTACT_SOCIAL_HEADING}
       </p>
       <motion.ul
         className="mt-4 flex flex-wrap gap-3"
@@ -69,7 +76,7 @@ export function ContactSocialLinks() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: false, amount: 0.5 }}
-        aria-label="Sosyal medya bağlantıları"
+        aria-label={isEn ? "Social media links" : "Sosyal medya bağlantıları"}
       >
         {social.map(({ href, label, Icon }) => (
           <motion.li key={label} variants={item} className="relative">

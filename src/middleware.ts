@@ -31,8 +31,8 @@ function buildCspHeaderValue(): string {
     "font-src 'self' data:",
     // Vercel Analytics / Web Vitals
     `connect-src 'self' https://vitals.vercel-insights.com${devConnectExtras}`,
-    // Google Maps embed (iframe)
-    "frame-src 'self' https://www.google.com https://maps.google.com",
+    // Google Maps iframe + yaygın alt çerçeve kaynakları
+    "frame-src 'self' https://www.google.com https://maps.google.com https://www.gstatic.com",
     // Extra hardening
     "upgrade-insecure-requests",
   ];
@@ -59,13 +59,6 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const email = req.auth?.user?.email;
   const isAdmin = isLoggedIn && isAdminEmail(email ?? null);
-
-  // Avoid noisy 404s: redirect legacy favicon request to app icon.
-  if (pathname === "/favicon.ico") {
-    const url = req.nextUrl.clone();
-    url.pathname = "/icon.svg";
-    return applySecurityHeaders(NextResponse.redirect(url));
-  }
 
   // Pass locale to Server Components (root layout) without breaking routing.
   const requestHeaders = new Headers(req.headers);
