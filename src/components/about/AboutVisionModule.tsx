@@ -116,7 +116,7 @@ export function AboutVisionModule({ aboutCms }: { aboutCms?: AboutCmsDraft | nul
               className="absolute inset-0 will-change-transform"
               style={{ y: mediaParallaxY }}
             >
-              <AboutHeroLoopVideo />
+              <AboutHeroLoopVideo videoSrc={aboutCms?.heroVideoUrl} posterSrc={aboutCms?.heroPosterUrl} />
             </motion.div>
             <div
               aria-hidden

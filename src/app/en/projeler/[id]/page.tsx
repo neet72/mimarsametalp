@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { ProjectDetailClient } from "@/components/projects/ProjectDetailClient";
 import { getPublicProjectBySlug } from "@/lib/public/projects";
 import { pageMetadata } from "@/lib/seo";
+import { firstImageUrl } from "@/lib/media-url";
+import { pickProjectForLocale } from "@/lib/public/project-locale";
 import { breadcrumbJsonLd, jsonLdScriptProps, projectJsonLd } from "@/lib/seo-jsonld";
 
 type PageProps = {
@@ -29,10 +31,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     });
   }
 
-  const img = project.imageUrls[0];
-  const title = project.title;
+  const view = pickProjectForLocale(project, "en");
+  const img = firstImageUrl(project.imageUrls);
+  const title = view.title;
   const description =
-    project.description?.slice(0, 180) ||
+    view.description?.slice(0, 180) ||
     "Samet Alp Architecture project detail: architectural approach, gallery, and key project information.";
 
   return {
@@ -66,29 +69,29 @@ export default async function ProjectDetailPageEn({ params }: PageProps) {
   const project = await getPublicProjectBySlug(slug);
   if (!project) notFound();
 
+  const view = pickProjectForLocale(project, "en");
+
   return (
-    <>
+    <div className="contents">
       <script
-        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Home", path: "/en" },
             { name: "Projects", path: "/en/projeler" },
-            { name: project.title, path: `/en/projeler/${project.slug}` },
+            { name: view.title, path: `/en/projeler/${project.slug}` },
           ]),
         )}
       />
       <script
-        key="jsonld-project"
         {...jsonLdScriptProps(
           projectJsonLd({
-            name: project.title,
-            description: project.description,
+            name: view.title,
+            description: view.description,
             path: `/en/projeler/${project.slug}`,
             imageUrls: project.imageUrls,
-            category: project.category,
-            status: project.status,
-            location: project.location,
+            category: view.category,
+            status: view.status,
+            location: view.location,
             year: project.year,
             areaM2: project.areaM2,
           }),
@@ -96,18 +99,18 @@ export default async function ProjectDetailPageEn({ params }: PageProps) {
       />
       <ProjectDetailClient
         project={{
-          title: project.title,
-          category: project.category ?? null,
-          description: project.description ?? null,
-          status: project.status ?? null,
+          title: view.title,
+          category: view.category ?? null,
+          description: view.description ?? null,
+          status: view.status ?? null,
           year: project.year ?? null,
-          location: project.location ?? null,
+          location: view.location ?? null,
           areaM2: project.areaM2 ?? null,
           imageUrl: project.imageUrls[0] ?? "/images/hero-1.webp",
           gallery: project.imageUrls,
         }}
       />
-    </>
+    </div>
   );
 }
 

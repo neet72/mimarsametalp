@@ -20,6 +20,12 @@ model Project {
   status      String?
   year        Int?
   location    String?
+  /// İngilizce içerik (public /en yolu; boşsa Türkçe alanlara düşülür)
+  titleEn       String?
+  categoryEn    String?
+  descriptionEn String?
+  statusEn      String?
+  locationEn    String?
   areaM2      Int?
   /// JSON dizi: ["https://.../a.webp","..."]
   imageUrls   String   @db.LongText @default("[]")
@@ -75,6 +81,13 @@ model Service {
   title            String
   shortDescription String?
   heroImageUrl     String?
+  /// İngilizce metinler (boşsa /en’de Türkçe kullanılır); görsel/slug ortak
+  titleEn              String?
+  shortDescriptionEn    String?
+  /// JSON: kapsam maddeleri EN — TR ile aynı sıra uzunluğunda tutulur
+  scopeEn              String?  @default("[]")
+  processEn            String?  @default("[]")
+  faqEn                String?  @default("[]")
   /// JSON string: ["..."] — optional for future usage
   scope            String?  @default("[]")
   /// JSON string: [{title,description}, ...]

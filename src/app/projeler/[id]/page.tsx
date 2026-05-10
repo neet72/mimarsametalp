@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ProjectDetailClient } from "@/components/projects/ProjectDetailClient";
 import { getPublicProjectBySlug } from "@/lib/public/projects";
 import { pageMetadata } from "@/lib/seo";
+import { firstImageUrl } from "@/lib/media-url";
 import { breadcrumbJsonLd, jsonLdScriptProps, projectJsonLd } from "@/lib/seo-jsonld";
 
 type PageProps = {
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const project = await getPublicProjectBySlug(slug);
   if (!project) return pageMetadata({ title: "Proje", description: "Proje detayı.", path: "/projeler" });
 
-  const img = project.imageUrls[0];
+  const img = firstImageUrl(project.imageUrls);
   const title = project.title;
   const description =
     project.description?.slice(0, 180) ||
@@ -55,9 +56,8 @@ export default async function ProjeDetayPage({ params }: PageProps) {
   if (!project) notFound();
 
   return (
-    <>
+    <div className="contents">
       <script
-        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Ana Sayfa", path: "/" },
@@ -67,7 +67,6 @@ export default async function ProjeDetayPage({ params }: PageProps) {
         )}
       />
       <script
-        key="jsonld-project"
         {...jsonLdScriptProps(
           projectJsonLd({
             name: project.title,
@@ -95,7 +94,7 @@ export default async function ProjeDetayPage({ params }: PageProps) {
           gallery: project.imageUrls,
         }}
       />
-    </>
+    </div>
   );
 }
 

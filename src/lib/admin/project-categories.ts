@@ -7,3 +7,13 @@ export const ADMIN_PROJECT_CATEGORIES = [
   "Mimari Danışmanlık",
   "Yenileme & Tadilat",
 ] as const;
+
+/** English panel — aynı sıra (public /en sayfaları) */
+export const ADMIN_PROJECT_CATEGORIES_EN = [
+  "Interior Architecture & Decoration",
+  "Turnkey Project",
+  "Architectural Supervision",
+  "Architectural Design & Permit",
+  "Architectural Consulting",
+  "Renovation & Remodeling",
+] as const;

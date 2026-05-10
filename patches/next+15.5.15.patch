@@ -1,0 +1,114 @@
+diff --git a/node_modules/next/dist/client/components/layout-router.js b/node_modules/next/dist/client/components/layout-router.js
+index 548c87c..e34e33a 100644
+--- a/node_modules/next/dist/client/components/layout-router.js
++++ b/node_modules/next/dist/client/components/layout-router.js
+@@ -492,14 +492,18 @@ function OuterLayoutRouter(param) {
+                                             tree: tree,
+                                             cacheNode: cacheNode,
+                                             segmentPath: segmentPath
+-                                        }),
+-                                        segmentBoundaryTriggerNode
++                                        }, stateKey + "-ilr"),
++                                        segmentBoundaryTriggerNode != null ? /*#__PURE__*/ (0, _jsxruntime.jsx)(_jsxruntime.Fragment, {
++                                            children: segmentBoundaryTriggerNode
++                                        }, stateKey + "-sbt") : null
+                                     ]
+                                 })
+                             })
+                         })
+-                    }),
+-                    segmentViewStateNode
++                    }, stateKey + "-eb"),
++                    segmentViewStateNode != null ? /*#__PURE__*/ (0, _jsxruntime.jsx)(_jsxruntime.Fragment, {
++                        children: segmentViewStateNode
++                    }, stateKey + "-svsn") : null
+                 ]
+             }),
+             children: [
+@@ -512,8 +516,12 @@ function OuterLayoutRouter(param) {
+             const { SegmentStateProvider } = require('../../next-devtools/userspace/app/segment-explorer-node');
+             child = /*#__PURE__*/ (0, _jsxruntime.jsxs)(SegmentStateProvider, {
+                 children: [
+-                    child,
+-                    segmentViewBoundaries
++                    /*#__PURE__*/ (0, _jsxruntime.jsx)(_jsxruntime.Fragment, {
++                        children: child
++                    }, stateKey + "-ssp-tree"),
++                    segmentViewBoundaries != null ? /*#__PURE__*/ (0, _jsxruntime.jsx)(_jsxruntime.Fragment, {
++                        children: segmentViewBoundaries
++                    }, stateKey + "-ssp-bounds") : null
+                 ]
+             }, stateKey);
+         }
+diff --git a/node_modules/next/dist/esm/client/components/layout-router.js b/node_modules/next/dist/esm/client/components/layout-router.js
+index f5f5101..50c5552 100644
+--- a/node_modules/next/dist/esm/client/components/layout-router.js
++++ b/node_modules/next/dist/esm/client/components/layout-router.js
+@@ -480,14 +480,18 @@ function ScrollAndFocusHandler(param) {
+                                             tree: tree,
+                                             cacheNode: cacheNode,
+                                             segmentPath: segmentPath
+-                                        }),
+-                                        segmentBoundaryTriggerNode
++                                        }, stateKey + "-ilr"),
++                                        segmentBoundaryTriggerNode != null ? /*#__PURE__*/ _jsx(_Fragment, {
++                                            children: segmentBoundaryTriggerNode
++                                        }, stateKey + "-sbt") : null
+                                     ]
+                                 })
+                             })
+                         })
+-                    }),
+-                    segmentViewStateNode
++                    }, stateKey + "-eb"),
++                    segmentViewStateNode != null ? /*#__PURE__*/ _jsx(_Fragment, {
++                        children: segmentViewStateNode
++                    }, stateKey + "-svsn") : null
+                 ]
+             }),
+             children: [
+@@ -500,8 +504,12 @@ function ScrollAndFocusHandler(param) {
+             const { SegmentStateProvider } = require('../../next-devtools/userspace/app/segment-explorer-node');
+             child = /*#__PURE__*/ _jsxs(SegmentStateProvider, {
+                 children: [
+-                    child,
+-                    segmentViewBoundaries
++                    /*#__PURE__*/ _jsx(_Fragment, {
++                        children: child
++                    }, stateKey + "-ssp-tree"),
++                    segmentViewBoundaries != null ? /*#__PURE__*/ _jsx(_Fragment, {
++                        children: segmentViewBoundaries
++                    }, stateKey + "-ssp-bounds") : null
+                 ]
+             }, stateKey);
+         }
+diff --git a/node_modules/next/dist/esm/next-devtools/userspace/app/segment-explorer-node.js b/node_modules/next/dist/esm/next-devtools/userspace/app/segment-explorer-node.js
+index 2dbcacc..efc71dc 100644
+--- a/node_modules/next/dist/esm/next-devtools/userspace/app/segment-explorer-node.js
++++ b/node_modules/next/dist/esm/next-devtools/userspace/app/segment-explorer-node.js
+@@ -81,7 +81,9 @@ export function SegmentViewNode(param) {
+     return /*#__PURE__*/ _jsxs(_Fragment, {
+         children: [
+             segmentNode,
+-            children
++            /*#__PURE__*/ _jsx(_Fragment, {
++                children: children
++            }, "segment-view-page")
+         ]
+     });
+ }
+diff --git a/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js b/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js
+index 8d9c565..ee7a2cd 100644
+--- a/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js
++++ b/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js
+@@ -118,7 +118,9 @@ function SegmentViewNode(param) {
+     return /*#__PURE__*/ (0, _jsxruntime.jsxs)(_jsxruntime.Fragment, {
+         children: [
+             segmentNode,
+-            children
++            /*#__PURE__*/ (0, _jsxruntime.jsx)(_jsxruntime.Fragment, {
++                children: children
++            }, "segment-view-page")
+         ]
+     });
+ }

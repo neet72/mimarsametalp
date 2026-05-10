@@ -54,6 +54,8 @@
     /* Yatay güvenli alan (kenar ekranlar) */
     padding-left: env(safe-area-inset-left, 0px);
     padding-right: env(safe-area-inset-right, 0px);
+    /* iOS Safari: dokunma vurgusu (mavi flaş) sadeleştirilir */
+    -webkit-tap-highlight-color: rgb(15 23 42 / 0.06);
   }
 
   ::selection {

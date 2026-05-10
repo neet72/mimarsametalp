@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { ServiceDetailClient } from "@/components/hizmetlerimiz/ServiceDetailClient";
 import { pageMetadata } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps, serviceJsonLd } from "@/lib/seo-jsonld";
-import { SERVICES_DETAIL } from "@/content/services-detail.en";
 import { getPublicServiceBySlug } from "@/lib/public/services";
+import { resolveServiceDetailData } from "@/lib/public/resolve-service-detail";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -16,27 +16,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const key = String(slug ?? "").trim().toLowerCase();
   const db = key ? await getPublicServiceBySlug(key) : null;
-  const staticService = SERVICES_DETAIL[slug];
-
-  const merged =
-    staticService != null
-      ? {
-          slug: staticService.slug,
-          name: db?.title ?? staticService.name,
-          shortDescription:
-            (db?.shortDescription && String(db.shortDescription).trim()) || staticService.shortDescription,
-          heroImageUrl: db?.heroImageUrl ?? staticService.heroImageUrl,
-        }
-      : db
-        ? {
-            slug: db.slug,
-            name: db.title,
-            shortDescription: db.shortDescription ?? "Service details — Samet Alp Architecture, Adana.",
-            heroImageUrl: db.heroImageUrl ?? undefined,
-          }
-        : null;
-
-  if (!merged) {
+  const resolved = resolveServiceDetailData(key, "en", db);
+  if (!resolved) {
     const fallbackTitle = `Services | ${enBrand}`;
     const fallbackDescription =
       "Explore architecture, interior design, and turnkey services from our Adana studio — Samet Alp Architecture.";
@@ -51,17 +32,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = merged.name;
-  const rawDesc = String(merged.shortDescription ?? "").trim();
-  const description = (rawDesc || `${title} — ${enBrand}, Adana.`).slice(0, 200);
+  const title = resolved.name;
+  const rawDesc = String(resolved.shortDescription ?? "").trim();
+  const description = (rawDesc || `${resolved.name} — ${enBrand}, Adana.`).slice(0, 200);
   const absoluteTitle = `${title} | ${enBrand}`;
-  const img = merged.heroImageUrl;
+  const img = resolved.heroImageUrl;
 
   return {
     ...pageMetadata({
       title,
       description,
-      path: `/en/hizmetlerimiz/${merged.slug}`,
+      path: `/en/hizmetlerimiz/${resolved.slug}`,
     }),
     title: { absolute: absoluteTitle },
     description,
@@ -70,7 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: "en_US",
       title: absoluteTitle,
       description,
-      url: `/en/hizmetlerimiz/${merged.slug}`,
+      url: `/en/hizmetlerimiz/${resolved.slug}`,
       images: img ? [{ url: img }] : undefined,
     },
     twitter: {
@@ -84,13 +65,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ServiceDetailPageEn({ params }: PageProps) {
   const { slug } = await params;
-  const service = SERVICES_DETAIL[slug];
+  const key = String(slug ?? "").trim().toLowerCase();
+  const db = key ? await getPublicServiceBySlug(key) : null;
+  const service = resolveServiceDetailData(key, "en", db);
   if (!service) notFound();
 
   return (
-    <>
+    <div className="contents">
       <script
-        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Home", path: "/en" },
@@ -100,7 +82,6 @@ export default async function ServiceDetailPageEn({ params }: PageProps) {
         )}
       />
       <script
-        key="jsonld-service"
         {...jsonLdScriptProps(
           serviceJsonLd({
             name: service.name,
@@ -111,7 +92,7 @@ export default async function ServiceDetailPageEn({ params }: PageProps) {
         )}
       />
       <ServiceDetailClient service={service} />
-    </>
+    </div>
   );
 }
 

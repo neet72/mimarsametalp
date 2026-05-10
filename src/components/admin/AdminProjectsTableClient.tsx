@@ -8,6 +8,7 @@ import { DeleteProjectButton } from "@/components/admin/DeleteProjectButton";
 import { ProjectPublishedToggle, ProjectSortOrderInput } from "@/components/admin/ProjectQuickActions";
 import { ActionMenu, ActionMenuItem } from "@/components/admin/ui/action-menu";
 import { cn } from "@/lib/cn";
+import { isVideoUrl } from "@/lib/media-url";
 
 type Row = {
   id: string;
@@ -23,14 +24,22 @@ type Row = {
 type SortKey = "createdAt" | "title" | "sortOrder";
 type SortDir = "asc" | "desc";
 
-function coverFromImageUrls(raw: string): string {
+function parseImageUrls(raw: string): string[] {
   try {
     const parsed = JSON.parse(raw) as unknown;
-    if (Array.isArray(parsed) && typeof parsed[0] === "string" && parsed[0]) return parsed[0];
+    if (Array.isArray(parsed)) return parsed.map(String).filter(Boolean);
   } catch {
     /* ignore */
   }
-  return "/images/hero-1.webp";
+  return [];
+}
+
+/** Tablo önizlemesi: public ile aynı — listedeki ilk URL (video veya görsel). */
+function coverPreviewFromImageUrls(raw: string): { src: string; isVideo: boolean } {
+  const urls = parseImageUrls(raw);
+  const first = urls[0];
+  if (!first) return { src: "/images/hero-1.webp", isVideo: false };
+  return { src: first, isVideo: isVideoUrl(first) };
 }
 
 export function AdminProjectsTableClient({ items }: { items: Row[] }) {
@@ -138,17 +147,32 @@ export function AdminProjectsTableClient({ items }: { items: Row[] }) {
               <td className="px-4 py-3">
                 <div className="flex items-center gap-3">
                   <div className="relative h-10 w-14 overflow-hidden rounded-md border border-zinc-800 bg-zinc-950">
-                    <Image
-                      src={coverFromImageUrls(p.imageUrls)}
-                      alt={
+                    {(() => {
+                      const { src, isVideo } = coverPreviewFromImageUrls(p.imageUrls);
+                      const altBase =
                         p.category?.trim()
                           ? `${p.title} — ${p.category.trim()} — kapak önizleme`
-                          : `${p.title} — kapak önizleme`
-                      }
-                      fill
-                      sizes="64px"
-                      className="object-cover object-center"
-                    />
+                          : `${p.title} — kapak önizleme`;
+                      return isVideo ? (
+                        <video
+                          src={src}
+                          muted
+                          playsInline
+                          loop
+                          autoPlay
+                          className="absolute inset-0 h-full w-full object-cover object-center"
+                          aria-label={altBase}
+                        />
+                      ) : (
+                        <Image
+                          src={src}
+                          alt={altBase}
+                          fill
+                          sizes="64px"
+                          className="object-cover object-center"
+                        />
+                      );
+                    })()}
                   </div>
                   <div className="min-w-0">
                     <p className="truncate font-medium text-zinc-200">{p.title}</p>

@@ -3,13 +3,11 @@
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { SERVICES_GALLERY as SERVICES_GALLERY_TR } from "@/content/services-gallery";
-import { SERVICES_GALLERY as SERVICES_GALLERY_EN } from "@/content/services-gallery.en";
 import { HIZMETLERIMIZ_INTRO as HIZMETLERIMIZ_INTRO_TR } from "@/content/hizmetlerimiz-page";
 import { HIZMETLERIMIZ_INTRO as HIZMETLERIMIZ_INTRO_EN } from "@/content/hizmetlerimiz-page.en";
 import { cn } from "@/lib/cn";
-import { localeFromPathname, withLocalePath } from "@/lib/locale";
+import type { ServiceListingItem } from "@/lib/service-listing-item";
+import { withLocalePath } from "@/lib/locale";
 import { fadeUpSoft } from "@/lib/motion";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -41,12 +39,15 @@ const cardItem: Variants = {
   },
 };
 
-function HizmetCard({ index }: { index: number }) {
-  const pathname = usePathname();
-  const locale = localeFromPathname(pathname);
-  const services = locale === "en" ? SERVICES_GALLERY_EN : SERVICES_GALLERY_TR;
-  const service = services[index]!;
-
+function HizmetCard({
+  service,
+  index,
+  locale,
+}: {
+  service: ServiceListingItem;
+  index: number;
+  locale: "tr" | "en";
+}) {
   return (
     <Link
       href={withLocalePath(`/hizmetlerimiz/${service.slug}`, locale)}
@@ -104,13 +105,15 @@ function HizmetCard({ index }: { index: number }) {
   );
 }
 
-export function HizmetlerimizPageContent() {
+export function HizmetlerimizPageContent({
+  items,
+  locale,
+}: {
+  items: ServiceListingItem[];
+  locale: "tr" | "en";
+}) {
   const reduceMotion = useReducedMotion();
-  const pathname = usePathname();
-  const locale = localeFromPathname(pathname);
-  const SERVICES_GALLERY = locale === "en" ? SERVICES_GALLERY_EN : SERVICES_GALLERY_TR;
-  const HIZMETLERIMIZ_INTRO =
-    locale === "en" ? HIZMETLERIMIZ_INTRO_EN : HIZMETLERIMIZ_INTRO_TR;
+  const HIZMETLERIMIZ_INTRO = locale === "en" ? HIZMETLERIMIZ_INTRO_EN : HIZMETLERIMIZ_INTRO_TR;
 
   const containerVariants: Variants = reduceMotion
     ? {
@@ -151,14 +154,14 @@ export function HizmetlerimizPageContent() {
           whileInView="visible"
           viewport={{ once: false, amount: 0.06, margin: "-4% 0px" }}
         >
-          {SERVICES_GALLERY.map((service, index) => (
+          {items.map((service, index) => (
             <motion.div
-              key={service.title}
+              key={service.slug}
               variants={itemVariants}
               className="min-w-0 w-full max-w-full"
               transition={reduceMotion ? undefined : { delay: Math.min(index * 0.06, 0.36) }}
             >
-              <HizmetCard index={index} />
+              <HizmetCard service={service} index={index} locale={locale} />
             </motion.div>
           ))}
         </motion.div>

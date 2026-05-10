@@ -24,9 +24,8 @@ export default async function HakkimizdaPage() {
   const aboutCms = mergeAboutWithPortraitFallback(parseAboutCms(rawTr), parseAboutCms(rawEn));
 
   return (
-    <>
+    <div className="contents">
       <script
-        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Ana Sayfa", path: "/" },
@@ -35,6 +34,6 @@ export default async function HakkimizdaPage() {
         )}
       />
       <AboutPageExperience aboutCms={aboutCms} />
-    </>
+    </div>
   );
 }

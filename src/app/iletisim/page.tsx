@@ -19,9 +19,8 @@ export const metadata: Metadata = {
 
 export default function IletisimPage() {
   return (
-    <>
+    <div className="contents">
       <script
-        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Ana Sayfa", path: "/" },
@@ -30,6 +29,6 @@ export default function IletisimPage() {
         )}
       />
       <ContactPageExperience />
-    </>
+    </div>
   );
 }

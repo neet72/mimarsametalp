@@ -7,6 +7,7 @@ import { X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SERVICES_GALLERY as SERVICES_GALLERY_TR } from "@/content/services-gallery";
 import { SERVICES_GALLERY as SERVICES_GALLERY_EN } from "@/content/services-gallery.en";
+import type { ServiceListingItem } from "@/lib/service-listing-item";
 import { localeFromPathname } from "@/lib/locale";
 import { easePremium, fadeUpSoft } from "@/lib/motion";
 import { cn } from "@/lib/cn";
@@ -30,11 +31,13 @@ const cardItem: Variants = {
   },
 };
 
-export function ServicesSection() {
+export function ServicesSection({ serviceItems }: { serviceItems?: ServiceListingItem[] }) {
   const reduceMotion = useReducedMotion();
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
-  const SERVICES_GALLERY = locale === "en" ? SERVICES_GALLERY_EN : SERVICES_GALLERY_TR;
+  const staticGallery = locale === "en" ? SERVICES_GALLERY_EN : SERVICES_GALLERY_TR;
+  const SERVICES_GALLERY =
+    serviceItems && serviceItems.length > 0 ? serviceItems : staticGallery;
 
   const containerVariants: Variants = reduceMotion
     ? { hidden: {}, visible: { transition: { staggerChildren: 0, delayChildren: 0 } } }

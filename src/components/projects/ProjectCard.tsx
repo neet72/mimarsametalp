@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useCallback } from "react";
 import { cn } from "@/lib/cn";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
+import { isVideoUrl } from "@/lib/media-url";
 
 const spring = { type: "spring" as const, stiffness: 380, damping: 28 };
 
@@ -25,6 +26,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
   const reduceMotion = useReducedMotion();
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
+  const coverIsVideo = isVideoUrl(project.imageUrl);
 
   const onMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
     // Desktop-only effect (CSS guarded). Keep very subtle.
@@ -86,21 +88,37 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
               "group-hover:scale-[1.03] motion-reduce:group-hover:scale-100",
             )}
           >
-            <Image
-              src={project.imageUrl}
-              alt={
-                locale === "en"
-                  ? `${project.title} — project cover image, Samet Alp Architecture`
-                  : `${project.title} — proje kapak görseli, Samet Alp Mimarlık`
-              }
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              priority={index === 0}
-              className={cn(
-                "object-cover object-center transition-[filter] duration-700 ease-out",
-                "group-hover:brightness-[1.03] motion-reduce:group-hover:brightness-100",
-              )}
-            />
+            {coverIsVideo ? (
+              <video
+                src={project.imageUrl}
+                muted
+                playsInline
+                loop
+                autoPlay
+                preload="metadata"
+                className={cn(
+                  "absolute inset-0 h-full w-full object-cover object-center transition-[filter] duration-700 ease-out",
+                  "group-hover:brightness-[1.03] motion-reduce:group-hover:brightness-100",
+                )}
+                aria-hidden
+              />
+            ) : (
+              <Image
+                src={project.imageUrl}
+                alt={
+                  locale === "en"
+                    ? `${project.title} — project cover image, Samet Alp Architecture`
+                    : `${project.title} — proje kapak görseli, Samet Alp Mimarlık`
+                }
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                priority={index === 0}
+                className={cn(
+                  "object-cover object-center transition-[filter] duration-700 ease-out",
+                  "group-hover:brightness-[1.03] motion-reduce:group-hover:brightness-100",
+                )}
+              />
+            )}
           </div>
 
         <div

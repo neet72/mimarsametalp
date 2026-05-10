@@ -24,6 +24,11 @@ export async function createProject(formData: FormData) {
     status: String(formData.get("status") ?? "").trim() || undefined,
     year: formData.get("year") ? Number(formData.get("year")) : undefined,
     location: String(formData.get("location") ?? "").trim() || undefined,
+    titleEn: String(formData.get("titleEn") ?? "").trim() || undefined,
+    categoryEn: String(formData.get("categoryEn") ?? "").trim() || undefined,
+    descriptionEn: String(formData.get("descriptionEn") ?? "").trim() || undefined,
+    statusEn: String(formData.get("statusEn") ?? "").trim() || undefined,
+    locationEn: String(formData.get("locationEn") ?? "").trim() || undefined,
     areaM2: formData.get("areaM2") ? Number(formData.get("areaM2")) : undefined,
     imageUrlsText: String(formData.get("imageUrlsText") ?? ""),
     published: formData.get("published") === "on" || formData.get("published") === "true",
@@ -54,6 +59,11 @@ export async function createProject(formData: FormData) {
             status: input.status || null,
             year: input.year ?? null,
             location: input.location || null,
+            titleEn: input.titleEn || null,
+            categoryEn: input.categoryEn || null,
+            descriptionEn: input.descriptionEn || null,
+            statusEn: input.statusEn || null,
+            locationEn: input.locationEn || null,
             areaM2: input.areaM2 ?? null,
             imageUrls: JSON.stringify(urls),
             published: input.published ?? false,
@@ -103,6 +113,11 @@ export async function updateProject(formData: FormData) {
     status: String(formData.get("status") ?? "").trim() || undefined,
     year: formData.get("year") ? Number(formData.get("year")) : undefined,
     location: String(formData.get("location") ?? "").trim() || undefined,
+    titleEn: String(formData.get("titleEn") ?? "").trim() || undefined,
+    categoryEn: String(formData.get("categoryEn") ?? "").trim() || undefined,
+    descriptionEn: String(formData.get("descriptionEn") ?? "").trim() || undefined,
+    statusEn: String(formData.get("statusEn") ?? "").trim() || undefined,
+    locationEn: String(formData.get("locationEn") ?? "").trim() || undefined,
     areaM2: formData.get("areaM2") ? Number(formData.get("areaM2")) : undefined,
     imageUrlsText: String(formData.get("imageUrlsText") ?? ""),
     published: formData.get("published") === "on" || formData.get("published") === "true",
@@ -138,6 +153,11 @@ export async function updateProject(formData: FormData) {
             status: input.status || null,
             year: input.year ?? null,
             location: input.location || null,
+            titleEn: input.titleEn || null,
+            categoryEn: input.categoryEn || null,
+            descriptionEn: input.descriptionEn || null,
+            statusEn: input.statusEn || null,
+            locationEn: input.locationEn || null,
             areaM2: input.areaM2 ?? null,
             imageUrls: JSON.stringify(urls),
             published: input.published ?? false,
@@ -204,6 +224,7 @@ export async function deleteProject(id: string) {
       });
       revalidatePath("/admin/projects");
       revalidatePath("/projeler");
+      revalidatePath("/en/projeler");
       revalidateTag("public-projects");
       return undefined;
     },
@@ -237,6 +258,7 @@ export async function setProjectPublished(id: string, published: boolean) {
       });
       revalidatePath("/admin/projects");
       revalidatePath("/projeler");
+      revalidatePath("/en/projeler");
       revalidateTag("public-projects");
       revalidateTag(`public-project:${updated.slug}`);
       return undefined;
@@ -271,6 +293,7 @@ export async function setProjectSortOrder(id: string, sortOrder: number) {
       });
       revalidatePath("/admin/projects");
       revalidatePath("/projeler");
+      revalidatePath("/en/projeler");
       revalidateTag("public-projects");
       revalidateTag(`public-project:${updated.slug}`);
       return undefined;

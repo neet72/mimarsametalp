@@ -1,27 +1,37 @@
 import type { Metadata } from "next";
 import { ProjectsPortfolio } from "@/components/projects/ProjectsPortfolio";
 import { pageMetadata } from "@/lib/seo";
+import { pickProjectForLocale } from "@/lib/public/project-locale";
 import { getPublicProjects } from "@/lib/public/projects";
 import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
-export const metadata: Metadata = pageMetadata({
-  title: "Projects",
-  description:
-    "A curated selection of residential, commercial, and interior architecture projects and applications.",
-  path: "/en/projeler",
-});
+const pageTitle = "Projects | Samet Alp Architecture";
+const pageDescription =
+  "A curated selection of residential, commercial, and interior architecture projects and applications.";
+
+export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "Projects",
+    description: pageDescription,
+    path: "/en/projeler",
+  }),
+  title: { absolute: pageTitle },
+  description: pageDescription,
+};
 
 export default async function ProjectsPageEn() {
   const rows = await getPublicProjects();
-  const projects = rows.map((p) => ({
-    slug: p.slug,
-    title: p.title,
-    imageUrl: p.imageUrls[0] ?? "/images/hero-1.webp",
-  }));
+  const projects = rows.map((p) => {
+    const en = pickProjectForLocale(p, "en");
+    return {
+      slug: p.slug,
+      title: en.title,
+      imageUrl: p.imageUrls[0] ?? "/images/hero-1.webp",
+    };
+  });
   return (
-    <>
+    <div className="contents">
       <script
-        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Home", path: "/en" },
@@ -30,7 +40,7 @@ export default async function ProjectsPageEn() {
         )}
       />
       <ProjectsPortfolio projects={projects} />
-    </>
+    </div>
   );
 }
 

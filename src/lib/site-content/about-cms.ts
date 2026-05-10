@@ -1,4 +1,8 @@
 export type AboutCmsDraft = {
+  /** MP4 tam URL veya `/videos/...` yolu */
+  heroVideoUrl: string;
+  /** Video yüklenene kadar gösterilecek kapak; portreyle aynı dosyayı kullanmayın (layout flash) */
+  heroPosterUrl: string;
   visionTitle: string;
   visionBody: string;
   architectName: string;
@@ -8,6 +12,8 @@ export type AboutCmsDraft = {
 };
 
 const emptyDraft: AboutCmsDraft = {
+  heroVideoUrl: "",
+  heroPosterUrl: "",
   visionTitle: "",
   visionBody: "",
   architectName: "",
@@ -24,6 +30,8 @@ export function parseAboutCms(raw: string | null | undefined): AboutCmsDraft | n
     if (!j || typeof j !== "object") return null;
     return {
       ...emptyDraft,
+      heroVideoUrl: typeof j.heroVideoUrl === "string" ? j.heroVideoUrl : "",
+      heroPosterUrl: typeof j.heroPosterUrl === "string" ? j.heroPosterUrl : "",
       visionTitle: typeof j.visionTitle === "string" ? j.visionTitle : "",
       visionBody: typeof j.visionBody === "string" ? j.visionBody : "",
       architectName: typeof j.architectName === "string" ? j.architectName : "",
@@ -48,13 +56,28 @@ export function mergeAboutWithPortraitFallback(
     (typeof p.portraitImageUrl === "string" && p.portraitImageUrl.trim()) ||
     (typeof s.portraitImageUrl === "string" && s.portraitImageUrl.trim()) ||
     "";
-  const merged: AboutCmsDraft = { ...p, portraitImageUrl: portrait };
+  const heroVideo =
+    (typeof p.heroVideoUrl === "string" && p.heroVideoUrl.trim()) ||
+    (typeof s.heroVideoUrl === "string" && s.heroVideoUrl.trim()) ||
+    "";
+  const heroPoster =
+    (typeof p.heroPosterUrl === "string" && p.heroPosterUrl.trim()) ||
+    (typeof s.heroPosterUrl === "string" && s.heroPosterUrl.trim()) ||
+    "";
+  const merged: AboutCmsDraft = {
+    ...p,
+    portraitImageUrl: portrait,
+    heroVideoUrl: heroVideo,
+    heroPosterUrl: heroPoster,
+  };
   const hasAny =
     merged.visionTitle.trim() ||
     merged.visionBody.trim() ||
     merged.architectName.trim() ||
     merged.architectRole.trim() ||
     merged.architectBio.trim() ||
-    portrait;
+    portrait ||
+    heroVideo ||
+    heroPoster;
   return hasAny ? merged : null;
 }

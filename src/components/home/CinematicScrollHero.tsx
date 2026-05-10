@@ -261,8 +261,9 @@ export function CinematicScrollHero() {
       const startMs = performance.now();
 
       // Cylinder + atlas (reference "images scroll as one")
+      // Mobilde radius sabit — sadece height artırılır (şerit dikeyde daha uzun, yatay yayılım aynı).
       const radius = isMobile ? 3.85 : 4.25;
-      const height = isMobile ? 1.75 : 2.05;
+      const height = isMobile ? 2.72 : 2.05;
       const radialSegments = 128;
       const cylinderGeo = new THREE.CylinderGeometry(radius, radius, height, radialSegments, 1, true);
 
@@ -330,7 +331,8 @@ export function CinematicScrollHero() {
           ? Math.min(window.devicePixelRatio || 1, 1.25)
           : Math.min(window.devicePixelRatio || 1, 2);
         const w = Math.max(1, Math.floor(rect.width * dpr));
-        const hBand = Math.max(1, Math.floor((rect.height * 0.22) * dpr));
+        const bandFrac = isMobile ? 0.095 : 0.22;
+        const hBand = Math.max(1, Math.floor(rect.height * bandFrac * dpr));
 
         const setup = (c: HTMLCanvasElement | null) => {
           if (!c) return;
@@ -375,7 +377,7 @@ export function CinematicScrollHero() {
         const mesh = new THREE.Mesh(cylinderGeo, cylinderMat);
         mesh.rotation.y = 0.5;
         // Push slightly up so it doesn't look "stuck" in the middle
-        mesh.position.y = isMobile ? 0.42 : 0.55;
+        mesh.position.y = isMobile ? 0.5 : 0.55;
         scene.add(mesh);
         return mesh;
       };
@@ -402,7 +404,7 @@ export function CinematicScrollHero() {
 
         if (cylinder) {
           // Keep the cylinder breathing subtly
-          cylinder.position.y = (isMobile ? 0.42 : 0.55) + Math.sin(time * 0.35) * (isMobile ? 0.014 : 0.02);
+          cylinder.position.y = (isMobile ? 0.5 : 0.55) + Math.sin(time * 0.35) * (isMobile ? 0.014 : 0.02);
         }
 
         // Draw wind overlay bands (top & bottom)
@@ -671,7 +673,7 @@ export function CinematicScrollHero() {
               height={1080}
               sizes="100vw"
               priority={index < 3}
-              onLoadingComplete={(el) => onAtlasImageLoaded(index, el)}
+              onLoad={(e) => onAtlasImageLoaded(index, e.currentTarget)}
             />
           ))}
         </div>
@@ -717,11 +719,11 @@ export function CinematicScrollHero() {
         <div aria-hidden className="pointer-events-none absolute inset-0 z-[2]">
           <canvas
             ref={windTopRef}
-            className="absolute left-0 right-0 top-0 h-[16%] w-full opacity-85 mix-blend-screen sm:h-[22%] sm:opacity-90"
+            className="absolute left-0 right-0 top-0 h-[9.5%] w-full opacity-85 mix-blend-screen sm:h-[22%] sm:opacity-90"
           />
           <canvas
             ref={windBottomRef}
-            className="absolute left-0 right-0 bottom-0 h-[16%] w-full opacity-85 mix-blend-screen sm:h-[22%] sm:opacity-90"
+            className="absolute left-0 right-0 bottom-0 h-[9.5%] w-full opacity-85 mix-blend-screen sm:h-[22%] sm:opacity-90"
           />
         </div>
 

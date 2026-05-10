@@ -36,22 +36,22 @@ export function ContactMapSection() {
 
   return (
     <motion.section
-      className="relative mt-20 w-screen max-w-none border-t border-border/60 bg-border/20 md:mt-28 left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]"
-      initial={reduceMotion ? false : { opacity: 0, y: 28 }}
-      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      className="relative mt-20 w-full max-w-full border-t border-border/60 bg-border/20 md:mt-28"
+      initial={reduceMotion ? false : { opacity: 0 }}
+      whileInView={reduceMotion ? undefined : { opacity: 1 }}
       viewport={{ once: false, amount: 0.2 }}
       transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
       aria-label={isEn ? "Office location map" : "Ofis konumu haritası"}
     >
       <div
-        className="relative h-[min(52vh,440px)] w-full min-h-[280px] overflow-hidden grayscale contrast-[1.15] brightness-[0.94] transition-[filter] duration-700 ease-out hover:grayscale-[0.35] hover:brightness-[0.98] motion-reduce:grayscale-0 motion-reduce:contrast-100 motion-reduce:brightness-100"
+        className="relative mx-auto h-[min(52vh,440px)] w-full min-h-[280px] max-w-full overflow-hidden grayscale contrast-[1.15] brightness-[0.94] transition-[filter] duration-700 ease-out hover:grayscale-[0.35] hover:brightness-[0.98] motion-reduce:grayscale-0 motion-reduce:contrast-100 motion-reduce:brightness-100"
       >
         <a
           href={openUrl}
           target="_blank"
           rel="noreferrer noopener"
           data-map-open="true"
-          className="absolute left-3 top-3 z-10 rounded-full border border-white/15 bg-black/35 px-4 py-2 text-xs font-semibold text-white/90 backdrop-blur-sm transition-colors hover:bg-black/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="touch-manipulation absolute left-3 top-3 z-10 inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/15 bg-black/35 px-4 py-2 text-xs font-semibold text-white/90 backdrop-blur-sm transition-colors hover:bg-black/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           {isEn ? "Open in Maps" : "Haritalarda aç"}
         </a>

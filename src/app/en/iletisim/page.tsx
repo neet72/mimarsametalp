@@ -19,9 +19,8 @@ export const metadata: Metadata = {
 
 export default function ContactPageEn() {
   return (
-    <>
+    <div className="contents">
       <script
-        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Home", path: "/en" },
@@ -30,7 +29,7 @@ export default function ContactPageEn() {
         )}
       />
       <ContactPageExperience />
-    </>
+    </div>
   );
 }
 

@@ -124,13 +124,13 @@ export function ContactFormPanel() {
         </p>
         <a
           href={`mailto:${CONTACT_EMAIL}`}
-          className="block font-display text-lg font-medium tracking-tight text-primary transition-colors hover:text-accent sm:text-xl"
+          className="inline-flex min-h-[44px] max-w-full items-center break-all font-display text-lg font-medium tracking-tight text-primary transition-colors hover:text-accent sm:min-h-0 sm:text-xl"
         >
           {CONTACT_EMAIL}
         </a>
         <a
           href={`tel:${CONTACT_PHONE_TEL}`}
-          className="mt-1 inline-block font-display text-base tracking-wide text-primary/75 transition-colors hover:text-primary sm:text-lg"
+          className="mt-1 inline-flex min-h-[44px] items-center font-display text-base tracking-wide text-primary/75 transition-colors hover:text-primary sm:min-h-0 sm:text-lg"
         >
           {CONTACT_PHONE_DISPLAY}
         </a>
@@ -231,7 +231,7 @@ export function ContactFormPanel() {
         <motion.button
           type="submit"
           disabled={isPending}
-          className="w-full bg-primary py-4 font-display text-sm font-semibold uppercase tracking-[0.2em] text-surface transition-[box-shadow,transform,opacity] hover:shadow-[0_12px_40px_-8px_rgb(15_23_42/0.35)] disabled:cursor-not-allowed disabled:opacity-55"
+          className="touch-manipulation w-full min-h-[48px] bg-primary py-4 font-display text-sm font-semibold uppercase tracking-[0.2em] text-surface transition-[box-shadow,transform,opacity] hover:shadow-[0_12px_40px_-8px_rgb(15_23_42/0.35)] disabled:cursor-not-allowed disabled:opacity-55"
           whileHover={reduceMotion || isPending ? undefined : { scale: 1.01 }}
           whileTap={reduceMotion || isPending ? undefined : { scale: 0.995 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
