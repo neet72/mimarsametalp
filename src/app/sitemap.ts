@@ -12,6 +12,14 @@ export const revalidate = 86400; // 1 gün
 
 const lastModified = new Date();
 
+function isValidPublicSlug(slug: unknown): slug is string {
+  if (typeof slug !== "string") return false;
+  const s = slug.trim().toLowerCase();
+  // Avoid emitting accidental/garbage slugs into sitemap (helps reduce GSC 404 noise).
+  if (s.length < 2 || s.length > 120) return false;
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s);
+}
+
 const paths: MetadataRoute.Sitemap = routes.map((path) => {
   const base = getSiteUrl();
   return {
@@ -43,38 +51,46 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB yoksa bile sitemap çalışsın.
   }
 
-  const projectPaths: MetadataRoute.Sitemap = projects.map((p) => ({
-    url: `${base}/projeler/${p.slug}`,
-    lastModified: p.updatedAt ?? lastModified,
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }));
+  const projectPaths: MetadataRoute.Sitemap = projects
+    .filter((p) => isValidPublicSlug(p.slug))
+    .map((p) => ({
+      url: `${base}/projeler/${p.slug}`,
+      lastModified: p.updatedAt ?? lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    }));
 
-  const projectPathsEn: MetadataRoute.Sitemap = projects.map((p) => ({
-    url: `${base}/en/projeler/${p.slug}`,
-    lastModified: p.updatedAt ?? lastModified,
-    changeFrequency: "monthly",
-    priority: 0.55,
-  }));
+  const projectPathsEn: MetadataRoute.Sitemap = projects
+    .filter((p) => isValidPublicSlug(p.slug))
+    .map((p) => ({
+      url: `${base}/en/projeler/${p.slug}`,
+      lastModified: p.updatedAt ?? lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.55,
+    }));
 
   const serviceSource =
     services.length > 0
       ? services.map((s) => ({ slug: s.slug, updatedAt: s.updatedAt }))
       : SERVICES_GALLERY.map((s) => ({ slug: s.slug, updatedAt: lastModified }));
 
-  const servicePaths: MetadataRoute.Sitemap = serviceSource.map((s) => ({
-    url: `${base}/hizmetlerimiz/${s.slug}`,
-    lastModified: s.updatedAt ?? lastModified,
-    changeFrequency: "monthly",
-    priority: 0.55,
-  }));
+  const servicePaths: MetadataRoute.Sitemap = serviceSource
+    .filter((s) => isValidPublicSlug(s.slug))
+    .map((s) => ({
+      url: `${base}/hizmetlerimiz/${s.slug}`,
+      lastModified: s.updatedAt ?? lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.55,
+    }));
 
-  const servicePathsEn: MetadataRoute.Sitemap = serviceSource.map((s) => ({
-    url: `${base}/en/hizmetlerimiz/${s.slug}`,
-    lastModified: s.updatedAt ?? lastModified,
-    changeFrequency: "monthly",
-    priority: 0.5,
-  }));
+  const servicePathsEn: MetadataRoute.Sitemap = serviceSource
+    .filter((s) => isValidPublicSlug(s.slug))
+    .map((s) => ({
+      url: `${base}/en/hizmetlerimiz/${s.slug}`,
+      lastModified: s.updatedAt ?? lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+    }));
 
   return [...paths, ...enPaths, ...servicePaths, ...servicePathsEn, ...projectPaths, ...projectPathsEn];
 }
