@@ -5,6 +5,7 @@
 import "react";
 
 declare module "react" {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- imza birleştirme: @types/react ile aynı jenerik
   interface VideoHTMLAttributes<T extends HTMLVideoElement> {
     fetchPriority?: "high" | "low" | "auto";
   }

@@ -17,5 +17,5 @@
     "paths": { "@/*": ["./src/*"] }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "REFERENCE_animation_logic"]
+  "exclude": ["node_modules", "REFERENCE_animation_logic", "velorah-hero"]
 }
