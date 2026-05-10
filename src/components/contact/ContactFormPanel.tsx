@@ -122,18 +122,20 @@ export function ContactFormPanel() {
         <p className="font-display text-[10px] font-semibold uppercase tracking-[0.28em] text-primary/45">
           {isEn ? CONTACT_FORM_SECTION_KICKER_EN : CONTACT_FORM_SECTION_KICKER}
         </p>
-        <a
-          href={`mailto:${CONTACT_EMAIL}`}
-          className="inline-flex min-h-[44px] max-w-full items-center break-all font-display text-lg font-medium tracking-tight text-primary transition-colors hover:text-accent sm:min-h-0 sm:text-xl"
-        >
-          {CONTACT_EMAIL}
-        </a>
-        <a
-          href={`tel:${CONTACT_PHONE_TEL}`}
-          className="mt-1 inline-flex min-h-[44px] items-center font-display text-base tracking-wide text-primary/75 transition-colors hover:text-primary sm:min-h-0 sm:text-lg"
-        >
-          {CONTACT_PHONE_DISPLAY}
-        </a>
+        <div className="mt-2 flex flex-col gap-3">
+          <a
+            href={`mailto:${CONTACT_EMAIL}`}
+            className="flex min-h-[44px] w-full items-center break-words font-display text-lg font-medium tracking-tight text-primary transition-colors hover:text-accent sm:min-h-0 sm:text-xl"
+          >
+            {CONTACT_EMAIL}
+          </a>
+          <a
+            href={`tel:${CONTACT_PHONE_TEL}`}
+            className="flex min-h-[44px] w-full items-center font-display text-base tracking-wide text-primary/75 transition-colors hover:text-primary sm:min-h-0 sm:text-lg"
+          >
+            {CONTACT_PHONE_DISPLAY}
+          </a>
+        </div>
 
         <ContactSocialLinks />
       </div>
