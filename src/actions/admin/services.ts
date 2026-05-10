@@ -81,7 +81,7 @@ export async function createService(formData: FormData) {
             faqEn: JSON.stringify(faqEn),
             published: input.published ?? false,
             sortOrder: input.sortOrder ?? 0,
-          } as any,
+          },
           select: { id: true },
         });
       } catch (e) {
@@ -180,7 +180,7 @@ export async function updateService(formData: FormData) {
             faqEn: JSON.stringify(faqEn),
             published: input.published ?? false,
             sortOrder: input.sortOrder ?? 0,
-          } as any,
+          },
           select: { id: true },
         });
       } catch (e) {
