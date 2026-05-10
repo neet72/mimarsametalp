@@ -84,6 +84,14 @@ export default auth((req) => {
     return applySecurityHeaders(NextResponse.redirect(url, 308));
   }
 
+  // Normalize trailing slashes (avoid duplicate URLs like `/projeler/`).
+  // Keep `/` intact.
+  if (pathname.length > 1 && pathname.endsWith("/")) {
+    const url = req.nextUrl.clone();
+    url.pathname = pathname.replace(/\/+$/, "");
+    return applySecurityHeaders(NextResponse.redirect(url, 308));
+  }
+
   const isLoggedIn = !!req.auth;
   const email = req.auth?.user?.email;
   const isAdmin = isLoggedIn && isAdminEmail(email ?? null);
