@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import authConfig from "@/auth.config";
 import { NextResponse } from "next/server";
 import { isAdminEmail } from "@/lib/security/admin";
+import { getSiteUrl } from "@/lib/seo";
 
 const { auth } = NextAuth(authConfig);
 
@@ -56,6 +57,33 @@ function applySecurityHeaders(res: NextResponse) {
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
+
+  // --- Canonical redirects (SEO) ---
+  // Fix common "duplicate without canonical" + "crawled - currently not indexed"
+  // cases caused by http/non-www or legacy paths like `/home`.
+  const canonical = new URL(getSiteUrl());
+  const canonicalHost = canonical.host;
+  const forwardedProto = req.headers.get("x-forwarded-proto");
+  const shouldBeHttps = canonical.protocol === "https:";
+  const isHttp = forwardedProto === "http" || req.nextUrl.protocol === "http:";
+  const hostMismatch = req.nextUrl.host !== canonicalHost;
+
+  // Redirect legacy aliases.
+  if (pathname === "/home") {
+    return applySecurityHeaders(NextResponse.redirect(new URL("/", canonical), 308));
+  }
+  if (pathname === "/en/home") {
+    return applySecurityHeaders(NextResponse.redirect(new URL("/en", canonical), 308));
+  }
+
+  // Enforce canonical host + https when needed.
+  if (hostMismatch || (shouldBeHttps && isHttp)) {
+    const url = req.nextUrl.clone();
+    url.protocol = canonical.protocol;
+    url.host = canonicalHost;
+    return applySecurityHeaders(NextResponse.redirect(url, 308));
+  }
+
   const isLoggedIn = !!req.auth;
   const email = req.auth?.user?.email;
   const isAdmin = isLoggedIn && isAdminEmail(email ?? null);
