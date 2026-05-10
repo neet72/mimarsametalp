@@ -3,7 +3,7 @@ import { ProjectsPortfolio } from "@/components/projects/ProjectsPortfolio";
 import { pageMetadata } from "@/lib/seo";
 import { pickProjectForLocale } from "@/lib/public/project-locale";
 import { getPublicProjects } from "@/lib/public/projects";
-import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
+import { breadcrumbJsonLd, itemListJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
 const pageTitle = "Projects | Samet Alp Architecture";
 const pageDescription =
@@ -37,6 +37,20 @@ export default async function ProjectsPageEn() {
             { name: "Home", path: "/en" },
             { name: "Projects", path: "/en/projeler" },
           ]),
+        )}
+      />
+      <script
+        {...jsonLdScriptProps(
+          itemListJsonLd({
+            name: "Projects",
+            path: "/en/projeler",
+            inLanguage: "en-US",
+            items: projects.map((p) => ({
+              name: p.title,
+              path: `/en/projeler/${p.slug}`,
+              imageUrl: p.imageUrl,
+            })),
+          }),
         )}
       />
       <ProjectsPortfolio projects={projects} />

@@ -61,6 +61,12 @@ export default auth((req) => {
   // --- Canonical redirects (SEO) ---
   // Fix common "duplicate without canonical" + "crawled - currently not indexed"
   // cases caused by http/non-www or legacy paths like `/home`.
+  const isDev = process.env.NODE_ENV !== "production";
+  const isLocal =
+    req.nextUrl.hostname === "localhost" ||
+    req.nextUrl.hostname === "127.0.0.1" ||
+    req.nextUrl.hostname === "::1";
+
   const canonical = new URL(getSiteUrl());
   const canonicalHost = canonical.host;
   const forwardedProto = req.headers.get("x-forwarded-proto");
@@ -70,14 +76,16 @@ export default auth((req) => {
 
   // Redirect legacy aliases.
   if (pathname === "/home") {
-    return applySecurityHeaders(NextResponse.redirect(new URL("/", canonical), 308));
+    return applySecurityHeaders(NextResponse.redirect(new URL("/", isLocal ? req.nextUrl.origin : canonical), 308));
   }
   if (pathname === "/en/home") {
-    return applySecurityHeaders(NextResponse.redirect(new URL("/en", canonical), 308));
+    return applySecurityHeaders(NextResponse.redirect(new URL("/en", isLocal ? req.nextUrl.origin : canonical), 308));
   }
 
   // Enforce canonical host + https when needed.
-  if (hostMismatch || (shouldBeHttps && isHttp)) {
+  // IMPORTANT: never redirect localhost in development, otherwise `http://localhost:3000`
+  // breaks by redirecting to the production domain.
+  if (!isDev && !isLocal && (hostMismatch || (shouldBeHttps && isHttp))) {
     const url = req.nextUrl.clone();
     url.protocol = canonical.protocol;
     url.host = canonicalHost;

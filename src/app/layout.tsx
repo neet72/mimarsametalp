@@ -5,6 +5,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { metadataBase, siteName } from "@/lib/seo";
 import { jsonLdScriptProps, localBusinessJsonLd, organizationJsonLd, siteNavigationJsonLd, websiteJsonLd } from "@/lib/seo-jsonld";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const inter = Inter({
@@ -145,6 +146,7 @@ export default async function RootLayout({
         </MainLayout>
         {/* Avoid dev key warnings inside analytics overlay on admin routes */}
         {isAdmin ? null : <Analytics key="analytics" />}
+        {isAdmin ? null : <SpeedInsights />}
       </body>
     </html>
   );

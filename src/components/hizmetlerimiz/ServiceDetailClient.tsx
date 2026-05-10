@@ -21,6 +21,7 @@ export type ServiceDetailData = {
 
 type Props = {
   service: ServiceDetailData;
+  relatedServices?: Array<{ title: string; href: string }>;
 };
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -35,7 +36,7 @@ const stagger: Variants = {
   show: { transition: { staggerChildren: 0.1, delayChildren: 0.06 } },
 };
 
-export function ServiceDetailClient({ service }: Props) {
+export function ServiceDetailClient({ service, relatedServices }: Props) {
   const reduceMotion = useReducedMotion();
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
@@ -281,6 +282,34 @@ export function ServiceDetailClient({ service }: Props) {
             </Link>
           </div>
         </motion.div>
+
+        {relatedServices && relatedServices.length > 0 ? (
+          <motion.div variants={fadeUp} className="mt-10 rounded-2xl border border-border bg-white p-8 shadow-[var(--shadow-card)]">
+            <h3 className="font-display text-base font-semibold uppercase tracking-[0.26em] text-primary/70">
+              {locale === "en" ? "Related services" : "İlgili hizmetler"}
+            </h3>
+            <p className="mt-3 max-w-2xl text-pretty text-sm leading-relaxed text-primary/65 sm:text-base">
+              {locale === "en"
+                ? "Explore other services that often complement this workflow."
+                : "Bu hizmetle birlikte en sık tercih edilen diğer hizmetleri de inceleyin."}
+            </p>
+            <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {relatedServices.map((s) => (
+                <li key={s.href}>
+                  <Link
+                    href={s.href}
+                    className="inline-flex w-full items-center justify-between rounded-xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-primary/85 transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                  >
+                    {s.title}
+                    <span aria-hidden className="text-primary/40">
+                      →
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        ) : null}
       </motion.section>
     </div>
   );

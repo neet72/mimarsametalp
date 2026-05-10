@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ProjectsPortfolio } from "@/components/projects/ProjectsPortfolio";
 import { pageMetadata } from "@/lib/seo";
 import { getPublicProjects } from "@/lib/public/projects";
-import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
+import { breadcrumbJsonLd, itemListJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
 const pageTitle = "Projeler | Samet Alp Mimarlık";
 const pageDescription =
@@ -33,6 +33,20 @@ export default async function ProjelerPage() {
             { name: "Ana Sayfa", path: "/" },
             { name: "Projeler", path: "/projeler" },
           ]),
+        )}
+      />
+      <script
+        {...jsonLdScriptProps(
+          itemListJsonLd({
+            name: "Projeler",
+            path: "/projeler",
+            inLanguage: "tr-TR",
+            items: projects.map((p) => ({
+              name: p.title,
+              path: `/projeler/${p.slug}`,
+              imageUrl: p.imageUrl,
+            })),
+          }),
         )}
       />
       <ProjectsPortfolio projects={projects} />

@@ -11,7 +11,9 @@ import { useEffect } from "react";
 import { ProjectCard } from "./ProjectCard";
 import { fadeUpSoft } from "@/lib/motion";
 import { usePathname } from "next/navigation";
-import { localeFromPathname } from "@/lib/locale";
+import Link from "next/link";
+import { localeFromPathname, withLocalePath } from "@/lib/locale";
+import { cn } from "@/lib/cn";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -155,6 +157,31 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
           >
             {description}
           </motion.p>
+
+          <motion.div variants={headerItem} className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href={withLocalePath("/hizmetlerimiz", locale)}
+              className={cn(
+                "inline-flex items-center justify-center rounded-full border border-border bg-white px-5 py-2.5",
+                "text-xs font-semibold uppercase tracking-[0.22em] text-primary/80",
+                "transition-colors hover:border-primary/25 hover:bg-primary/[0.03] hover:text-primary",
+                "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent",
+              )}
+            >
+              {locale === "en" ? "Explore Services" : "Hizmetleri İncele"}
+            </Link>
+            <Link
+              href={withLocalePath("/iletisim", locale)}
+              className={cn(
+                "inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5",
+                "text-xs font-semibold uppercase tracking-[0.22em] text-white",
+                "transition-colors hover:bg-primary/90",
+                "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent",
+              )}
+            >
+              {locale === "en" ? "Contact" : "İletişim"}
+            </Link>
+          </motion.div>
         </motion.header>
 
         <div className="grid grid-cols-1 gap-12 pb-16 pt-4 sm:gap-14 sm:pb-20 md:grid-cols-2 md:gap-x-10 md:gap-y-14 md:pb-28 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-20">
@@ -173,6 +200,40 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
               <ProjectCard project={project} index={index} />
             </motion.div>
           ))}
+        </div>
+
+        <div className="pb-16 sm:pb-20 md:pb-28">
+          <div className="mx-auto max-w-3xl rounded-2xl border border-border bg-white/70 p-8 text-center shadow-[var(--shadow-card)]">
+            <p className="text-pretty text-sm leading-relaxed text-primary/70 sm:text-base">
+              {locale === "en"
+                ? "If you’d like a similar solution, share your site constraints, budget range, and timeline—so we can propose a realistic roadmap."
+                : "Benzer bir çözüm hedefliyorsanız arsa/alan, bütçe aralığı ve zaman planınızı paylaşın; size gerçekçi bir yol haritası önerelim."}
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href={withLocalePath("/iletisim", locale)}
+                className={cn(
+                  "inline-flex items-center justify-center rounded-full bg-primary px-6 py-3",
+                  "text-xs font-semibold uppercase tracking-[0.22em] text-white",
+                  "transition-colors hover:bg-primary/90",
+                  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent",
+                )}
+              >
+                {locale === "en" ? "Request a Quote" : "Teklif Al / İletişim"}
+              </Link>
+              <Link
+                href={withLocalePath("/hizmetlerimiz", locale)}
+                className={cn(
+                  "inline-flex items-center justify-center rounded-full border border-border bg-white px-6 py-3",
+                  "text-xs font-semibold uppercase tracking-[0.22em] text-primary/80",
+                  "transition-colors hover:border-primary/25 hover:bg-primary/[0.03] hover:text-primary",
+                  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent",
+                )}
+              >
+                {locale === "en" ? "Services" : "Hizmetler"}
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>

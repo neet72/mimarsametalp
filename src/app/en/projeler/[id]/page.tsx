@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProjectDetailClient } from "@/components/projects/ProjectDetailClient";
-import { getPublicProjectBySlug } from "@/lib/public/projects";
+import { getPublicProjectBySlug, getPublicProjects } from "@/lib/public/projects";
 import { pageMetadata } from "@/lib/seo";
 import { firstImageUrl } from "@/lib/media-url";
 import { pickProjectForLocale } from "@/lib/public/project-locale";
@@ -71,6 +71,15 @@ export default async function ProjectDetailPageEn({ params }: PageProps) {
 
   const view = pickProjectForLocale(project, "en");
 
+  const all = await getPublicProjects();
+  const relatedProjects = all
+    .filter((p) => p.slug !== project.slug && (view.category ? pickProjectForLocale(p, "en").category === view.category : true))
+    .slice(0, 4)
+    .map((p) => {
+      const v = pickProjectForLocale(p, "en");
+      return { title: v.title, href: `/en/projeler/${p.slug}` };
+    });
+
   return (
     <div className="contents">
       <script
@@ -94,6 +103,8 @@ export default async function ProjectDetailPageEn({ params }: PageProps) {
             location: view.location,
             year: project.year,
             areaM2: project.areaM2,
+            inLanguage: "en-US",
+            dateModified: project.updatedAt,
           }),
         )}
       />
@@ -109,6 +120,7 @@ export default async function ProjectDetailPageEn({ params }: PageProps) {
           imageUrl: project.imageUrls[0] ?? "/images/hero-1.webp",
           gallery: project.imageUrls,
         }}
+        relatedProjects={relatedProjects}
       />
     </div>
   );

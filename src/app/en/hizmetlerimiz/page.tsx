@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { HizmetlerimizPageContent } from "@/components/hizmetlerimiz/HizmetlerimizPageContent";
 import { pageMetadata } from "@/lib/seo";
-import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
+import { breadcrumbJsonLd, itemListJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 import { getServiceListingItems } from "@/lib/public/service-listing";
 
 const pageTitle = "Services | Samet Alp Architecture";
@@ -28,6 +28,20 @@ export default async function ServicesPageEn() {
             { name: "Home", path: "/en" },
             { name: "Services", path: "/en/hizmetlerimiz" },
           ]),
+        )}
+      />
+      <script
+        {...jsonLdScriptProps(
+          itemListJsonLd({
+            name: "Services",
+            path: "/en/hizmetlerimiz",
+            inLanguage: "en-US",
+            items: items.map((s) => ({
+              name: s.title,
+              path: `/en/hizmetlerimiz/${s.slug}`,
+              imageUrl: s.imageUrl,
+            })),
+          }),
         )}
       />
       <HizmetlerimizPageContent items={items} locale="en" />

@@ -23,6 +23,7 @@ type ProjectDetailClientProps = {
     imageUrl: string;
     gallery: string[];
   };
+  relatedProjects?: Array<{ title: string; href: string }>;
 };
 
 const easeInOut = [0.42, 0, 0.58, 1] as const;
@@ -44,7 +45,7 @@ function projectPhotoAlt(
   return locale === "en" ? `${base} — gallery thumbnail ${index + 1}` : `${base} — galeri küçük görsel ${index + 1}`;
 }
 
-export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
+export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailClientProps) {
   const reduceMotion = useReducedMotion();
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
@@ -180,7 +181,16 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
               {locale === "en" ? "About the Project" : "Proje Hakkında"}
             </h2>
             <p className="mt-5 max-w-3xl text-pretty text-base leading-relaxed text-primary/70 sm:text-lg">
-              {project.description || "—"}
+              {project.description?.trim()
+                ? project.description
+                : locale === "en"
+                  ? "A concise project summary will be added here. For now, explore the gallery and key details on the right."
+                  : "Bu alana proje özeti eklenecek. Şimdilik galeri ve sağ taraftaki proje bilgileri üzerinden inceleyebilirsiniz."}
+            </p>
+            <p className="mt-4 max-w-3xl text-pretty text-base leading-relaxed text-primary/65 sm:text-lg">
+              {locale === "en"
+                ? "We focus on a clear concept, functional planning, and a premium finish—balancing aesthetics with usability and execution quality."
+                : "Net konsept, fonksiyonel planlama ve premium bitişe odaklanıyor; estetik ile kullanılabilirliği uygulama kalitesiyle dengeliyoruz."}
             </p>
 
             <h3 className="mt-12 font-display text-xl font-semibold tracking-tight text-primary">
@@ -321,6 +331,36 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
                   {locale === "en" ? "Back to Projects" : "Projeler Sayfasına Dön"}
                 </Link>
               </div>
+
+              {project.description?.trim() ? (
+                <div className="mt-8 rounded-xl border border-border bg-white/70 p-4">
+                  <p className="text-sm leading-relaxed text-primary/70">
+                    {locale === "en"
+                      ? "Want a similar solution? Browse services or contact us with your constraints (site, budget, timeline)."
+                      : "Benzer bir çözüm mü istiyorsunuz? Hizmetlerimizi inceleyin veya arsa/bütçe/zaman kısıtlarınızla bize yazın."}
+                  </p>
+                </div>
+              ) : null}
+
+              {relatedProjects && relatedProjects.length > 0 ? (
+                <div className="mt-8">
+                  <h4 className="font-display text-xs font-semibold uppercase tracking-[0.24em] text-primary/70">
+                    {locale === "en" ? "Related Projects" : "Benzer Projeler"}
+                  </h4>
+                  <ul className="mt-4 space-y-2">
+                    {relatedProjects.map((p) => (
+                      <li key={p.href}>
+                        <Link
+                          href={p.href}
+                          className="inline-flex w-full rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium text-primary/85 transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                        >
+                          {p.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </div>
           </aside>
         </div>

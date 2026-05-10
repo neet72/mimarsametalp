@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProjectDetailClient } from "@/components/projects/ProjectDetailClient";
-import { getPublicProjectBySlug } from "@/lib/public/projects";
+import { getPublicProjectBySlug, getPublicProjects } from "@/lib/public/projects";
 import { pageMetadata } from "@/lib/seo";
 import { firstImageUrl } from "@/lib/media-url";
 import { breadcrumbJsonLd, jsonLdScriptProps, projectJsonLd } from "@/lib/seo-jsonld";
@@ -55,6 +55,12 @@ export default async function ProjeDetayPage({ params }: PageProps) {
   const project = await getPublicProjectBySlug(slug);
   if (!project) notFound();
 
+  const all = await getPublicProjects();
+  const relatedProjects = all
+    .filter((p) => p.slug !== project.slug && (project.category ? p.category === project.category : true))
+    .slice(0, 4)
+    .map((p) => ({ title: p.title, href: `/projeler/${p.slug}` }));
+
   return (
     <div className="contents">
       <script
@@ -78,6 +84,8 @@ export default async function ProjeDetayPage({ params }: PageProps) {
             location: project.location,
             year: project.year,
             areaM2: project.areaM2,
+            inLanguage: "tr-TR",
+            dateModified: project.updatedAt,
           }),
         )}
       />
@@ -93,6 +101,7 @@ export default async function ProjeDetayPage({ params }: PageProps) {
           imageUrl: project.imageUrls[0] ?? "/images/hero-1.webp",
           gallery: project.imageUrls,
         }}
+        relatedProjects={relatedProjects}
       />
     </div>
   );

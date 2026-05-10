@@ -141,29 +141,45 @@ export function breadcrumbJsonLd(
       const raw = "url" in it ? it.url : it.path;
       const url = raw.startsWith("http") ? raw : `${base}${raw}`;
       return {
-      "@type": "ListItem",
-      position: idx + 1,
-      name: it.name,
+        "@type": "ListItem",
+        position: idx + 1,
+        name: it.name,
         item: url,
       };
     }),
   } satisfies JsonLd;
 }
 
-export function serviceJsonLd(input: { name: string; description: string; path: `/${string}`; imageUrl?: string }) {
+export function serviceJsonLd(input: {
+  name: string;
+  description: string | null | undefined;
+  path: `/${string}`;
+  imageUrl?: string | null;
+  inLanguage?: string;
+  dateModified?: Date | string | null;
+}) {
   const base = getSiteUrl();
+  const url = `${base}${input.path}`;
+  const img = input.imageUrl?.trim();
+  const image = img ? (img.startsWith("http") ? img : `${base}${img}`) : undefined;
+  const desc = String(input.description ?? "").trim();
   return {
     "@context": "https://schema.org",
     "@type": "Service",
+    "@id": `${url}#service`,
     name: input.name,
-    description: input.description,
+    description: desc.length > 0 ? desc : undefined,
     provider: {
       "@type": "Organization",
+      "@id": `${base}#org`,
       name: siteName,
       url: base,
     },
-    url: `${base}${input.path}`,
-    ...(input.imageUrl ? { image: input.imageUrl.startsWith("http") ? input.imageUrl : `${base}${input.imageUrl}` } : {}),
+    url,
+    mainEntityOfPage: url,
+    ...(input.inLanguage ? { inLanguage: input.inLanguage } : {}),
+    ...(input.dateModified ? { dateModified: input.dateModified } : {}),
+    ...(image ? { image } : {}),
   } satisfies JsonLd;
 }
 
@@ -177,8 +193,11 @@ export function projectJsonLd(input: {
   location?: string | null;
   year?: number | null;
   areaM2?: number | null;
+  inLanguage?: string;
+  dateModified?: Date | string | null;
 }) {
   const base = getSiteUrl();
+  const url = `${base}${input.path}`;
   const images = (input.imageUrls ?? [])
     .filter((u) => typeof u === "string" && u.trim() && !isVideoUrl(u))
     .map((u) => (u.startsWith("http") ? u : `${base}${u}`));
@@ -196,17 +215,58 @@ export function projectJsonLd(input: {
         }
       : null,
   ].filter(Boolean);
+  const desc = String(input.description ?? "").trim();
   return {
     "@context": "https://schema.org",
     // Mimarlık işleri için Project iyi bir genel tip; gerekirse CreativeWork'a düşer.
     "@type": "Project",
+    "@id": `${url}#project`,
     name: input.name,
-    description: input.description ?? undefined,
-    url: `${base}${input.path}`,
+    description: desc.length > 0 ? desc : undefined,
+    url,
+    mainEntityOfPage: url,
+    isPartOf: { "@type": "WebSite", "@id": `${base}#website`, url: base, name: siteName },
+    creator: { "@type": "Organization", "@id": `${base}#org`, name: siteName, url: base },
     ...(images.length ? { image: images } : {}),
     ...(additionalProperty.length ? { additionalProperty } : {}),
-    ...(input.location ? { location: input.location } : {}),
+    ...(input.location ? { location: { "@type": "Place", name: input.location } } : {}),
     ...(input.year ? { temporalCoverage: String(input.year) } : {}),
+    ...(input.inLanguage ? { inLanguage: input.inLanguage } : {}),
+    ...(input.dateModified ? { dateModified: input.dateModified } : {}),
+  } satisfies JsonLd;
+}
+
+export function itemListJsonLd(input: {
+  name: string;
+  path: `/${string}`;
+  inLanguage: string;
+  items: Array<{ name: string; path: `/${string}`; imageUrl?: string | null }>;
+}) {
+  const base = getSiteUrl();
+  const url = `${base}${input.path}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": `${url}#itemlist`,
+    name: input.name,
+    url,
+    inLanguage: input.inLanguage,
+    itemListElement: input.items.map((it, idx) => {
+      const itemUrl = `${base}${it.path}`;
+      const rawImg = it.imageUrl?.trim();
+      const image = rawImg ? (rawImg.startsWith("http") ? rawImg : `${base}${rawImg}`) : undefined;
+      return {
+        "@type": "ListItem",
+        position: idx + 1,
+        item: {
+          "@type": "Thing",
+          "@id": itemUrl,
+          url: itemUrl,
+          name: it.name,
+          ...(image ? { image } : {}),
+        },
+      };
+    }),
   } satisfies JsonLd;
 }
 

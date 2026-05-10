@@ -5,6 +5,7 @@ import { pageMetadata, siteName } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps, serviceJsonLd } from "@/lib/seo-jsonld";
 import { getPublicServiceBySlug } from "@/lib/public/services";
 import { resolveServiceDetailData } from "@/lib/public/resolve-service-detail";
+import { getServiceListingItems } from "@/lib/public/service-listing";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -67,6 +68,12 @@ export default async function HizmetDetayPage({ params }: PageProps) {
   const db = key ? await getPublicServiceBySlug(key) : null;
   const service = resolveServiceDetailData(key, "tr", db);
   if (!service) notFound();
+
+  const listing = await getServiceListingItems("tr");
+  const relatedServices = listing
+    .filter((s) => s.slug !== service.slug)
+    .slice(0, 6)
+    .map((s) => ({ title: s.title, href: `/hizmetlerimiz/${s.slug}` }));
   return (
     <div className="contents">
       <script
@@ -85,10 +92,12 @@ export default async function HizmetDetayPage({ params }: PageProps) {
             description: service.shortDescription,
             path: `/hizmetlerimiz/${service.slug}`,
             imageUrl: service.heroImageUrl,
+            inLanguage: "tr-TR",
+            dateModified: db?.updatedAt ?? null,
           }),
         )}
       />
-      <ServiceDetailClient service={service} />
+      <ServiceDetailClient service={service} relatedServices={relatedServices} />
     </div>
   );
 }

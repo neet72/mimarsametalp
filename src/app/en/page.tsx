@@ -6,7 +6,7 @@ import { VisionIntro } from "@/components/home/VisionIntro";
 import { SocialGallery } from "@/components/home/SocialGallery";
 import { getServiceListingItems } from "@/lib/public/service-listing";
 import { pageMetadata } from "@/lib/seo";
-import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
+import { breadcrumbJsonLd, itemListJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
 const pageTitle = `Samet Alp Architecture | Home`;
 const pageDescription =
@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 
 export default async function HomePageEn() {
   const serviceItems = await getServiceListingItems("en");
+  const featuredServices = serviceItems.slice(0, 6);
   return (
     <div className="contents">
       <script
@@ -31,6 +32,20 @@ export default async function HomePageEn() {
           breadcrumbJsonLd([
             { name: "Home", path: "/en" },
           ]),
+        )}
+      />
+      <script
+        {...jsonLdScriptProps(
+          itemListJsonLd({
+            name: "Featured services",
+            path: "/en",
+            inLanguage: "en-US",
+            items: featuredServices.map((s) => ({
+              name: s.title,
+              path: `/en/hizmetlerimiz/${s.slug}`,
+              imageUrl: s.imageUrl,
+            })),
+          }),
         )}
       />
       <CinematicScrollHero />
