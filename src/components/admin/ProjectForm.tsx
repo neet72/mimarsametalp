@@ -5,11 +5,12 @@ import Image from "next/image";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { createProject, updateProject } from "@/actions/admin/projects";
 import { uploadAdminMedia } from "@/actions/admin/upload";
-import { ADMIN_PROJECT_CATEGORIES } from "@/lib/admin/project-categories";
+import { ADMIN_PROJECT_CATEGORIES, ADMIN_PROJECT_CATEGORIES_EN } from "@/lib/admin/project-categories";
 import type { Project } from "@prisma/client";
 import { slugify } from "@/lib/slugify";
 import { ArrowDown, ArrowUp, ExternalLink, ImagePlus, Trash2, UploadCloud } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { isVideoUrl } from "@/lib/media-url";
 import { RichTextLite } from "@/components/admin/ui/rich-text-lite";
 
 function formatImageUrls(raw: string): string {
@@ -55,6 +56,11 @@ export default function ProjectForm({
   const [status, setStatus] = useState(project?.status ?? "");
   const [year, setYear] = useState(project?.year ? String(project.year) : "");
   const [location, setLocation] = useState(project?.location ?? "");
+  const [titleEn, setTitleEn] = useState(project?.titleEn ?? "");
+  const [categoryEn, setCategoryEn] = useState(project?.categoryEn ?? "");
+  const [descriptionEn, setDescriptionEn] = useState(project?.descriptionEn ?? "");
+  const [statusEn, setStatusEn] = useState(project?.statusEn ?? "");
+  const [locationEn, setLocationEn] = useState(project?.locationEn ?? "");
   const [areaM2, setAreaM2] = useState(project?.areaM2 ? String(project.areaM2) : "");
   const [imageUrlsRaw, setImageUrlsRaw] = useState(
     project?.imageUrls ? formatImageUrls(project.imageUrls) : "",
@@ -79,6 +85,7 @@ export default function ProjectForm({
 
   const imageUrls = useMemo(() => parseLines(imageUrlsRaw), [imageUrlsRaw]);
   const coverUrl = imageUrls[0] ?? "/images/hero-1.webp";
+  const coverIsVideo = coverUrl !== "/images/hero-1.webp" && isVideoUrl(coverUrl);
 
   const previewLabel = useMemo(() => {
     const label = title.trim() || project?.title?.trim() || "Proje";
@@ -120,7 +127,7 @@ export default function ProjectForm({
         const isPlaceholderOnly =
           current.length === 1 && (current[0] === "/images/hero-1.webp" || current[0].endsWith("/images/hero-1.webp"));
         const base = current.length === 0 || isPlaceholderOnly ? [] : current;
-        // Put newly uploaded images to the front so cover updates immediately.
+        // Put newly uploaded media to the front so cover updates immediately.
         return toLines([...urls, ...base]);
       });
     } catch (e) {
@@ -140,6 +147,11 @@ export default function ProjectForm({
     fd.set("status", status);
     fd.set("year", year);
     fd.set("location", location);
+    fd.set("titleEn", titleEn);
+    fd.set("categoryEn", categoryEn);
+    fd.set("descriptionEn", descriptionEn);
+    fd.set("statusEn", statusEn);
+    fd.set("locationEn", locationEn);
     fd.set("areaM2", areaM2);
     fd.set("imageUrlsText", imageUrlsRaw);
     fd.set("sortOrder", sortOrder);
@@ -211,103 +223,206 @@ export default function ProjectForm({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 rounded-xl border border-zinc-800 bg-zinc-950/40 p-5 sm:grid-cols-2">
-          <div className="space-y-2">
-            <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Başlık</label>
-            <input
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className={cn(
-                "w-full rounded-lg border bg-zinc-950 px-3 py-2 text-sm text-zinc-100",
-                fieldErrors.title ? "border-red-800/70" : "border-zinc-700",
-              )}
-            />
-            {fieldErrors.title?.[0] ? (
-              <p className="text-xs text-red-300">{fieldErrors.title[0]}</p>
-            ) : null}
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between gap-3">
-              <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Slug</label>
-              <button
-                type="button"
-                onClick={() => {
-                  setSlugTouched(true);
-                  setSlug(slugify(title).toLowerCase());
-                }}
-                className="text-xs font-medium text-[rgb(200,170,130)] hover:underline"
-              >
-                Başlıktan üret
-              </button>
-            </div>
-            <input
-              value={slug}
-              onChange={(e) => {
-                setSlugTouched(true);
-                setSlug(e.target.value);
-              }}
-              placeholder="örn: cukurova-villa"
-              className={cn(
-                "w-full rounded-lg border bg-zinc-950 px-3 py-2 text-sm text-zinc-100",
-                fieldErrors.slug ? "border-red-800/70" : "border-zinc-700",
-              )}
-            />
-            {slug ? (
-              <p className="text-xs text-zinc-500">
-                Public URL: <span className="text-zinc-300">/projeler/{slug}</span>
-              </p>
-            ) : null}
-            {fieldErrors.slug?.[0] ? (
-              <p className="text-xs text-red-300">{fieldErrors.slug[0]}</p>
-            ) : null}
-          </div>
-
-          <div className="space-y-2 sm:col-span-2">
-            <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Kategori</label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
-            >
-              <option value="">—</option>
-              {ADMIN_PROJECT_CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="space-y-2 sm:col-span-2">
-            <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Açıklama</label>
-            <RichTextLite
-              value={description}
-              onChangePlain={setDescription}
-              storageKey={`admin:project:desc:${mode}:${project?.id ?? "new"}`}
-              invalid={Boolean(fieldErrors.description)}
-            />
-            {fieldErrors.description?.[0] ? (
-              <p className="text-xs text-red-300">{fieldErrors.description[0]}</p>
-            ) : null}
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 sm:col-span-2 sm:grid-cols-2">
-            <div className="space-y-2">
-              <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Durum</label>
+        <div className="space-y-5">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-5">
+            <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Slug (her iki dilde aynı)</p>
+            <div className="mt-4 space-y-2">
+              <div className="flex items-center justify-between gap-3">
+                <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Slug</label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSlugTouched(true);
+                    setSlug(slugify(title).toLowerCase());
+                  }}
+                  className="text-xs font-medium text-[rgb(200,170,130)] hover:underline"
+                >
+                  TR başlıktan üret
+                </button>
+              </div>
               <input
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                placeholder="örn: Tamamlandı / Devam ediyor"
+                value={slug}
+                onChange={(e) => {
+                  setSlugTouched(true);
+                  setSlug(e.target.value);
+                }}
+                placeholder="örn: cukurova-villa"
                 className={cn(
                   "w-full rounded-lg border bg-zinc-950 px-3 py-2 text-sm text-zinc-100",
-                  fieldErrors.status ? "border-red-800/70" : "border-zinc-700",
+                  fieldErrors.slug ? "border-red-800/70" : "border-zinc-700",
                 )}
               />
-              {fieldErrors.status?.[0] ? <p className="text-xs text-red-300">{fieldErrors.status[0]}</p> : null}
+              {slug ? (
+                <div className="space-y-1 text-xs text-zinc-500">
+                  <p>
+                    TR: <span className="text-zinc-300">/projeler/{slug}</span>
+                  </p>
+                  <p>
+                    EN: <span className="text-zinc-300">/en/projeler/{slug}</span>
+                  </p>
+                </div>
+              ) : null}
+              {fieldErrors.slug?.[0] ? <p className="text-xs text-red-300">{fieldErrors.slug[0]}</p> : null}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+            <div className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-950/40 p-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(200,170,130)]">Türkçe</p>
+                <p className="mt-1 text-xs text-zinc-500">/projeler için zorunlu başlık ve içerik.</p>
+              </div>
+              <div className="space-y-2">
+                <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Başlık</label>
+                <input
+                  required
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className={cn(
+                    "w-full rounded-lg border bg-zinc-950 px-3 py-2 text-sm text-zinc-100",
+                    fieldErrors.title ? "border-red-800/70" : "border-zinc-700",
+                  )}
+                />
+                {fieldErrors.title?.[0] ? (
+                  <p className="text-xs text-red-300">{fieldErrors.title[0]}</p>
+                ) : null}
+              </div>
+              <div className="space-y-2">
+                <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Kategori</label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
+                >
+                  <option value="">—</option>
+                  {ADMIN_PROJECT_CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Açıklama</label>
+                <RichTextLite
+                  value={description}
+                  onChangePlain={setDescription}
+                  storageKey={`admin:project:desc:${mode}:${project?.id ?? "new"}`}
+                  invalid={Boolean(fieldErrors.description)}
+                />
+                {fieldErrors.description?.[0] ? (
+                  <p className="text-xs text-red-300">{fieldErrors.description[0]}</p>
+                ) : null}
+              </div>
+              <div className="space-y-2">
+                <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Durum</label>
+                <input
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  placeholder="örn: Tamamlandı / Devam ediyor"
+                  className={cn(
+                    "w-full rounded-lg border bg-zinc-950 px-3 py-2 text-sm text-zinc-100",
+                    fieldErrors.status ? "border-red-800/70" : "border-zinc-700",
+                  )}
+                />
+                {fieldErrors.status?.[0] ? <p className="text-xs text-red-300">{fieldErrors.status[0]}</p> : null}
+              </div>
+              <div className="space-y-2">
+                <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Konum</label>
+                <input
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="örn: Adana"
+                  className={cn(
+                    "w-full rounded-lg border bg-zinc-950 px-3 py-2 text-sm text-zinc-100",
+                    fieldErrors.location ? "border-red-800/70" : "border-zinc-700",
+                  )}
+                />
+                {fieldErrors.location?.[0] ? <p className="text-xs text-red-300">{fieldErrors.location[0]}</p> : null}
+              </div>
             </div>
 
+            <div className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-950/40 p-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(200,170,130)]">English</p>
+                <p className="mt-1 text-xs text-zinc-500">
+                  /en/projeler — boş bıraktığın alanlarda Türkçe metin gösterilir.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Title</label>
+                <input
+                  value={titleEn}
+                  onChange={(e) => setTitleEn(e.target.value)}
+                  placeholder="Project title in English"
+                  className={cn(
+                    "w-full rounded-lg border bg-zinc-950 px-3 py-2 text-sm text-zinc-100",
+                    fieldErrors.titleEn ? "border-red-800/70" : "border-zinc-700",
+                  )}
+                />
+                {fieldErrors.titleEn?.[0] ? <p className="text-xs text-red-300">{fieldErrors.titleEn[0]}</p> : null}
+              </div>
+              <div className="space-y-2">
+                <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Category</label>
+                <select
+                  value={categoryEn}
+                  onChange={(e) => setCategoryEn(e.target.value)}
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
+                >
+                  <option value="">—</option>
+                  {ADMIN_PROJECT_CATEGORIES_EN.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Description</label>
+                <RichTextLite
+                  value={descriptionEn}
+                  onChangePlain={setDescriptionEn}
+                  storageKey={`admin:project:descEn:${mode}:${project?.id ?? "new"}`}
+                  invalid={Boolean(fieldErrors.descriptionEn)}
+                />
+                {fieldErrors.descriptionEn?.[0] ? (
+                  <p className="text-xs text-red-300">{fieldErrors.descriptionEn[0]}</p>
+                ) : null}
+              </div>
+              <div className="space-y-2">
+                <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Status</label>
+                <input
+                  value={statusEn}
+                  onChange={(e) => setStatusEn(e.target.value)}
+                  placeholder="e.g. Completed / In progress"
+                  className={cn(
+                    "w-full rounded-lg border bg-zinc-950 px-3 py-2 text-sm text-zinc-100",
+                    fieldErrors.statusEn ? "border-red-800/70" : "border-zinc-700",
+                  )}
+                />
+                {fieldErrors.statusEn?.[0] ? <p className="text-xs text-red-300">{fieldErrors.statusEn[0]}</p> : null}
+              </div>
+              <div className="space-y-2">
+                <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Location</label>
+                <input
+                  value={locationEn}
+                  onChange={(e) => setLocationEn(e.target.value)}
+                  placeholder="e.g. Adana"
+                  className={cn(
+                    "w-full rounded-lg border bg-zinc-950 px-3 py-2 text-sm text-zinc-100",
+                    fieldErrors.locationEn ? "border-red-800/70" : "border-zinc-700",
+                  )}
+                />
+                {fieldErrors.locationEn?.[0] ? <p className="text-xs text-red-300">{fieldErrors.locationEn[0]}</p> : null}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 rounded-xl border border-zinc-800 bg-zinc-950/40 p-5 sm:grid-cols-2">
+            <div className="space-y-2 sm:col-span-2">
+              <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Ortak bilgiler</p>
+              <p className="text-xs text-zinc-500">Yıl ve alan her iki dilde aynı gösterilir.</p>
+            </div>
             <div className="space-y-2">
               <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Yıl</label>
               <input
@@ -322,21 +437,6 @@ export default function ProjectForm({
               />
               {fieldErrors.year?.[0] ? <p className="text-xs text-red-300">{fieldErrors.year[0]}</p> : null}
             </div>
-
-            <div className="space-y-2">
-              <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Konum</label>
-              <input
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="örn: Adana"
-                className={cn(
-                  "w-full rounded-lg border bg-zinc-950 px-3 py-2 text-sm text-zinc-100",
-                  fieldErrors.location ? "border-red-800/70" : "border-zinc-700",
-                )}
-              />
-              {fieldErrors.location?.[0] ? <p className="text-xs text-red-300">{fieldErrors.location[0]}</p> : null}
-            </div>
-
             <div className="space-y-2">
               <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500">Alan (m²)</label>
               <input
@@ -357,21 +457,33 @@ export default function ProjectForm({
         <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-5">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Görsel Galerisi</p>
+              <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Görsel ve video galerisi</p>
               <p className="mt-1 text-sm text-zinc-400">
-                İlk görsel kapak olarak kullanılır. URL veya <span className="font-mono">/public</span> yolu gir.
+                İlk satır kapak olarak kullanılır (görsel veya video). URL veya <span className="font-mono">/public</span>{" "}
+                yolu; sınırsız medya ekleyebilirsin.
               </p>
             </div>
             {slug ? (
-              <a
-                href={`/projeler/${slug}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-200 hover:bg-zinc-900"
-              >
-                <ExternalLink className="h-4 w-4" aria-hidden />
-                Public’te Gör
-              </a>
+              <div className="flex flex-wrap items-center gap-2">
+                <a
+                  href={`/projeler/${slug}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-200 hover:bg-zinc-900"
+                >
+                  <ExternalLink className="h-4 w-4" aria-hidden />
+                  TR — önizle
+                </a>
+                <a
+                  href={`/en/projeler/${slug}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-200 hover:bg-zinc-900"
+                >
+                  <ExternalLink className="h-4 w-4" aria-hidden />
+                  EN — önizle
+                </a>
+              </div>
             ) : null}
           </div>
 
@@ -399,7 +511,7 @@ export default function ProjectForm({
                   {uploading ? "Yükleniyor…" : "Cihazdan Yükle"}
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/*,video/*,.mp4,.webm,.mov,.m4v"
                     multiple
                     className="hidden"
                     onChange={(e) => {
@@ -435,7 +547,7 @@ export default function ProjectForm({
                     });
                     setNewImageUrl("");
                   }}
-                  placeholder="Yeni görsel URL’i ekle…"
+                  placeholder="Görsel veya video URL’i ekle…"
                   className="h-10 flex-1 rounded-lg border border-zinc-700 bg-zinc-950 px-3 text-sm text-zinc-100"
                 />
                 <button
@@ -473,7 +585,19 @@ export default function ProjectForm({
 
             <div className="space-y-3">
               <div className="relative aspect-video overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
-                <Image src={coverUrl} alt="Kapak" fill sizes="420px" className="object-cover object-center" />
+                {coverIsVideo ? (
+                  <video
+                    src={coverUrl}
+                    muted
+                    playsInline
+                    loop
+                    autoPlay
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                    aria-label="Kapak videosu önizleme"
+                  />
+                ) : (
+                  <Image src={coverUrl} alt="Kapak" fill sizes="420px" className="object-cover object-center" />
+                )}
                 <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-4">
                   <p className="text-xs font-semibold uppercase tracking-wider text-white/70">Kapak</p>
@@ -508,13 +632,25 @@ export default function ProjectForm({
                       setDragOverIdx(null);
                     }}
                   >
-                    <Image
-                      src={src}
-                      alt={`${previewLabel} — galeri ${idx + 1} (önizleme)`}
-                      fill
-                      sizes="140px"
-                      className="object-cover object-center"
-                    />
+                    {isVideoUrl(src) ? (
+                      <video
+                        src={src}
+                        muted
+                        playsInline
+                        loop
+                        autoPlay
+                        className="absolute inset-0 h-full w-full object-cover object-center"
+                        aria-hidden
+                      />
+                    ) : (
+                      <Image
+                        src={src}
+                        alt={`${previewLabel} — galeri ${idx + 1} (önizleme)`}
+                        fill
+                        sizes="140px"
+                        className="object-cover object-center"
+                      />
+                    )}
                     <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/35" />
                     <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
                       <button
@@ -598,13 +734,25 @@ export default function ProjectForm({
           <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Önizleme</p>
           <div className="mt-4 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
             <div className="relative aspect-video">
-              <Image
-                src={coverUrl}
-                alt={`${previewLabel} — kapak görseli (sağ özet)`}
-                fill
-                sizes="420px"
-                className="object-cover object-center"
-              />
+              {coverIsVideo ? (
+                <video
+                  src={coverUrl}
+                  muted
+                  playsInline
+                  loop
+                  autoPlay
+                  className="absolute inset-0 h-full w-full object-cover object-center"
+                  aria-label={`${previewLabel} — kapak videosu`}
+                />
+              ) : (
+                <Image
+                  src={coverUrl}
+                  alt={`${previewLabel} — kapak görseli (sağ özet)`}
+                  fill
+                  sizes="420px"
+                  className="object-cover object-center"
+                />
+              )}
               <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-4">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70">
@@ -617,9 +765,22 @@ export default function ProjectForm({
               <p className="line-clamp-3 text-xs leading-relaxed text-zinc-400">
                 {description || "Açıklama…"}
               </p>
+              {titleEn.trim() || descriptionEn.trim() ? (
+                <div className="mt-3 border-t border-zinc-800 pt-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">English preview</p>
+                  {titleEn.trim() ? (
+                    <p className="mt-1 text-xs font-medium text-zinc-200">{titleEn}</p>
+                  ) : (
+                    <p className="mt-1 text-xs italic text-zinc-600">Title empty — site uses Turkish title on /en</p>
+                  )}
+                  {descriptionEn.trim() ? (
+                    <p className="mt-1 line-clamp-2 text-xs text-zinc-500">{descriptionEn}</p>
+                  ) : null}
+                </div>
+              ) : null}
               <div className="mt-3 flex items-center justify-between text-xs text-zinc-500">
                 <span>{published ? "Yayında" : "Taslak"}</span>
-                <span>Görsel: {imageUrls.length}</span>
+                <span>Medya: {imageUrls.length}</span>
               </div>
             </div>
           </div>

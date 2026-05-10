@@ -12,6 +12,11 @@ export type PublicProject = {
   status: string | null;
   year: number | null;
   location: string | null;
+  titleEn: string | null;
+  categoryEn: string | null;
+  descriptionEn: string | null;
+  statusEn: string | null;
+  locationEn: string | null;
   areaM2: number | null;
   imageUrls: string[];
   updatedAt: Date;
@@ -36,6 +41,11 @@ function toPublicProject(row: {
   status: string | null;
   year: number | null;
   location: string | null;
+  titleEn: string | null;
+  categoryEn: string | null;
+  descriptionEn: string | null;
+  statusEn: string | null;
+  locationEn: string | null;
   areaM2: number | null;
   imageUrls: string;
   updatedAt: Date;
@@ -50,6 +60,11 @@ function toPublicProject(row: {
     status: row.status,
     year: row.year,
     location: row.location,
+    titleEn: row.titleEn,
+    categoryEn: row.categoryEn,
+    descriptionEn: row.descriptionEn,
+    statusEn: row.statusEn,
+    locationEn: row.locationEn,
     areaM2: row.areaM2,
     imageUrls: urls,
     updatedAt: row.updatedAt,
@@ -70,6 +85,11 @@ export const getPublicProjects = unstable_cache(
         status: true,
         year: true,
         location: true,
+        titleEn: true,
+        categoryEn: true,
+        descriptionEn: true,
+        statusEn: true,
+        locationEn: true,
         areaM2: true,
         imageUrls: true,
         updatedAt: true,
@@ -77,7 +97,7 @@ export const getPublicProjects = unstable_cache(
     });
     return rows.map(toPublicProject);
   },
-  ["public-projects:v1"],
+  ["public-projects:v2"],
   { revalidate: 60, tags: ["public-projects"] },
 );
 
@@ -95,6 +115,11 @@ export const getPublicProjectBySlug = (slug: string) =>
           status: true,
           year: true,
           location: true,
+          titleEn: true,
+          categoryEn: true,
+          descriptionEn: true,
+          statusEn: true,
+          locationEn: true,
           areaM2: true,
           imageUrls: true,
           updatedAt: true,
@@ -102,7 +127,7 @@ export const getPublicProjectBySlug = (slug: string) =>
       });
       return row ? toPublicProject(row) : null;
     },
-    [`public-project:${slug}:v1`],
+    [`public-project:${slug}:v2`],
     { revalidate: 60, tags: ["public-projects", `public-project:${slug}`] },
   )();
 

@@ -4,12 +4,19 @@ import { pageMetadata } from "@/lib/seo";
 import { getPublicProjects } from "@/lib/public/projects";
 import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
-export const metadata: Metadata = pageMetadata({
-  title: "Projeler",
-  description:
-    "Konut, ticari ve iç mimarlık projelerinden seçilmiş mimari çalışmalar ve uygulama örnekleri.",
-  path: "/projeler",
-});
+const pageTitle = "Projeler | Samet Alp Mimarlık";
+const pageDescription =
+  "Konut, ticari ve iç mimarlık projelerinden seçilmiş mimari çalışmalar ve uygulama örnekleri.";
+
+export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "Projeler",
+    description: pageDescription,
+    path: "/projeler",
+  }),
+  title: { absolute: pageTitle },
+  description: pageDescription,
+};
 
 export default async function ProjelerPage() {
   const rows = await getPublicProjects();
@@ -19,9 +26,8 @@ export default async function ProjelerPage() {
     imageUrl: p.imageUrls[0] ?? "/images/hero-1.webp",
   }));
   return (
-    <>
+    <div className="contents">
       <script
-        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Ana Sayfa", path: "/" },
@@ -30,6 +36,6 @@ export default async function ProjelerPage() {
         )}
       />
       <ProjectsPortfolio projects={projects} />
-    </>
+    </div>
   );
 }

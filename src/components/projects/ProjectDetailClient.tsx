@@ -9,6 +9,7 @@ import { cn } from "@/lib/cn";
 import { usePathname } from "next/navigation";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
 import { CONTACT_SOCIAL_WHATSAPP } from "@/content/contact-page";
+import { isVideoUrl } from "@/lib/media-url";
 
 type ProjectDetailClientProps = {
   project: {
@@ -142,14 +143,26 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
     <div className="w-full bg-white">
       {/* HERO */}
       <section className="relative h-[50vh] w-full overflow-hidden bg-border/30">
-        <Image
-          src={project.imageUrl}
-          alt={projectPhotoAlt(locale, project, "cover", 0)}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
+        {isVideoUrl(project.imageUrl) ? (
+          <video
+            className="absolute inset-0 h-full w-full object-cover object-center"
+            src={project.imageUrl}
+            muted
+            playsInline
+            loop
+            autoPlay
+            aria-hidden
+          />
+        ) : (
+          <Image
+            src={project.imageUrl}
+            alt={projectPhotoAlt(locale, project, "cover", 0)}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+        )}
         <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/30 to-black/10" />
         <div className="relative z-10 flex h-full w-full items-center justify-center px-6 text-center">
           <h1 className="font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl">
@@ -185,15 +198,36 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
                     "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent",
                   )}
                   onClick={() => setSelectedImageIndex(index)}
-                  aria-label={locale === "en" ? "Open image" : "Görseli büyüt"}
+                  aria-label={
+                    isVideoUrl(src)
+                      ? locale === "en"
+                        ? "Open video"
+                        : "Videoyu aç"
+                      : locale === "en"
+                        ? "Open image"
+                        : "Görseli büyüt"
+                  }
                 >
-                  <Image
-                    src={src}
-                    alt={`${project.title} | ${locale === "en" ? "Gallery image" : "Galeri görseli"} ${index + 1}`}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover object-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02]"
-                  />
+                  {isVideoUrl(src) ? (
+                    <video
+                      src={src}
+                      muted
+                      playsInline
+                      loop
+                      autoPlay
+                      preload="metadata"
+                      className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02]"
+                      aria-hidden
+                    />
+                  ) : (
+                    <Image
+                      src={src}
+                      alt={`${project.title} | ${locale === "en" ? "Gallery image" : "Galeri görseli"} ${index + 1}`}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover object-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02]"
+                    />
+                  )}
                   <span
                     aria-hidden
                     className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10"
@@ -300,7 +334,7 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
             className="fixed inset-0 z-[400] flex min-h-[100dvh] w-full items-center justify-center"
             role="dialog"
             aria-modal="true"
-            aria-label={locale === "en" ? "Image viewer" : "Görsel görüntüleyici"}
+            aria-label={locale === "en" ? "Media viewer" : "Medya görüntüleyici"}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -330,7 +364,7 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
             {/* Prev / Next */}
             <button
               type="button"
-              aria-label={locale === "en" ? "Previous image" : "Önceki görsel"}
+              aria-label={locale === "en" ? "Previous" : "Önceki"}
               onClick={prev}
               disabled={!canPrev}
               className={cn(
@@ -345,7 +379,7 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
 
             <button
               type="button"
-              aria-label={locale === "en" ? "Next image" : "Sonraki görsel"}
+              aria-label={locale === "en" ? "Next" : "Sonraki"}
               onClick={next}
               disabled={!canNext}
               className={cn(
@@ -358,35 +392,47 @@ export function ProjectDetailClient({ project }: ProjectDetailClientProps) {
               <ChevronRight className="h-5 w-5" strokeWidth={1.8} />
             </button>
 
-            {/* Image stage */}
+            {/* Media stage */}
             <div className="relative z-10 mx-auto w-[min(1200px,92vw)]">
               <div
-                className="relative h-[78vh] w-full touch-none"
-                onTouchStart={onTouchStart}
-                onTouchMove={onTouchMove}
-                onTouchEnd={onTouchEnd}
+                className={cn(
+                  "relative h-[78vh] w-full",
+                  isVideoUrl(activeSrc) ? "" : "touch-none",
+                )}
+                onTouchStart={isVideoUrl(activeSrc) ? undefined : onTouchStart}
+                onTouchMove={isVideoUrl(activeSrc) ? undefined : onTouchMove}
+                onTouchEnd={isVideoUrl(activeSrc) ? undefined : onTouchEnd}
               >
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div
                     key={activeSrc}
-                    className="absolute inset-0"
+                    className={cn("absolute inset-0", isVideoUrl(activeSrc) && "flex items-center justify-center")}
                     initial={reduceMotion ? false : { opacity: 0, x: 16 }}
                     animate={reduceMotion ? undefined : { opacity: 1, x: 0 }}
                     exit={reduceMotion ? undefined : { opacity: 0, x: -16 }}
                     transition={{ duration: reduceMotion ? 0.01 : 0.28, ease: easeInOut }}
                   >
-                    <Image
-                      src={activeSrc}
-                      alt={
-                        selectedImageIndex == null
-                          ? project.title
-                          : projectPhotoAlt(locale, project, "lightbox", selectedImageIndex)
-                      }
-                      fill
-                      sizes="(max-width: 768px) 92vw, 1200px"
-                      className="object-contain object-center"
-                      priority={false}
-                    />
+                    {isVideoUrl(activeSrc) ? (
+                      <video
+                        src={activeSrc}
+                        controls
+                        playsInline
+                        className="max-h-[78vh] w-full max-w-full rounded-sm"
+                      />
+                    ) : (
+                      <Image
+                        src={activeSrc}
+                        alt={
+                          selectedImageIndex == null
+                            ? project.title
+                            : projectPhotoAlt(locale, project, "lightbox", selectedImageIndex)
+                        }
+                        fill
+                        sizes="(max-width: 768px) 92vw, 1200px"
+                        className="object-contain object-center"
+                        priority={false}
+                      />
+                    )}
                   </motion.div>
                 </AnimatePresence>
               </div>

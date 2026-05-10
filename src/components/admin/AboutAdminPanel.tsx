@@ -12,6 +12,8 @@ type Locale = "tr" | "en";
 type AboutDraft = AboutCmsDraft;
 
 const emptyDraft: AboutDraft = {
+  heroVideoUrl: "",
+  heroPosterUrl: "",
   visionTitle: "",
   visionBody: "",
   architectName: "",
@@ -60,8 +62,33 @@ export function AboutAdminPanel({
     if (!json.ok || !json.data?.url) {
       throw new Error("Yükleme başarısız.");
     }
-    // `json.data` is narrowed by the guard above.
     setDraft((v) => ({ ...v, portraitImageUrl: json.data!.url ?? "" }));
+  }
+
+  async function uploadHeroVideo(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    const f = Array.from(files)[0];
+    if (!f) return;
+    const fd = new FormData();
+    fd.set("file", f);
+    const json = await uploadAdminMedia(fd);
+    if (!json.ok || !json.data?.url) {
+      throw new Error(json.ok ? "Video yüklenemedi." : json.error ?? "Video yüklenemedi.");
+    }
+    setDraft((v) => ({ ...v, heroVideoUrl: json.data!.url ?? "" }));
+  }
+
+  async function uploadHeroPoster(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    const f = Array.from(files)[0];
+    if (!f) return;
+    const fd = new FormData();
+    fd.set("file", f);
+    const json = await uploadAdminMedia(fd);
+    if (!json.ok || !json.data?.url) {
+      throw new Error("Kapak yüklenemedi.");
+    }
+    setDraft((v) => ({ ...v, heroPosterUrl: json.data!.url ?? "" }));
   }
 
   return (
@@ -72,11 +99,12 @@ export function AboutAdminPanel({
             Hakkımızda
           </h2>
           <p className="mt-1 text-sm text-zinc-500">
-            Metinleri ve{" "}
-            <span className="text-zinc-300">mimar portresini</span> kaydedin; /hakkimizda ve
-            /en/hakkimizda sayfalarında canlı görünür. Boş alanlar sitedeki varsayılan metinleri
-            kullanır. Portre için yalnızca TR veya EN sekmesinden bir kez yüklemiş olmanız yeter —
-            diğer dil boşsa aynı görsel iki dilde de kullanılır.
+            Üstteki <span className="text-zinc-300">video ve kapak</span>,{" "}
+            <span className="text-zinc-300">vizyon metni</span> ve{" "}
+            <span className="text-zinc-300">mimar portresi</span> kaydedilir; /hakkimizda ve
+            /en/hakkimizda canlı güncellenir. Boş metin alanları sitedeki varsayılan metinleri kullanır.
+            Video/kapak ve portre için bir dilde yüklemeniz yeter; diğer dil boşsa aynı URL iki yerde de
+            kullanılabilir. Yüklemeler Cloudinary üzerindedir (projelerle aynı).
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -117,6 +145,112 @@ export function AboutAdminPanel({
         className="space-y-4"
       >
         <div className="grid gap-4 lg:grid-cols-12">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 lg:col-span-12">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              Üst alan — döngü videosu ve kapak
+            </h3>
+            <p className="mt-1 text-xs leading-relaxed text-zinc-600">
+              Sitede en üstteki geniş video ve (&quot;kapak&quot;) video yüklenene kadar gösterilecek yatay görsel.
+              <span className="text-zinc-500">
+                {" "}
+                Mimari portre fotoğrafıyla aynı dosyayı buraya koymayın — önce portre, sonra video geliyormuş gibi
+                görünür.
+              </span>{" "}
+              MP4 Cloudinary veya tam URL; kapak için geniş/yatay kare önerilir. Boş bırakırsanız video için{" "}
+              <code className="rounded bg-zinc-900 px-1 py-0.5 text-[11px] text-zinc-400">/videos/about-hero.mp4</code>{" "}
+              kullanılır.
+            </p>
+            <div className="mt-4 grid gap-6 lg:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+                  Video (MP4) — URL veya yükle
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  <input
+                    value={draft.heroVideoUrl}
+                    onChange={(e) => setDraft((v) => ({ ...v, heroVideoUrl: e.target.value }))}
+                    placeholder="https://... veya /videos/..."
+                    className="min-w-[12rem] flex-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
+                  />
+                  <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-200 hover:bg-zinc-900">
+                    Video yükle
+                    <input
+                      type="file"
+                      accept="video/mp4,video/webm,video/quicktime"
+                      className="hidden"
+                      onChange={(e) => {
+                        void uploadHeroVideo(e.currentTarget.files).catch((e2) =>
+                          setErr(e2 instanceof Error ? e2.message : "Yükleme başarısız."),
+                        );
+                        e.currentTarget.value = "";
+                      }}
+                      disabled={pending}
+                    />
+                  </label>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+                  Kapak (poster) — URL veya yükle
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  <input
+                    value={draft.heroPosterUrl}
+                    onChange={(e) => setDraft((v) => ({ ...v, heroPosterUrl: e.target.value }))}
+                    placeholder="https://... (yatay görsel)"
+                    className="min-w-[12rem] flex-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
+                  />
+                  <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-200 hover:bg-zinc-900">
+                    Görsel yükle
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        void uploadHeroPoster(e.currentTarget.files).catch((e2) =>
+                          setErr(e2 instanceof Error ? e2.message : "Yükleme başarısız."),
+                        );
+                        e.currentTarget.value = "";
+                      }}
+                      disabled={pending}
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+            {draft.heroVideoUrl.trim() || draft.heroPosterUrl.trim() ? (
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                {draft.heroVideoUrl.trim() ? (
+                  <div className="overflow-hidden rounded-lg border border-zinc-800 bg-black/40">
+                    <video
+                      key={draft.heroVideoUrl.trim()}
+                      className="aspect-[16/10] w-full object-cover object-center"
+                      controls
+                      muted
+                      playsInline
+                      preload="metadata"
+                      src={draft.heroVideoUrl.trim()}
+                    />
+                  </div>
+                ) : null}
+                {draft.heroPosterUrl.trim() ? (
+                  <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/60">
+                    <Image
+                      src={draft.heroPosterUrl.trim()}
+                      alt="Kapak önizleme"
+                      fill
+                      className="object-cover object-center"
+                      sizes="(max-width:768px) 100vw, 400px"
+                      unoptimized={
+                        draft.heroPosterUrl.startsWith("http") || draft.heroPosterUrl.startsWith("//")
+                      }
+                    />
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+
           <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 lg:col-span-12">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
               Firma Hakkında

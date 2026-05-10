@@ -67,6 +67,9 @@ export default async function AdminDashboardPage() {
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Hizmetler</p>
               <p className="mt-2 text-3xl font-semibold tabular-nums text-zinc-100">{serviceCount}</p>
+              <p className="mt-2 line-clamp-2 text-xs leading-snug text-zinc-500">
+                Site hizmet sayfaları: metin, görsel, sıra ve yayın.
+              </p>
             </div>
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-200">
               <Wrench className="h-5 w-5" aria-hidden />

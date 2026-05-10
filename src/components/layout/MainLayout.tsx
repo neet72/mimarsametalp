@@ -15,7 +15,10 @@ export function MainLayout({ children }: MainLayoutProps) {
       <ScrollManager />
       <Navbar />
       <div aria-hidden className="h-[var(--header-h)]" />
-      <main id="icerik" className="min-h-0 flex-1">
+      <main
+        id="icerik"
+        className="min-h-0 flex-1 pb-[max(5.5rem,calc(env(safe-area-inset-bottom,0px)+4.5rem))] md:pb-[max(4rem,calc(env(safe-area-inset-bottom,0px)+3rem))]"
+      >
         <PageTransition>{children}</PageTransition>
       </main>
       <FloatingWhatsAppCTA />

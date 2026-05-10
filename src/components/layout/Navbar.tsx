@@ -96,6 +96,7 @@ export function Navbar() {
   const lastYRef = useRef(0);
   const lastDirRef = useRef<"up" | "down">("up");
   const panelId = useId();
+  const menuCloseBtnRef = useRef<HTMLButtonElement>(null);
   const motionDuration = reduceMotion ? 0.01 : 0.28;
   const motionEase = [0.22, 1, 0.36, 1] as const;
 
@@ -205,8 +206,6 @@ export function Navbar() {
           <button
             type="button"
             className="touch-manipulation flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-full border border-border/90 px-3 font-display text-[0.6875rem] font-medium tracking-wide text-muted transition-colors hover:border-primary/20 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-h-0 sm:min-w-0 sm:px-4 sm:py-2 sm:text-xs md:text-[0.8125rem]"
-            aria-haspopup="listbox"
-            aria-expanded="false"
             onClick={() => {
               const next = locale === "en" ? "tr" : "en";
               router.push(withLocalePath(pathname, next));
@@ -287,6 +286,7 @@ export function Navbar() {
                 </Link>
 
                 <button
+                  ref={menuCloseBtnRef}
                   type="button"
                   className="touch-manipulation inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border/90 text-primary transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                   onClick={() => setOpen(false)}
@@ -298,7 +298,7 @@ export function Navbar() {
 
               <nav
                 aria-label="Mobil sayfa bağlantıları"
-                className="flex min-h-0 flex-1 flex-col items-center justify-start gap-2 overflow-y-auto px-6 py-10 [-webkit-overflow-scrolling:touch] sm:px-8"
+                className="flex min-h-0 flex-1 flex-col items-center justify-start gap-2 overflow-y-auto overscroll-contain px-6 py-10 [-webkit-overflow-scrolling:touch] sm:px-8"
               >
                 <motion.ul
                   className="w-full max-w-md space-y-2"

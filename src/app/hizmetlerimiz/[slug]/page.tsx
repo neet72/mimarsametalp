@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { ServiceDetailClient } from "@/components/hizmetlerimiz/ServiceDetailClient";
 import { pageMetadata, siteName } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps, serviceJsonLd } from "@/lib/seo-jsonld";
-import { SERVICES_DETAIL } from "@/content/services-detail";
 import { getPublicServiceBySlug } from "@/lib/public/services";
+import { resolveServiceDetailData } from "@/lib/public/resolve-service-detail";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -13,17 +13,9 @@ type PageProps = {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const key = String(slug ?? "").trim().toLowerCase();
-  // Prefer DB-backed cached service (Cloudinary hero image included), fallback to in-code content.
   const db = key ? await getPublicServiceBySlug(key) : null;
-  const service = db
-    ? {
-        slug: db.slug,
-        name: db.title,
-        shortDescription: db.shortDescription ?? "Hizmet detayı.",
-        heroImageUrl: db.heroImageUrl ?? undefined,
-      }
-    : SERVICES_DETAIL[slug];
-  if (!service) {
+  const resolved = resolveServiceDetailData(key, "tr", db);
+  if (!resolved) {
     const fallbackTitle = `Hizmetlerimiz | ${siteName}`;
     const fallbackDescription =
       "Adana mimarlık ofisi Samet Alp Mimarlık: mimari tasarım, iç mimarlık ve anahtar teslim hizmetlerimizi keşfedin.";
@@ -38,17 +30,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = service.name;
-  const rawDesc = String(service.shortDescription ?? "").trim();
-  const description = (rawDesc || `${service.name} — ${siteName}, Adana.`).slice(0, 200);
+  const title = resolved.name;
+  const rawDesc = String(resolved.shortDescription ?? "").trim();
+  const description = (rawDesc || `${resolved.name} — ${siteName}, Adana.`).slice(0, 200);
   const absoluteTitle = `${title} | ${siteName}`;
-  const img = service.heroImageUrl;
+  const img = resolved.heroImageUrl;
 
   return {
     ...pageMetadata({
       title,
       description,
-      path: `/hizmetlerimiz/${service.slug}`,
+      path: `/hizmetlerimiz/${resolved.slug}`,
     }),
     title: { absolute: absoluteTitle },
     description,
@@ -57,7 +49,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: "tr_TR",
       title: absoluteTitle,
       description,
-      url: `/hizmetlerimiz/${service.slug}`,
+      url: `/hizmetlerimiz/${resolved.slug}`,
       images: img ? [{ url: img }] : undefined,
     },
     twitter: {
@@ -71,12 +63,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function HizmetDetayPage({ params }: PageProps) {
   const { slug } = await params;
-  const service = SERVICES_DETAIL[slug];
+  const key = String(slug ?? "").trim().toLowerCase();
+  const db = key ? await getPublicServiceBySlug(key) : null;
+  const service = resolveServiceDetailData(key, "tr", db);
   if (!service) notFound();
   return (
-    <>
+    <div className="contents">
       <script
-        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Ana Sayfa", path: "/" },
@@ -86,7 +79,6 @@ export default async function HizmetDetayPage({ params }: PageProps) {
         )}
       />
       <script
-        key="jsonld-service"
         {...jsonLdScriptProps(
           serviceJsonLd({
             name: service.name,
@@ -97,7 +89,7 @@ export default async function HizmetDetayPage({ params }: PageProps) {
         )}
       />
       <ServiceDetailClient service={service} />
-    </>
+    </div>
   );
 }
 

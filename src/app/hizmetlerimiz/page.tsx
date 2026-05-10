@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { HizmetlerimizPageContent } from "@/components/hizmetlerimiz/HizmetlerimizPageContent";
 import { pageMetadata } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
+import { getServiceListingItems } from "@/lib/public/service-listing";
 
 const pageTitle = "Hizmetlerimiz | Samet Alp Mimarlık";
 const pageDescription =
@@ -18,11 +19,11 @@ export const metadata: Metadata = {
   description: pageDescription,
 };
 
-export default function HizmetlerimizPage() {
+export default async function HizmetlerimizPage() {
+  const items = await getServiceListingItems("tr");
   return (
-    <>
+    <div className="contents">
       <script
-        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Ana Sayfa", path: "/" },
@@ -30,7 +31,7 @@ export default function HizmetlerimizPage() {
           ]),
         )}
       />
-      <HizmetlerimizPageContent />
-    </>
+      <HizmetlerimizPageContent items={items} locale="tr" />
+    </div>
   );
 }

@@ -4,6 +4,7 @@ import { CinematicScrollHero } from "@/components/home/CinematicScrollHero";
 import { ServicesSection } from "@/components/home/ServicesSection";
 import { VisionIntro } from "@/components/home/VisionIntro";
 import { SocialGallery } from "@/components/home/SocialGallery";
+import { getServiceListingItems } from "@/lib/public/service-listing";
 import { pageMetadata } from "@/lib/seo";
 import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
@@ -21,11 +22,11 @@ export const metadata: Metadata = {
   description: pageDescription,
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const serviceItems = await getServiceListingItems("tr");
   return (
-    <>
+    <div className="contents">
       <script
-        key="jsonld-breadcrumb"
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
             { name: "Ana Sayfa", path: "/" },
@@ -35,9 +36,9 @@ export default function HomePage() {
       <CinematicScrollHero />
       <div id="home-content-start" aria-hidden className="h-px w-full" />
       <VisionIntro />
-      <ServicesSection />
+      <ServicesSection serviceItems={serviceItems} />
       <AboutSection />
       <SocialGallery />
-    </>
+    </div>
   );
 }

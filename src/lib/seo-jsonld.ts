@@ -1,5 +1,6 @@
 import "server-only";
 
+import { isVideoUrl } from "@/lib/media-url";
 import { getSiteUrl, siteName } from "@/lib/seo";
 import {
   CONTACT_EMAIL,
@@ -178,7 +179,9 @@ export function projectJsonLd(input: {
   areaM2?: number | null;
 }) {
   const base = getSiteUrl();
-  const images = (input.imageUrls ?? []).map((u) => (u.startsWith("http") ? u : `${base}${u}`));
+  const images = (input.imageUrls ?? [])
+    .filter((u) => typeof u === "string" && u.trim() && !isVideoUrl(u))
+    .map((u) => (u.startsWith("http") ? u : `${base}${u}`));
   const additionalProperty = [
     input.category
       ? { "@type": "PropertyValue", name: "Category", value: input.category }
