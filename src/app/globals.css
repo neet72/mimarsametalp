@@ -141,4 +141,524 @@
       opacity: 1;
     }
   }
+
+  /* Video hero homepage — sıvı cam CTA ve giriş animasyonları */
+  .liquid-glass {
+    background: rgba(255, 255, 255, 0.01);
+    background-blend-mode: luminosity;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: none;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .liquid-glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.4px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.45) 0%,
+      rgba(255, 255, 255, 0.15) 20%,
+      rgba(255, 255, 255, 0) 40%,
+      rgba(255, 255, 255, 0) 60%,
+      rgba(255, 255, 255, 0.15) 80%,
+      rgba(255, 255, 255, 0.45) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .animate-fade-rise-video {
+    animation: fade-rise-video 0.8s ease-out both;
+  }
+
+  .animate-fade-rise-video-delay {
+    animation: fade-rise-video 0.8s ease-out 0.2s both;
+  }
+
+  .animate-fade-rise-video-delay-2 {
+    animation: fade-rise-video 0.8s ease-out 0.4s both;
+  }
+}
+
+/* Opacity “from:0” + both + SPA yeniden bağlanması bazen ilk kareyi sonsuz gizliyor; kaydırınca reflow ile düzeliyordu — sadece hafif yukarı geliş. */
+@keyframes fade-rise-video {
+  from {
+    opacity: 1;
+    transform: translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-video-hero .animate-fade-rise-video,
+  .home-video-hero .animate-fade-rise-video-delay,
+  .home-video-hero .animate-fade-rise-video-delay-2 {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Global `*` kuralının !important sıfır süresini bu blokta bastırır */
+  .home-video-hero.home-video-hero--motion .animate-fade-rise-video {
+    animation-name: fade-rise-video !important;
+    animation-duration: 0.8s !important;
+    animation-timing-function: ease-out !important;
+    animation-fill-mode: both !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .home-video-hero.home-video-hero--motion .animate-fade-rise-video-delay {
+    animation-name: fade-rise-video !important;
+    animation-duration: 0.8s !important;
+    animation-timing-function: ease-out !important;
+    animation-fill-mode: both !important;
+    animation-delay: 0.2s !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .home-video-hero.home-video-hero--motion .animate-fade-rise-video-delay-2 {
+    animation-name: fade-rise-video !important;
+    animation-duration: 0.8s !important;
+    animation-timing-function: ease-out !important;
+    animation-fill-mode: both !important;
+    animation-delay: 0.4s !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  /* Üst kata ince sıcak ışı yüzey animasyonu (global * süre sıfırını bastırır) */
+  .home-video-hero.home-video-hero--motion .hero-dream-sheen-anim {
+    animation-name: hero-dream-sheen-shift !important;
+    animation-duration: 38s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
+    animation-fill-mode: none !important;
+    animation-delay: 0s !important;
+  }
+
+  .hero-dream-backdrop--motion .hero-dream-anim-a {
+    animation-name: hero-dream-drift-a !important;
+    animation-duration: 56s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
+    animation-direction: alternate !important;
+    animation-fill-mode: both !important;
+  }
+
+  .hero-dream-backdrop--motion .hero-dream-anim-b {
+    animation-name: hero-dream-drift-b !important;
+    animation-duration: 64s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
+    animation-direction: alternate !important;
+    animation-fill-mode: both !important;
+  }
+
+  .hero-dream-backdrop--motion .hero-dream-anim-rise {
+    animation-name: hero-dream-rise-band !important;
+    animation-duration: 42s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
+    animation-direction: alternate !important;
+    animation-fill-mode: both !important;
+  }
+
+  .hero-dream-backdrop--motion .hero-dream-anim-grain {
+    animation-name: hero-dream-grain-breathe !important;
+    animation-duration: 22s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
+    animation-direction: alternate !important;
+    animation-fill-mode: both !important;
+  }
+
+  .hero-dream-backdrop--motion .hero-dream-anim-c {
+    animation-name: hero-dream-drift-c !important;
+    animation-duration: 72s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
+    animation-direction: alternate !important;
+    animation-fill-mode: both !important;
+  }
+
+  .hero-dream-backdrop--motion .hero-dream-anim-strata {
+    animation-name: hero-dream-strata-lift !important;
+    animation-duration: 54s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
+    animation-direction: alternate !important;
+    animation-fill-mode: both !important;
+  }
+
+  .hero-dream-backdrop--motion .hero-dream-anim-veil {
+    animation-name: hero-dream-veil-drift !important;
+    animation-duration: 78s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
+    animation-direction: alternate !important;
+    animation-fill-mode: both !important;
+  }
+
+  .hero-dream-backdrop--motion .hero-dream-anim-rays {
+    animation-name: hero-dream-rays-slow !important;
+    animation-duration: 148s !important;
+    animation-timing-function: linear !important;
+    animation-iteration-count: infinite !important;
+    animation-fill-mode: none !important;
+  }
+
+  .hero-dream-backdrop--motion .hero-dream-anim-grain-fine {
+    animation-name: hero-dream-grain-micro !important;
+    animation-duration: 31s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
+    animation-direction: alternate !important;
+    animation-fill-mode: both !important;
+  }
+
+  .hero-dream-backdrop--motion .hero-dream-anim-horizon {
+    animation-name: hero-dream-horizon-pulse !important;
+    animation-duration: 36s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
+    animation-direction: alternate !important;
+    animation-fill-mode: both !important;
+  }
+}
+
+.hero-dream-backdrop {
+  background: radial-gradient(
+    ellipse 100% 88% at 50% 100%,
+    hsl(201 92% 16% / 0.94) 0%,
+    hsl(215 78% 6% / 1) 58%
+  );
+}
+
+.hero-dream-luminosity {
+  background:
+    radial-gradient(ellipse 95% 55% at 50% -4%, hsl(206 72% 30% / 0.42) 0%, transparent 58%),
+    radial-gradient(ellipse 68% 48% at 12% 38%, hsl(198 62% 24% / 0.34) 0%, transparent 52%),
+    radial-gradient(ellipse 72% 52% at 92% 32%, hsl(216 54% 20% / 0.38) 0%, transparent 50%),
+    radial-gradient(
+      ellipse 120% 80% at 50% 100%,
+      hsl(205 88% 12% / 0.55) 0%,
+      hsl(217 74% 4% / 0.92) 65%,
+      hsl(218 76% 2% / 1) 100%
+    ),
+    radial-gradient(ellipse 50% 24% at 72% 18%, hsl(32 48% 48% / 0.065) 0%, transparent 70%);
+}
+
+.hero-dream-ray-fan {
+  transform-origin: 50% 100%;
+  mix-blend-mode: screen;
+  opacity: 0.42;
+  background: conic-gradient(
+    from 185deg at 50% 100%,
+    transparent 0deg,
+    hsl(203 74% 36% / 0.065) 5deg,
+    transparent 26deg,
+    transparent 318deg,
+    hsl(207 76% 32% / 0.058) 330deg,
+    transparent 356deg,
+    hsl(206 82% 40% / 0.048) 360deg
+  );
+  mask-image: radial-gradient(ellipse 120% 90% at 50% 100%, black 14%, transparent 72%);
+}
+
+.hero-dream-strata {
+  bottom: 16%;
+  height: min(56vh, 34rem);
+  opacity: 0.38;
+  mix-blend-mode: soft-light;
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0,
+      transparent 76px,
+      hsl(207 62% 40% / 0.036) 76px,
+      hsl(208 62% 38% / 0.036) 77px,
+      transparent 78px
+    ),
+    linear-gradient(to top, hsl(207 74% 8% / 0.52) 0%, transparent 38%, transparent 100%);
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 26%,
+    black 71%,
+    transparent 94%
+  );
+}
+
+.hero-dream-veil {
+  opacity: 0.55;
+  mix-blend-mode: soft-light;
+  background-image:
+    repeating-linear-gradient(
+      108deg,
+      transparent 0,
+      transparent 22px,
+      hsl(217 72% 38% / 0.038) 22px,
+      hsl(217 74% 40% / 0.038) 23px,
+      transparent 24px
+    ),
+    linear-gradient(to bottom, hsl(219 76% 4% / 0.06) 0%, transparent 40%, hsl(207 74% 6% / 0.048) 100%);
+}
+
+.hero-dream-orb-a {
+  left: -14%;
+  top: -14%;
+  width: min(56rem, 90vw);
+  height: min(56rem, 90vw);
+  background: radial-gradient(circle at 42% 48%, hsl(198 74% 32% / 0.52) 0%, transparent 70%);
+}
+
+.hero-dream-orb-b {
+  right: -18%;
+  bottom: -20%;
+  width: min(58rem, 92vw);
+  height: min(58rem, 92vw);
+  background:
+    radial-gradient(circle at 36% 40%, hsl(222 54% 16% / 0.74) 0%, transparent 64%),
+    radial-gradient(circle at 62% 70%, hsl(32 42% 50% / 0.13) 0%, transparent 46%);
+}
+
+.hero-dream-orb-c {
+  left: 32%;
+  top: -12%;
+  width: min(36rem, 58vw);
+  height: min(30rem, 50vw);
+  background:
+    radial-gradient(circle at 48% 52%, hsl(38 62% 48% / 0.096) 0%, transparent 62%),
+    radial-gradient(circle at 72% 28%, hsl(205 74% 36% / 0.065) 0%, transparent 48%);
+}
+
+.hero-dream-rise {
+  background: linear-gradient(
+    to top,
+    hsl(0 0% 100% / 0.058) 0%,
+    hsl(201 65% 20% / 0.038) 32%,
+    transparent 62%
+  );
+  mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 74%, transparent 100%);
+}
+
+.hero-dream-grain {
+  opacity: 0.2;
+  background-image:
+    radial-gradient(rgb(255 255 255 / 0.1) 1px, transparent 1px),
+    radial-gradient(rgb(210 226 246 / 0.03) 0.85px, transparent 0.85px);
+  background-size:
+    26px 26px,
+    19px 19px;
+  background-position:
+    0 0,
+    13px 7px;
+  mix-blend-mode: overlay;
+}
+
+.hero-dream-grain-fine {
+  opacity: 0.085;
+  background-image:
+    radial-gradient(rgb(255 255 255 / 0.11) 0.55px, transparent 0.55px),
+    repeating-linear-gradient(
+      137deg,
+      transparent 0,
+      rgb(242 246 253 / 0.012) 1px,
+      transparent 4px,
+      transparent 52px
+    );
+  background-size:
+    4.5px 4.5px,
+    auto;
+  mix-blend-mode: overlay;
+}
+
+.hero-dream-horizon {
+  transform-origin: 50% 50%;
+  background: linear-gradient(
+    to right,
+    transparent 8%,
+    hsl(207 94% 66% / 0.085) 28%,
+    hsl(207 94% 78% / 0.095) 50%,
+    hsl(207 94% 66% / 0.082) 72%,
+    transparent 94%
+  );
+  box-shadow: 0 -1px 22px hsl(206 94% 40% / 0.068);
+}
+
+.hero-dream-sheen-anim {
+  mix-blend-mode: soft-light;
+  background-image: linear-gradient(
+    118deg,
+    transparent 12%,
+    hsl(37 42% 58% / 0.09) 44%,
+    hsl(0 0% 100% / 0.06) 51%,
+    transparent 76%
+  );
+  background-size: 240% 240%;
+}
+
+@keyframes hero-dream-drift-a {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(3.8%, 4.8%, 0) scale(1.07);
+  }
+}
+
+@keyframes hero-dream-drift-b {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(-4.2%, -3.5%, 0) scale(1.06);
+  }
+}
+
+@keyframes hero-dream-drift-c {
+  from {
+    transform: translate3d(0, 0, 0) scale(1) rotate(-1.2deg);
+  }
+
+  to {
+    transform: translate3d(2.2%, 3.9%, 0) scale(1.05) rotate(2deg);
+  }
+}
+
+@keyframes hero-dream-rise-band {
+  from {
+    opacity: 0.48;
+    transform: translateY(4%);
+  }
+
+  to {
+    opacity: 0.78;
+    transform: translateY(-3.6%);
+  }
+}
+
+@keyframes hero-dream-grain-breathe {
+  from {
+    opacity: 0.16;
+  }
+
+  to {
+    opacity: 0.27;
+  }
+}
+
+@keyframes hero-dream-strata-lift {
+  from {
+    opacity: 0.28;
+    transform: translateY(2.4%);
+  }
+
+  to {
+    opacity: 0.46;
+    transform: translateY(-2.1%);
+  }
+}
+
+@keyframes hero-dream-veil-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-2.5%, -1.3%, 0);
+  }
+}
+
+@keyframes hero-dream-rays-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hero-dream-grain-micro {
+  from {
+    opacity: 0.055;
+  }
+
+  to {
+    opacity: 0.1;
+  }
+}
+
+@keyframes hero-dream-horizon-pulse {
+  from {
+    opacity: 0.48;
+    transform: scaleX(0.94);
+  }
+
+  to {
+    opacity: 0.76;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes hero-dream-sheen-shift {
+  0% {
+    background-position: 8% 88%;
+    opacity: 1;
+  }
+
+  50% {
+    background-position: 92% 12%;
+    opacity: 1;
+  }
+
+  100% {
+    background-position: 8% 88%;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-dream-backdrop--motion .hero-dream-anim-a,
+  .hero-dream-backdrop--motion .hero-dream-anim-b,
+  .hero-dream-backdrop--motion .hero-dream-anim-c,
+  .hero-dream-backdrop--motion .hero-dream-anim-rise,
+  .hero-dream-backdrop--motion .hero-dream-anim-grain,
+  .hero-dream-backdrop--motion .hero-dream-anim-grain-fine,
+  .hero-dream-backdrop--motion .hero-dream-anim-strata,
+  .hero-dream-backdrop--motion .hero-dream-anim-veil,
+  .hero-dream-backdrop--motion .hero-dream-anim-rays,
+  .hero-dream-backdrop--motion .hero-dream-anim-horizon,
+  .hero-dream-sheen-anim {
+    animation: none !important;
+  }
+
+  .hero-dream-grain {
+    opacity: 0.2;
+    animation: none !important;
+  }
+
+  .hero-dream-grain-fine {
+    opacity: 0.085;
+    animation: none !important;
+  }
 }

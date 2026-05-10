@@ -7,5 +7,6 @@ export default function AppTemplate({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  /* Tek kök: `children` dizi olduğunda OuterLayoutRouter'da key uyarısını önler */
+  return <>{children}</>;
 }

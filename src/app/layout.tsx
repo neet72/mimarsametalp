@@ -146,7 +146,7 @@ export default async function RootLayout({
         </MainLayout>
         {/* Avoid dev key warnings inside analytics overlay on admin routes */}
         {isAdmin ? null : <Analytics key="analytics" />}
-        {isAdmin ? null : <SpeedInsights />}
+        {isAdmin ? null : <SpeedInsights key="speed-insights" />}
       </body>
     </html>
   );

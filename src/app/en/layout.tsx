@@ -47,6 +47,6 @@ export default function EnLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return children;
+  return <>{children}</>;
 }
 

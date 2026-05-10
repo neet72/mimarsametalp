@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AboutSection } from "@/components/home/AboutSection";
-import { CinematicScrollHero } from "@/components/home/CinematicScrollHero";
+import { HeroCinematicLite } from "@/components/home/HeroCinematicLite";
 import { ServicesSection } from "@/components/home/ServicesSection";
 import { VisionIntro } from "@/components/home/VisionIntro";
 import { SocialGallery } from "@/components/home/SocialGallery";
@@ -26,7 +26,7 @@ export default async function HomePageEn() {
   const serviceItems = await getServiceListingItems("en");
   const featuredServices = serviceItems.slice(0, 6);
   return (
-    <div className="contents">
+    <div className="w-full">
       <script
         {...jsonLdScriptProps(
           breadcrumbJsonLd([
@@ -48,7 +48,7 @@ export default async function HomePageEn() {
           }),
         )}
       />
-      <CinematicScrollHero />
+      <HeroCinematicLite />
       <div id="home-content-start" aria-hidden className="h-px w-full" />
       <VisionIntro />
       <ServicesSection serviceItems={serviceItems} />
