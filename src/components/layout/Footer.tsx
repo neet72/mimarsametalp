@@ -1,26 +1,28 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { Reveal } from "@/components/motion/FadeIn";
 import { cn } from "@/lib/cn";
-import { localeFromPathname } from "@/lib/locale";
+import { localeFromPathname, withLocalePath } from "@/lib/locale";
 import { pageContainerClass } from "@/lib/page-layout";
 
 const services =
   "Mimarlık, İç Mimarlık, Dekorasyon, Anahtar Teslim Proje, Mimari Danışmanlık, Yenileme ve Tadilat";
 
 const address =
-  "Güzelevler Mahallesi 2067/2 Sokak A blok No: 32/2 Adana / Türkiye";
+  "Güzelevler Mahallesi 2067/2 Sokak A blok No: 32/3 Adana / Türkiye";
 
 export function Footer() {
   const pathname = usePathname();
-  const t = localeFromPathname(pathname) === "en";
+  const locale = localeFromPathname(pathname);
+  const t = locale === "en";
   const year = new Date().getFullYear();
   const servicesText = t
     ? "Architecture, Interior Architecture, Decoration, Turnkey Projects, Architectural Consulting, Renovation & Remodeling"
     : services;
   const addressText = t
-    ? "Güzelevler District, 2067/2 Street A Block No: 32/2, Adana / Türkiye"
+    ? "Güzelevler District, 2067/2 Street A Block No: 32/3, Adana / Türkiye"
     : address;
   return (
     <footer className="mt-auto border-t border-border bg-surface pb-[max(0px,env(safe-area-inset-bottom,0px))]">
@@ -82,6 +84,14 @@ export function Footer() {
                 >
                   LinkedIn
                 </a>
+              </li>
+              <li>
+                <Link
+                  href={withLocalePath("/kvkk", locale)}
+                  className="touch-manipulation inline-flex min-h-[44px] items-center py-1 font-medium transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-h-0"
+                >
+                  {t ? "Privacy / KVKK" : "KVKK / Gizlilik"}
+                </Link>
               </li>
             </ul>
           </div>

@@ -3,11 +3,11 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { OFFICE_ADDRESS_MAP_QUERY } from "@/content/kvkk-page";
 import { localeFromPathname } from "@/lib/locale";
 import { easePremium, viewportOnce } from "@/lib/motion";
 
 /** Embed, API anahtarı gerektirmez */
-const OFFICE_ADDRESS = "Güzelevler, 2067/2 SK A blok no:32/3, 01220 Yüreğir/Adana";
 const OFFICE_PLACE_NAME_TR = "MİMAR SAMET ALP";
 const OFFICE_PLACE_NAME_EN = "Samet Alp Architecture";
 
@@ -24,7 +24,7 @@ export function ContactMapSection() {
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
   const isEn = locale === "en";
-  const query = `${isEn ? OFFICE_PLACE_NAME_EN : OFFICE_PLACE_NAME_TR}, ${OFFICE_ADDRESS}`;
+  const query = `${isEn ? OFFICE_PLACE_NAME_EN : OFFICE_PLACE_NAME_TR}, ${OFFICE_ADDRESS_MAP_QUERY}`;
   const embedUrl = mapEmbedUrl(query, isEn ? "en" : "tr");
   const openUrl = mapOpenUrl(query);
 

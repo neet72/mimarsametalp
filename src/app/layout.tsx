@@ -114,7 +114,6 @@ export default async function RootLayout({
   return (
     <html
       lang={locale === "en" ? "en" : "tr"}
-      data-scroll-behavior="smooth"
       className={`${inter.variable} ${outfit.variable}`}
       suppressHydrationWarning
     >

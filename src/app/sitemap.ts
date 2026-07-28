@@ -4,8 +4,8 @@ import { getPublicProjects } from "@/lib/public/projects";
 import { SERVICES_GALLERY } from "@/content/services-gallery";
 import { getPublicServices } from "@/lib/public/services";
 
-const routes = ["", "/projeler", "/hizmetlerimiz", "/hakkimizda", "/iletisim"] as const;
-const enRoutes = ["/en", "/en/projeler", "/en/hizmetlerimiz", "/en/hakkimizda", "/en/iletisim"] as const;
+const routes = ["", "/projeler", "/hizmetlerimiz", "/hakkimizda", "/iletisim", "/kvkk"] as const;
+const enRoutes = ["/en", "/en/projeler", "/en/hizmetlerimiz", "/en/hakkimizda", "/en/iletisim", "/en/kvkk"] as const;
 
 // Çok sık değişmiyor — cache dostu.
 export const revalidate = 86400; // 1 gün

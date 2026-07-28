@@ -7,12 +7,18 @@ export const contactFormSchema = z.object({
   email: z.string().trim().email("Geçerli bir e-posta girin").max(320),
   message: z.string().trim().min(10, "Mesaj en az 10 karakter olmalı").max(5000),
   company: z.string().trim().max(120).optional(),
+  kvkkConsent: z.boolean().refine((v) => v === true, {
+    message: "Devam etmek için KVKK onayını işaretleyin.",
+  }),
 });
 
 export type ContactFormInput = z.infer<typeof contactFormSchema>;
 
 export type ContactFieldErrors = Partial<
-  Record<keyof Pick<ContactFormInput, "firstName" | "lastName" | "email" | "message">, string[]>
+  Record<
+    keyof Pick<ContactFormInput, "firstName" | "lastName" | "email" | "message" | "kvkkConsent">,
+    string[]
+  >
 >;
 
 export function flattenContactErrors(
@@ -24,5 +30,6 @@ export function flattenContactErrors(
     lastName: flat.lastName,
     email: flat.email,
     message: flat.message,
+    kvkkConsent: flat.kvkkConsent,
   };
 }

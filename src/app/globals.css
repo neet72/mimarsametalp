@@ -68,7 +68,8 @@ html.dark {
 
 @layer base {
   html {
-    scroll-behavior: smooth;
+    /* Sayfa içi #anchor için; route geçişinde scrollTo behavior:instant kullanılıyor */
+    scroll-behavior: auto;
     /* iOS metin otomatik zoom / font şişmesini sınırla */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;

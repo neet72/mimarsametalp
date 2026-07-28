@@ -4,6 +4,7 @@ import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import { useReducedMotion } from "framer-motion";
 import { useEffect } from "react";
+import { setActiveLenis } from "@/lib/scroll-top";
 
 type UseSmoothScrollOptions = {
   lerp?: number;
@@ -32,7 +33,11 @@ export function useSmoothScroll(options?: UseSmoothScrollOptions) {
       smoothWheel: true,
       wheelMultiplier,
       touchMultiplier,
+      // Programmatic scrollTo(0) on route change should not ease from mid-page.
+      syncTouch: false,
     });
+
+    setActiveLenis(lenis);
 
     let rafId = 0;
     const tick = (time: number) => {
@@ -43,6 +48,7 @@ export function useSmoothScroll(options?: UseSmoothScrollOptions) {
 
     return () => {
       cancelAnimationFrame(rafId);
+      setActiveLenis(null);
       lenis.destroy();
     };
   }, [reduceMotion, lerp, wheelMultiplier, touchMultiplier]);

@@ -35,6 +35,14 @@ import {
   CONTACT_FORM_WA_FALLBACK as CONTACT_FORM_WA_FALLBACK_EN,
 } from "@/content/contact-page.en";
 import {
+  CONTACT_FORM_KVKK_ERROR,
+  CONTACT_FORM_KVKK_LABEL,
+} from "@/content/kvkk-page";
+import {
+  CONTACT_FORM_KVKK_ERROR as CONTACT_FORM_KVKK_ERROR_EN,
+  CONTACT_FORM_KVKK_LABEL as CONTACT_FORM_KVKK_LABEL_EN,
+} from "@/content/kvkk-page.en";
+import {
   contactFormSchema,
   flattenContactErrors,
   type ContactFieldErrors,
@@ -42,7 +50,8 @@ import {
 import { ContactSocialLinks } from "./ContactSocialLinks";
 import { ContactUnderlineField } from "./ContactUnderlineField";
 import { usePathname } from "next/navigation";
-import { localeFromPathname } from "@/lib/locale";
+import Link from "next/link";
+import { localeFromPathname, withLocalePath } from "@/lib/locale";
 import { viewportOnce } from "@/lib/motion";
 
 export function ContactFormPanel() {
@@ -56,6 +65,7 @@ export function ContactFormPanel() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [honeypot, setHoneypot] = useState("");
+  const [kvkkConsent, setKvkkConsent] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<ContactFieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -70,6 +80,7 @@ export function ContactFormPanel() {
   const lastErr = fieldErrors.lastName?.[0];
   const emailErr = fieldErrors.email?.[0];
   const messageErr = fieldErrors.message?.[0];
+  const kvkkErr = fieldErrors.kvkkConsent?.[0];
 
   const onSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -84,6 +95,7 @@ export function ContactFormPanel() {
         email,
         message,
         company: honeypot || undefined,
+        kvkkConsent: kvkkConsent ? true : false,
       };
       setLastPayload({ firstName, lastName, email, message });
 
@@ -102,13 +114,14 @@ export function ContactFormPanel() {
           setLastName("");
           setEmail("");
           setMessage("");
+          setKvkkConsent(false);
           return;
         }
         if (result.fieldErrors) setFieldErrors(result.fieldErrors);
         setFormError(result.error);
       });
     },
-    [email, firstName, honeypot, isEn, lastName, message],
+    [email, firstName, honeypot, isEn, kvkkConsent, lastName, message],
   );
 
   return (
@@ -207,6 +220,34 @@ export function ContactFormPanel() {
           onChange={setMessage}
           error={messageErr}
         />
+
+        <div className="space-y-2">
+          <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-muted">
+            <input
+              type="checkbox"
+              name="kvkkConsent"
+              checked={kvkkConsent}
+              onChange={(e) => setKvkkConsent(e.target.checked)}
+              className="mt-1 h-4 w-4 shrink-0 rounded border-border text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            />
+            <span>
+              {isEn ? CONTACT_FORM_KVKK_LABEL_EN : CONTACT_FORM_KVKK_LABEL}{" "}
+              <Link
+                href={withLocalePath("/kvkk", locale)}
+                className="font-medium text-primary underline-offset-2 transition hover:text-accent hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {isEn ? "Read full notice" : "Metni oku"}
+              </Link>
+            </span>
+          </label>
+          {kvkkErr ? (
+            <p className="text-xs text-red-600" role="alert">
+              {isEn ? CONTACT_FORM_KVKK_ERROR_EN : CONTACT_FORM_KVKK_ERROR}
+            </p>
+          ) : null}
+        </div>
 
         {formError ? (
           <div

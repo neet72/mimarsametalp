@@ -65,7 +65,7 @@ export function localBusinessJsonLd() {
     // Local SEO (mock — sonra kolayca güncelleyebilmen için)
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Güzelevler, 2067/2 SK A blok no:32/3",
+      streetAddress: "Güzelevler, 2067/2 SK A blok No: 32/3",
       addressLocality: "Yüreğir",
       addressRegion: "Adana",
       postalCode: "01220",

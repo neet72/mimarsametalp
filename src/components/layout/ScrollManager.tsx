@@ -2,12 +2,12 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { scrollToTopImmediate } from "@/lib/scroll-top";
 
 export function ScrollManager() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Prevent browser from restoring previous scroll position on reload/back-forward.
     if (typeof window === "undefined") return;
     try {
       if ("scrollRestoration" in window.history) {
@@ -19,21 +19,34 @@ export function ScrollManager() {
   }, []);
 
   useEffect(() => {
-    // Always start at top after navigation.
     if (typeof window === "undefined") return;
-    // rAF avoids fighting with layout/transition frames.
-    const id = window.requestAnimationFrame(() => {
-      window.scrollTo(0, 0);
-      // Some in-view animations can miss the first measurement during soft navigations
-      // (especially on locale switches). Nudge observers on the next frame.
+
+    // Hash hedeflerine izin ver (örn. #section)
+    if (window.location.hash) return;
+
+    const goTop = () => {
+      scrollToTopImmediate();
+    };
+
+    // Senkron + layout sonrası: Lenis/next soft-nav bazen bir frame gecikmeli ölçer.
+    goTop();
+    const raf1 = window.requestAnimationFrame(() => {
+      goTop();
       window.requestAnimationFrame(() => {
+        goTop();
         window.dispatchEvent(new Event("scroll"));
         window.dispatchEvent(new Event("resize"));
       });
     });
-    return () => window.cancelAnimationFrame(id);
+    const t1 = window.setTimeout(goTop, 40);
+    const t2 = window.setTimeout(goTop, 120);
+
+    return () => {
+      window.cancelAnimationFrame(raf1);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
   }, [pathname]);
 
   return null;
 }
-
