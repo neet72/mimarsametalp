@@ -81,7 +81,7 @@ export default async function ProjectDetailPageEn({ params }: PageProps) {
     });
 
   return (
-    <div className="contents">
+    <div className="w-full">
       <script
         {...jsonLdScriptProps(
           breadcrumbJsonLd([

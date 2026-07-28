@@ -24,7 +24,7 @@ export default async function AboutPageEn() {
   const aboutCms = mergeAboutWithPortraitFallback(parseAboutCms(rawEn), parseAboutCms(rawTr));
 
   return (
-    <div className="contents">
+    <div className="w-full">
       <script
         {...jsonLdScriptProps(
           breadcrumbJsonLd([

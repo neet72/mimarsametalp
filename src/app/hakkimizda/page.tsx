@@ -24,7 +24,7 @@ export default async function HakkimizdaPage() {
   const aboutCms = mergeAboutWithPortraitFallback(parseAboutCms(rawTr), parseAboutCms(rawEn));
 
   return (
-    <div className="contents">
+    <div className="w-full">
       <script
         {...jsonLdScriptProps(
           breadcrumbJsonLd([

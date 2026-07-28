@@ -21,7 +21,7 @@ function buildCspHeaderValue(): string {
     "frame-ancestors 'none'",
     "form-action 'self'",
     // Next.js injects styles; nonce plumbing is non-trivial in App Router, so allow inline styles only.
-    "style-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     // Next.js (App Router) uses inline scripts for hydration/runtime in production builds.
     // Nonce/hashes would be ideal but require plumbing; keep eval disabled in prod.
     `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}${analyticsScriptSrc}`,
@@ -29,7 +29,7 @@ function buildCspHeaderValue(): string {
     `script-src-elem 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}${analyticsScriptSrc}`,
     "img-src 'self' data: blob: https://res.cloudinary.com",
     "media-src 'self' blob: https://res.cloudinary.com",
-    "font-src 'self' data:",
+    "font-src 'self' data: https://fonts.gstatic.com",
     // Vercel Analytics / Web Vitals
     `connect-src 'self' https://vitals.vercel-insights.com${devConnectExtras}`,
     // Google Maps iframe + yaygın alt çerçeve kaynakları

@@ -58,17 +58,7 @@ export async function submitContactForm(data: unknown): Promise<ContactSubmitRes
     return { ok: true, message: "Mesajınız alındı. En kısa sürede size dönüş yapacağız." };
   }
 
-  const emailResult = await sendContactNotification({
-    firstName: parsed.data.firstName,
-    lastName: parsed.data.lastName,
-    email: parsed.data.email,
-    message: parsed.data.message,
-  });
-
-  if (!emailResult.ok) {
-    return { ok: false, error: emailResult.error };
-  }
-
+  let dbSaved = false;
   try {
     await prisma.message.create({
       data: {
@@ -80,12 +70,36 @@ export async function submitContactForm(data: unknown): Promise<ContactSubmitRes
       },
       select: { id: true },
     });
+    dbSaved = true;
   } catch (e) {
     logger.warn({
       msg: "contact message db write failed",
       scope: "public.contact.submit",
       error: e instanceof Error ? { name: e.name, message: e.message } : String(e),
     });
+  }
+
+  const emailResult = await sendContactNotification({
+    firstName: parsed.data.firstName,
+    lastName: parsed.data.lastName,
+    email: parsed.data.email,
+    message: parsed.data.message,
+  });
+
+  if (!emailResult.ok) {
+    // E-posta düşse bile admin panelinde mesaj kalsın
+    if (dbSaved) {
+      logger.warn({
+        msg: "contact email failed after db save",
+        scope: "public.contact.submit",
+        error: emailResult.error,
+      });
+      return {
+        ok: true,
+        message: "Mesajınız kaydedildi. En kısa sürede size dönüş yapacağız.",
+      };
+    }
+    return { ok: false, error: emailResult.error };
   }
 
   return { ok: true, message: "Mesajınız alındı. En kısa sürede size dönüş yapacağız." };

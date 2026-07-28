@@ -26,7 +26,7 @@ export default async function ProjelerPage() {
     imageUrl: p.imageUrls[0] ?? "/images/hero-1.webp",
   }));
   return (
-    <div className="contents">
+    <div className="w-full">
       <script
         {...jsonLdScriptProps(
           breadcrumbJsonLd([

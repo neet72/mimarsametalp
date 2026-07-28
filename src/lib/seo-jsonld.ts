@@ -13,10 +13,12 @@ import {
 type JsonLd = Record<string, unknown>;
 
 export function jsonLdScriptProps(data: JsonLd) {
+  // `</script>` içeren CMS metinleri script bloğunu erken kapatmasın diye `<` kaçırılır
+  const html = JSON.stringify(data).replace(/</g, "\\u003c");
   return {
     type: "application/ld+json",
     // Next.js: server component içinde inline script
-    dangerouslySetInnerHTML: { __html: JSON.stringify(data) },
+    dangerouslySetInnerHTML: { __html: html },
   } as const;
 }
 

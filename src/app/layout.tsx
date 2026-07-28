@@ -117,6 +117,18 @@ export default async function RootLayout({
       className={`${inter.variable} ${outfit.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        {/* Instrument Serif — App Router `head.tsx` kullanılmaz; CSP ile Google Fonts açık */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font -- Instrument Serif next/font'ta yok */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap"
+          rel="stylesheet"
+        />
+        <link rel="dns-prefetch" href="//res.cloudinary.com" />
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="" />
+      </head>
       <body
         className="font-sans [--font-display:var(--font-outfit)] [--font-sans:var(--font-inter)]"
         suppressHydrationWarning

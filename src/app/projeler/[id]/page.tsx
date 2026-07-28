@@ -62,7 +62,7 @@ export default async function ProjeDetayPage({ params }: PageProps) {
     .map((p) => ({ title: p.title, href: `/projeler/${p.slug}` }));
 
   return (
-    <div className="contents">
+    <div className="w-full">
       <script
         {...jsonLdScriptProps(
           breadcrumbJsonLd([

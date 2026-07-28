@@ -43,13 +43,15 @@ export function HeroCinematicLite() {
 
   /** İlk sunucu + ilk istemci çizimi aynı olsun; reduceMotion sadece mount sonrası. */
   const motionOn = !hydrated || reduceMotion !== true;
+  const preferStaticHero = hydrated && reduceMotion === true;
 
   useEffect(() => {
+    if (preferStaticHero) return;
     const el = videoRef.current;
     if (!el) return;
     el.muted = true;
     void el.play().catch(() => {});
-  }, [pathname]);
+  }, [pathname, preferStaticHero]);
 
   const ctaHrefProjects = isEn ? "/en/projeler" : "/projeler";
   const ctaHrefContact = isEn ? "/en/iletisim" : "/iletisim";
@@ -94,31 +96,41 @@ export function HeroCinematicLite() {
       }}
     >
       <HeroDreamBackdrop motionOn={motionOn} />
-      <video
-        ref={videoRef}
-        className="absolute inset-0 z-[1] h-full w-full object-cover"
-        poster={HERO_POSTER}
-        suppressHydrationWarning
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        disablePictureInPicture
-        disableRemotePlayback
-        fetchPriority="high"
-      >
-        {HERO_VIDEO_OVERRIDE ? (
-          <source src={HERO_VIDEO_OVERRIDE} type={videoMimeFromUrl(HERO_VIDEO_OVERRIDE)} />
-        ) : (
-          <>
-            {USE_WEBM_SOURCE ? (
-              <source src={`${HERO_VIDEO_STEM}.webm`} type="video/webm" />
-            ) : null}
-            <source src={`${HERO_VIDEO_STEM}.mp4`} type="video/mp4" />
-          </>
-        )}
-      </video>
+      {preferStaticHero ? (
+        // eslint-disable-next-line @next/next/no-img-element -- poster tam ekran kapak; next/image fill burada fazla
+        <img
+          src={HERO_POSTER}
+          alt=""
+          className="absolute inset-0 z-[1] h-full w-full object-cover"
+          fetchPriority="high"
+        />
+      ) : (
+        <video
+          ref={videoRef}
+          className="absolute inset-0 z-[1] h-full w-full object-cover"
+          poster={HERO_POSTER}
+          suppressHydrationWarning
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+          disableRemotePlayback
+          fetchPriority="high"
+        >
+          {HERO_VIDEO_OVERRIDE ? (
+            <source src={HERO_VIDEO_OVERRIDE} type={videoMimeFromUrl(HERO_VIDEO_OVERRIDE)} />
+          ) : (
+            <>
+              {USE_WEBM_SOURCE ? (
+                <source src={`${HERO_VIDEO_STEM}.webm`} type="video/webm" />
+              ) : null}
+              <source src={`${HERO_VIDEO_STEM}.mp4`} type="video/mp4" />
+            </>
+          )}
+        </video>
+      )}
 
       <div
         aria-hidden

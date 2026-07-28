@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function IletisimPage() {
   return (
-    <div className="contents">
+    <div className="w-full">
       <script
         {...jsonLdScriptProps(
           breadcrumbJsonLd([

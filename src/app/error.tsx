@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { logger } from "@/lib/observability/logger";
+import { localeFromPathname } from "@/lib/locale";
 
 export default function Error({
   error,
@@ -11,6 +13,9 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const pathname = usePathname();
+  const isEn = localeFromPathname(pathname) === "en";
+
   useEffect(() => {
     logger.error({
       msg: "app error boundary",
@@ -24,10 +29,12 @@ export default function Error({
     <div className="mx-auto w-full max-w-2xl px-6 py-16">
       <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
         <h1 className="font-display text-xl font-semibold text-primary">
-          Bir şeyler ters gitti
+          {isEn ? "Something went wrong" : "Bir şeyler ters gitti"}
         </h1>
         <p className="mt-2 text-sm text-muted">
-          Sayfa yüklenirken beklenmedik bir hata oluştu. Lütfen tekrar deneyin.
+          {isEn
+            ? "An unexpected error occurred while loading this page. Please try again."
+            : "Sayfa yüklenirken beklenmedik bir hata oluştu. Lütfen tekrar deneyin."}
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <button
@@ -35,17 +42,16 @@ export default function Error({
             onClick={() => reset()}
             className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-surface transition-colors hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            Tekrar dene
+            {isEn ? "Try again" : "Tekrar dene"}
           </button>
           <Link
-            href="/"
+            href={isEn ? "/en" : "/"}
             className="inline-flex items-center justify-center rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-muted/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            Ana sayfaya dön
+            {isEn ? "Back to home" : "Ana sayfaya dön"}
           </Link>
         </div>
       </div>
     </div>
   );
 }
-

@@ -78,7 +78,7 @@ export default async function ServiceDetailPageEn({ params }: PageProps) {
     .map((s) => ({ title: s.title, href: `/en/hizmetlerimiz/${s.slug}` }));
 
   return (
-    <div className="contents">
+    <div className="w-full">
       <script
         {...jsonLdScriptProps(
           breadcrumbJsonLd([

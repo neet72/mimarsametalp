@@ -30,7 +30,7 @@ export default async function ProjectsPageEn() {
     };
   });
   return (
-    <div className="contents">
+    <div className="w-full">
       <script
         {...jsonLdScriptProps(
           breadcrumbJsonLd([

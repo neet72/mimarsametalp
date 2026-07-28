@@ -185,21 +185,28 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
         </motion.header>
 
         <div className="grid grid-cols-1 gap-12 pb-16 pt-4 sm:gap-14 sm:pb-20 md:grid-cols-2 md:gap-x-10 md:gap-y-14 md:pb-28 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-20">
-          {projects.map((project, index) => (
-            <motion.div
-              key={project.slug}
-              variants={reduceMotion ? undefined : cardReveal}
-              initial={reduceMotion ? false : "hidden"}
-              whileInView={reduceMotion ? undefined : "show"}
-              viewport={{ once: false, margin: "0px 0px -12% 0px", amount: 0.14 }}
-              transition={{
-                // Awwwards-like domino timing
-                delay: reduceMotion ? 0 : Math.min(index * 0.08, 0.64),
-              }}
-            >
-              <ProjectCard project={project} index={index} />
-            </motion.div>
-          ))}
+          {projects.length === 0 ? (
+            <p className="col-span-full py-8 text-center text-sm text-primary/55 sm:text-base">
+              {locale === "en"
+                ? "No published projects yet. Check back soon."
+                : "Henüz yayında proje yok. Yakında burada göreceksiniz."}
+            </p>
+          ) : (
+            projects.map((project, index) => (
+              <motion.div
+                key={project.slug}
+                variants={reduceMotion ? undefined : cardReveal}
+                initial={reduceMotion ? false : "hidden"}
+                whileInView={reduceMotion ? undefined : "show"}
+                viewport={{ once: false, margin: "0px 0px -12% 0px", amount: 0.14 }}
+                transition={{
+                  delay: reduceMotion ? 0 : Math.min(index * 0.08, 0.64),
+                }}
+              >
+                <ProjectCard project={project} index={index} />
+              </motion.div>
+            ))
+          )}
         </div>
 
         <div className="pb-16 sm:pb-20 md:pb-28">

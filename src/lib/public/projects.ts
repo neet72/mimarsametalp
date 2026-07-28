@@ -2,6 +2,7 @@ import "server-only";
 
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db/prisma";
+import { PROJECTS } from "@/data/projects";
 
 export type PublicProject = {
   id: string;
@@ -21,6 +22,44 @@ export type PublicProject = {
   imageUrls: string[];
   updatedAt: Date;
 };
+
+function slugifyTitle(title: string): string {
+  return title
+    .toLocaleLowerCase("tr-TR")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ğ/g, "g")
+    .replace(/ü/g, "u")
+    .replace(/ş/g, "s")
+    .replace(/ı/g, "i")
+    .replace(/ö/g, "o")
+    .replace(/ç/g, "c")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/** DB boş/hatalıysa `src/data/projects.ts` portfolyosu (hizmet listesiyle aynı mantık). */
+function staticFallbackProjects(): PublicProject[] {
+  const updatedAt = new Date(0);
+  return PROJECTS.map((p) => ({
+    id: `static-${p.id}`,
+    slug: slugifyTitle(p.title),
+    title: p.title,
+    category: p.category,
+    description: p.description,
+    status: null,
+    year: null,
+    location: null,
+    titleEn: null,
+    categoryEn: null,
+    descriptionEn: null,
+    statusEn: null,
+    locationEn: null,
+    areaM2: null,
+    imageUrls: p.gallery.length > 0 ? p.gallery : [p.imageUrl],
+    updatedAt,
+  }));
+}
 
 function safeParseJsonArray(value: string): string[] {
   try {
@@ -49,7 +88,7 @@ function toPublicProject(row: {
   areaM2: number | null;
   imageUrls: string;
   updatedAt: Date;
-}) : PublicProject {
+}): PublicProject {
   const urls = safeParseJsonArray(row.imageUrls);
   return {
     id: row.id,
@@ -96,30 +135,31 @@ export const getPublicProjects = unstable_cache(
           updatedAt: true,
         },
       });
+      if (rows.length === 0) return staticFallbackProjects();
       return rows.map(toPublicProject);
     } catch (error) {
-      // Üretim DB’sinde kolon/migration eksikse sayfa 500 olmasın (hizmet listesi gibi)
       console.error(
         JSON.stringify({
           level: "error",
-          msg: "getPublicProjects failed",
+          msg: "getPublicProjects failed — using static fallback",
           scope: "public.projects",
           error: error instanceof Error ? { name: error.name, message: error.message } : String(error),
         }),
       );
-      return [];
+      return staticFallbackProjects();
     }
   },
-  ["public-projects:v3"],
+  ["public-projects:v4"],
   { revalidate: 60, tags: ["public-projects"] },
 );
 
 export const getPublicProjectBySlug = (slug: string) =>
   unstable_cache(
     async () => {
+      const normalized = slug.trim().toLowerCase();
       try {
         const row = await prisma.project.findFirst({
-          where: { published: true, slug },
+          where: { published: true, slug: normalized },
           select: {
             id: true,
             slug: true,
@@ -139,21 +179,20 @@ export const getPublicProjectBySlug = (slug: string) =>
             updatedAt: true,
           },
         });
-        return row ? toPublicProject(row) : null;
+        if (row) return toPublicProject(row);
       } catch (error) {
         console.error(
           JSON.stringify({
             level: "error",
-            msg: "getPublicProjectBySlug failed",
+            msg: "getPublicProjectBySlug failed — trying static fallback",
             scope: "public.projects",
-            slug,
+            slug: normalized,
             error: error instanceof Error ? { name: error.name, message: error.message } : String(error),
           }),
         );
-        return null;
       }
+      return staticFallbackProjects().find((p) => p.slug === normalized) ?? null;
     },
-    [`public-project:${slug}:v3`],
+    [`public-project:${slug}:v4`],
     { revalidate: 60, tags: ["public-projects", `public-project:${slug}`] },
   )();
-

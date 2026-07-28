@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 export default async function ServicesPageEn() {
   const items = await getServiceListingItems("en");
   return (
-    <div className="contents">
+    <div className="w-full">
       <script
         {...jsonLdScriptProps(
           breadcrumbJsonLd([

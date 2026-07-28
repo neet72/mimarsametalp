@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 export default async function HizmetlerimizPage() {
   const items = await getServiceListingItems("tr");
   return (
-    <div className="contents">
+    <div className="w-full">
       <script
         {...jsonLdScriptProps(
           breadcrumbJsonLd([

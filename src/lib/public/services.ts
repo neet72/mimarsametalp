@@ -114,37 +114,10 @@ function toPublicService(row: {
 
 export const getPublicServices = unstable_cache(
   async () => {
-    const rows = (await prisma.service.findMany({
-      where: { published: true },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-      select: {
-        id: true,
-        slug: true,
-        title: true,
-        shortDescription: true,
-        heroImageUrl: true,
-        titleEn: true,
-        shortDescriptionEn: true,
-        scope: true,
-        scopeEn: true,
-        process: true,
-        processEn: true,
-        faq: true,
-        faqEn: true,
-        updatedAt: true,
-      },
-    } as Parameters<typeof prisma.service.findMany>[0])) as Array<Parameters<typeof toPublicService>[0]>;
-    return rows.map(toPublicService);
-  },
-  ["public-services:v3"],
-  { revalidate: 60, tags: ["public-services"] },
-);
-
-export const getPublicServiceBySlug = (slug: string) =>
-  unstable_cache(
-    async () => {
-      const row = (await prisma.service.findFirst({
-        where: { published: true, slug },
+    try {
+      const rows = (await prisma.service.findMany({
+        where: { published: true },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
         select: {
           id: true,
           slug: true,
@@ -161,10 +134,62 @@ export const getPublicServiceBySlug = (slug: string) =>
           faqEn: true,
           updatedAt: true,
         },
-      } as Parameters<typeof prisma.service.findFirst>[0])) as Parameters<typeof toPublicService>[0] | null;
-      return row ? toPublicService(row) : null;
+      } as Parameters<typeof prisma.service.findMany>[0])) as Array<Parameters<typeof toPublicService>[0]>;
+      return rows.map(toPublicService);
+    } catch (error) {
+      console.error(
+        JSON.stringify({
+          level: "error",
+          msg: "getPublicServices failed",
+          scope: "public.services",
+          error: error instanceof Error ? { name: error.name, message: error.message } : String(error),
+        }),
+      );
+      return [];
+    }
+  },
+  ["public-services:v4"],
+  { revalidate: 60, tags: ["public-services"] },
+);
+
+export const getPublicServiceBySlug = (slug: string) =>
+  unstable_cache(
+    async () => {
+      try {
+        const row = (await prisma.service.findFirst({
+          where: { published: true, slug },
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            shortDescription: true,
+            heroImageUrl: true,
+            titleEn: true,
+            shortDescriptionEn: true,
+            scope: true,
+            scopeEn: true,
+            process: true,
+            processEn: true,
+            faq: true,
+            faqEn: true,
+            updatedAt: true,
+          },
+        } as Parameters<typeof prisma.service.findFirst>[0])) as Parameters<typeof toPublicService>[0] | null;
+        return row ? toPublicService(row) : null;
+      } catch (error) {
+        console.error(
+          JSON.stringify({
+            level: "error",
+            msg: "getPublicServiceBySlug failed",
+            scope: "public.services",
+            slug,
+            error: error instanceof Error ? { name: error.name, message: error.message } : String(error),
+          }),
+        );
+        return null;
+      }
     },
-    [`public-service:${slug}:v3`],
+    [`public-service:${slug}:v4`],
     { revalidate: 60, tags: ["public-services", `public-service:${slug}`] },
   )();
 
