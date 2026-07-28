@@ -61,13 +61,28 @@ export async function upsertSiteContent(formData: FormData) {
 export async function getSiteContent(key: "about" | "contact", locale: "tr" | "en") {
   return unstable_cache(
     async () => {
-      const row = await prisma.siteContent.findUnique({
-        where: { key_locale: { key, locale } },
-        select: { data: true, updatedAt: true },
-      });
-      return row?.data ?? null;
+      try {
+        const row = await prisma.siteContent.findUnique({
+          where: { key_locale: { key, locale } },
+          select: { data: true, updatedAt: true },
+        });
+        return row?.data ?? null;
+      } catch (error) {
+        // SiteContent tablosu migrate edilmemişse hakkımızda 500 olmasın
+        console.error(
+          JSON.stringify({
+            level: "error",
+            msg: "getSiteContent failed",
+            scope: "public.siteContent",
+            key,
+            locale,
+            error: error instanceof Error ? { name: error.name, message: error.message } : String(error),
+          }),
+        );
+        return null;
+      }
     },
-    [`site-content:${key}:${locale}:v1`],
+    [`site-content:${key}:${locale}:v2`],
     { revalidate: 60, tags: [`site-content:${key}:${locale}`] },
   )();
 }

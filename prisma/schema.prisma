@@ -111,8 +111,8 @@ model SiteContent {
   key       String
   /// "tr" | "en"
   locale    String
-  /// JSON string payload
-  data      String   @default("{}")
+  /// JSON string payload (CMS metinleri uzun olabilir)
+  data      String   @db.LongText @default("{}")
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 
