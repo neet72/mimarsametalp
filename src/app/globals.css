@@ -102,7 +102,11 @@ html.dark {
     background-color: rgb(var(--color-accent-bright-rgb) / 1);
     filter: none;
   }
-}
+
+  /* Dokunma gecikmesini azaltır; çift dokunma zoom ile çakışmayı sınırlar */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
 
   .overscroll-contain {
     overscroll-behavior: contain;
