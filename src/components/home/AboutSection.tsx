@@ -152,7 +152,7 @@ export function AboutSection() {
               <Link
                 href={withLocalePath("/hakkimizda", locale)}
                 aria-label={locale === "en" ? "Go to the About page" : "Hakkımızda sayfasına git"}
-                className="inline-flex items-center justify-center rounded-full bg-primary px-10 py-3 font-display text-[11px] font-medium uppercase tracking-[0.28em] text-surface shadow-sm transition duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-card focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="inline-flex items-center justify-center rounded-full bg-solid px-10 py-3 font-display text-[11px] font-medium uppercase tracking-[0.28em] text-surface shadow-sm transition duration-300 hover:-translate-y-0.5 hover:bg-solid/90 hover:shadow-card focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 {locale === "en" ? "ABOUT" : "HAKKIMIZDA"}
               </Link>

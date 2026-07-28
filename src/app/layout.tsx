@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import { headers } from "next/headers";
+import { ThemeProvider, THEME_BOOT_SCRIPT } from "@/components/theme/ThemeProvider";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { metadataBase, siteName } from "@/lib/seo";
 import { jsonLdScriptProps, localBusinessJsonLd, organizationJsonLd, siteNavigationJsonLd, websiteJsonLd } from "@/lib/seo-jsonld";
@@ -30,7 +31,7 @@ export const viewport: Viewport = {
   viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#fafafa" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+    { media: "(prefers-color-scheme: dark)", color: "#1A1815" },
   ],
 };
 
@@ -118,6 +119,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
         {/* Instrument Serif — App Router `head.tsx` kullanılmaz; CSP ile Google Fonts açık */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -153,12 +155,11 @@ export default async function RootLayout({
             }),
           )}
         />
-        <MainLayout key="main-layout">
-          {children}
-        </MainLayout>
-        {/* Avoid dev key warnings inside analytics overlay on admin routes */}
-        {isAdmin ? null : <Analytics key="analytics" />}
-        {isAdmin ? null : <SpeedInsights key="speed-insights" />}
+        <ThemeProvider>
+          <MainLayout key="main-layout">{children}</MainLayout>
+          {isAdmin ? null : <Analytics key="analytics" />}
+          {isAdmin ? null : <SpeedInsights key="speed-insights" />}
+        </ThemeProvider>
       </body>
     </html>
   );

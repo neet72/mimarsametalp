@@ -40,7 +40,7 @@ export default function Error({
           <button
             type="button"
             onClick={() => reset()}
-            className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-surface transition-colors hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="inline-flex items-center justify-center rounded-full bg-solid px-5 py-2.5 text-sm font-semibold text-on-solid transition-colors hover:bg-solid/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             {isEn ? "Try again" : "Tekrar dene"}
           </button>

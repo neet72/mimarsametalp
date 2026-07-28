@@ -89,11 +89,6 @@ export function HeroCinematicLite() {
         motionOn && "home-video-hero--motion",
       )}
       aria-label={isEn ? "Homepage hero" : "Ana sayfa karşılama alanı"}
-      style={{
-        fontFamily: "var(--font-inter, var(--font-sans), sans-serif)",
-        minHeight: "calc(100svh - var(--header-h))",
-        backgroundColor: "hsl(201 100% 13%)",
-      }}
     >
       <HeroDreamBackdrop motionOn={motionOn} />
       {preferStaticHero ? (
@@ -134,7 +129,7 @@ export function HeroCinematicLite() {
 
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-[hsl(201_95%_8%/0.45)] via-transparent to-[hsl(210_85%_6%/0.55)] mix-blend-multiply"
+        className="home-video-hero-veil pointer-events-none absolute inset-0 z-[2]"
       />
       <div
         aria-hidden
@@ -148,6 +143,7 @@ export function HeroCinematicLite() {
         <h1
           className={cn(
             "max-w-[80rem] text-balance font-normal text-5xl leading-[0.95] tracking-[-0.154rem] sm:text-7xl md:text-8xl",
+            "font-[family-name:var(--font-instrument-serif,'Instrument_Serif',var(--font-display),serif)]",
             motionOn && "animate-fade-rise-video",
           )}
           style={{

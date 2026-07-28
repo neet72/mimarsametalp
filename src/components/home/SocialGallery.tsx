@@ -104,12 +104,12 @@ export function SocialGallery() {
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
-              "group inline-flex items-center gap-3 rounded-full border border-primary/15 bg-primary px-9 py-3.5 font-display text-[11px] font-medium uppercase tracking-[0.28em] text-surface",
-              "shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-primary hover:bg-primary/90 hover:shadow-card-hover",
+              "group inline-flex items-center gap-3 rounded-full border border-solid/20 bg-solid px-9 py-3.5 font-display text-[11px] font-medium uppercase tracking-[0.28em] text-on-solid",
+              "shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-accent hover:bg-solid/90 hover:shadow-card-hover",
               "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
             )}
           >
-            <InstagramGlyph className="h-5 w-5 shrink-0 text-surface/90 transition group-hover:scale-105" />
+            <InstagramGlyph className="h-5 w-5 shrink-0 text-on-solid/90 transition group-hover:scale-105" />
             <span>Instagram</span>
           </Link>
         </motion.div>

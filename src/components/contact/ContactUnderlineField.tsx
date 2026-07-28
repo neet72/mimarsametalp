@@ -95,7 +95,7 @@ export function ContactUnderlineField({
         aria-hidden
         className={cn(
           "pointer-events-none absolute bottom-0 left-0 h-[2px] w-full origin-left",
-          error ? "bg-red-600/80" : "bg-primary",
+          error ? "bg-red-600/80" : "bg-accent",
         )}
         initial={false}
         animate={{

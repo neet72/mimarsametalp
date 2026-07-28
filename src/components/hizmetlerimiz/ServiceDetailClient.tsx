@@ -49,7 +49,7 @@ export function ServiceDetailClient({ service, relatedServices }: Props) {
   const FaqIcon = faqIcon;
 
   return (
-    <div className="w-full bg-white text-primary">
+    <div className="w-full bg-surface">
       {/* HERO */}
       <section className="relative h-[50vh] w-full overflow-hidden bg-border/30">
         <Image
@@ -150,10 +150,10 @@ export function ServiceDetailClient({ service, relatedServices }: Props) {
             <motion.li
               key={step.title}
               variants={fadeUp}
-              className="relative rounded-2xl border border-border bg-white p-7 shadow-[var(--shadow-card)]"
+              className="relative rounded-2xl border border-border bg-panel p-7 shadow-[var(--shadow-card)]"
             >
               <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-white">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-solid text-on-solid">
                   <span className="font-display text-sm font-semibold tracking-wide">
                     {String(i + 1).padStart(2, "0")}
                   </span>
@@ -192,7 +192,7 @@ export function ServiceDetailClient({ service, relatedServices }: Props) {
           </p>
         </motion.div>
 
-        <motion.div variants={fadeUp} className="mt-10 divide-y divide-border rounded-2xl border border-border bg-white shadow-[var(--shadow-card)]">
+        <motion.div variants={fadeUp} className="mt-10 divide-y divide-border rounded-2xl border border-border bg-panel shadow-[var(--shadow-card)]">
           {service.sss.map((item, index) => {
             const isOpen = openIndex === index;
             return (
@@ -269,14 +269,14 @@ export function ServiceDetailClient({ service, relatedServices }: Props) {
             <Link
               href={withLocalePath("/iletisim", locale)}
               title={locale === "en" ? "Go to contact page" : "İletişim sayfasına git"}
-              className="inline-flex w-full shrink-0 items-center justify-center rounded-xl bg-primary px-7 py-4 font-display text-sm font-semibold uppercase tracking-[0.22em] text-white transition-colors hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:w-auto"
+              className="inline-flex w-full shrink-0 items-center justify-center rounded-xl bg-solid px-7 py-4 font-display text-sm font-semibold uppercase tracking-[0.22em] text-on-solid transition-colors hover:bg-solid/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:w-auto"
             >
               {locale === "en" ? "Contact" : "İletişime Geç"}
             </Link>
             <Link
               href={withLocalePath("/projeler", locale)}
               title={locale === "en" ? "View projects" : "Projeleri görüntüle"}
-              className="inline-flex w-full shrink-0 items-center justify-center rounded-xl border border-border bg-white px-7 py-4 font-display text-sm font-semibold uppercase tracking-[0.22em] text-primary transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:w-auto"
+              className="inline-flex w-full shrink-0 items-center justify-center rounded-xl border border-border bg-panel px-7 py-4 font-display text-sm font-semibold uppercase tracking-[0.22em] text-primary transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:w-auto"
             >
               {locale === "en" ? "View Projects" : "Projeleri Gör"}
             </Link>
@@ -284,7 +284,7 @@ export function ServiceDetailClient({ service, relatedServices }: Props) {
         </motion.div>
 
         {relatedServices && relatedServices.length > 0 ? (
-          <motion.div variants={fadeUp} className="mt-10 rounded-2xl border border-border bg-white p-8 shadow-[var(--shadow-card)]">
+          <motion.div variants={fadeUp} className="mt-10 rounded-2xl border border-border bg-panel p-8 shadow-[var(--shadow-card)]">
             <h3 className="font-display text-base font-semibold uppercase tracking-[0.26em] text-primary/70">
               {locale === "en" ? "Related services" : "İlgili hizmetler"}
             </h3>

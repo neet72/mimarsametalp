@@ -16,9 +16,14 @@ const config: Config = {
       colors: {
         primary: "rgb(var(--color-primary-rgb) / <alpha-value>)",
         accent: "rgb(var(--color-accent-rgb) / <alpha-value>)",
+        "accent-bright": "rgb(var(--color-accent-bright-rgb) / <alpha-value>)",
         surface: "rgb(var(--color-surface-rgb) / <alpha-value>)",
+        panel: "rgb(var(--color-panel-rgb) / <alpha-value>)",
         muted: "rgb(var(--color-muted-rgb) / <alpha-value>)",
         border: "rgb(var(--color-border-rgb) / <alpha-value>)",
+        sage: "rgb(var(--color-sage-rgb) / <alpha-value>)",
+        solid: "rgb(var(--color-solid-rgb) / <alpha-value>)",
+        "on-solid": "rgb(var(--color-on-solid-rgb) / <alpha-value>)",
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],

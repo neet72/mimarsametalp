@@ -140,8 +140,8 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
         />
         </div>
 
-        <div className="mt-5 text-center sm:text-left">
-          <h2 className="font-display text-xs font-semibold uppercase tracking-[0.24em] text-muted transition-colors duration-300 group-hover:text-primary sm:text-[0.8125rem] sm:tracking-[0.26em] md:text-sm md:tracking-[0.28em]">
+        <div className="mt-4 text-left">
+          <h2 className="font-display text-sm font-semibold tracking-tight text-primary transition-colors duration-300 group-hover:text-accent sm:text-[0.9375rem]">
             {project.title}
           </h2>
         </div>

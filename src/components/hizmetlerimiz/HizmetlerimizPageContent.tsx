@@ -149,7 +149,7 @@ export function HizmetlerimizPageContent({
             <Link
               href={withLocalePath("/projeler", locale)}
               className={cn(
-                "inline-flex items-center justify-center rounded-full border border-border bg-white px-5 py-2.5",
+                "inline-flex items-center justify-center rounded-full border border-border bg-panel px-5 py-2.5",
                 "text-xs font-semibold uppercase tracking-[0.22em] text-primary/80",
                 "transition-colors hover:border-primary/25 hover:bg-primary/[0.03] hover:text-primary",
                 "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent",
@@ -160,9 +160,9 @@ export function HizmetlerimizPageContent({
             <Link
               href={withLocalePath("/iletisim", locale)}
               className={cn(
-                "inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5",
-                "text-xs font-semibold uppercase tracking-[0.22em] text-white",
-                "transition-colors hover:bg-primary/90",
+                "inline-flex items-center justify-center rounded-full bg-solid px-5 py-2.5",
+                "text-xs font-semibold uppercase tracking-[0.22em] text-on-solid",
+                "transition-colors hover:bg-solid/90",
                 "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent",
               )}
             >
@@ -190,7 +190,7 @@ export function HizmetlerimizPageContent({
           ))}
         </motion.div>
 
-        <div className="mt-14 rounded-2xl border border-border bg-white/70 p-8 text-center shadow-[var(--shadow-card)] sm:mt-16 md:mt-20">
+        <div className="mt-14 rounded-2xl border border-border bg-panel/70 p-8 text-center shadow-[var(--shadow-card)] sm:mt-16 md:mt-20">
           <p className="mx-auto max-w-3xl text-pretty text-sm leading-relaxed text-primary/70 sm:text-base">
             {locale === "en"
               ? "Tell us your goals, constraints, and timeline. We’ll recommend the right scope and the most efficient delivery plan."
@@ -200,9 +200,9 @@ export function HizmetlerimizPageContent({
             <Link
               href={withLocalePath("/iletisim", locale)}
               className={cn(
-                "inline-flex items-center justify-center rounded-full bg-primary px-6 py-3",
-                "text-xs font-semibold uppercase tracking-[0.22em] text-white",
-                "transition-colors hover:bg-primary/90",
+                "inline-flex items-center justify-center rounded-full bg-solid px-6 py-3",
+                "text-xs font-semibold uppercase tracking-[0.22em] text-on-solid",
+                "transition-colors hover:bg-solid/90",
                 "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent",
               )}
             >
@@ -211,7 +211,7 @@ export function HizmetlerimizPageContent({
             <Link
               href={withLocalePath("/projeler", locale)}
               className={cn(
-                "inline-flex items-center justify-center rounded-full border border-border bg-white px-6 py-3",
+                "inline-flex items-center justify-center rounded-full border border-border bg-panel px-6 py-3",
                 "text-xs font-semibold uppercase tracking-[0.22em] text-primary/80",
                 "transition-colors hover:border-primary/25 hover:bg-primary/[0.03] hover:text-primary",
                 "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent",

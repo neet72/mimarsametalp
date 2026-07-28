@@ -9,6 +9,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { PAGE_MAX_CLASS, PAGE_PAD_X } from "@/lib/page-layout";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 const nav = [
   { href: "/projeler", label: "Projeler" },
@@ -203,6 +204,7 @@ export function Navbar() {
         </nav>
 
         <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3 md:justify-self-end">
+          <ThemeToggle />
           <button
             type="button"
             className="touch-manipulation flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-full border border-border/90 px-3 font-display text-[0.6875rem] font-medium tracking-wide text-muted transition-colors hover:border-primary/20 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-h-0 sm:min-w-0 sm:px-4 sm:py-2 sm:text-xs md:text-[0.8125rem]"
@@ -256,7 +258,7 @@ export function Navbar() {
             <motion.button
               type="button"
               aria-label="Menüyü kapat"
-              className="touch-manipulation absolute inset-0 bg-primary/45"
+              className="touch-manipulation absolute inset-0 bg-black/50"
               initial={reduceMotion ? false : { opacity: 0 }}
               animate={reduceMotion ? undefined : { opacity: 1 }}
               exit={reduceMotion ? undefined : { opacity: 0 }}
@@ -279,21 +281,24 @@ export function Navbar() {
               <div className={cn(shellClass, "py-4")}>
                 <Link
                   href={withLocalePath("/", locale)}
-                  className="touch-manipulation min-w-0 max-w-[calc(100%-3.25rem)] truncate py-2 font-display text-[0.6875rem] font-semibold uppercase leading-tight tracking-[0.22em] text-primary transition-colors hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:text-[0.75rem] sm:tracking-[0.24em]"
+                  className="touch-manipulation min-w-0 max-w-[calc(100%-7rem)] truncate py-2 font-display text-[0.6875rem] font-semibold uppercase leading-tight tracking-[0.22em] text-primary transition-colors hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:text-[0.75rem] sm:tracking-[0.24em]"
                   onClick={() => setOpen(false)}
                 >
                   Samet Alp Mimarlık
                 </Link>
 
-                <button
-                  ref={menuCloseBtnRef}
-                  type="button"
-                  className="touch-manipulation inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border/90 text-primary transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-                  onClick={() => setOpen(false)}
-                >
-                  <span className="sr-only">Menüyü kapat</span>
-                  <X className="h-6 w-6" strokeWidth={1.65} />
-                </button>
+                <div className="flex shrink-0 items-center gap-2">
+                  <ThemeToggle />
+                  <button
+                    ref={menuCloseBtnRef}
+                    type="button"
+                    className="touch-manipulation inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border/90 text-primary transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                    onClick={() => setOpen(false)}
+                  >
+                    <span className="sr-only">Menüyü kapat</span>
+                    <X className="h-6 w-6" strokeWidth={1.65} />
+                  </button>
+                </div>
               </div>
 
               <nav

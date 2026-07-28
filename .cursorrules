@@ -12,17 +12,35 @@ Bu depo, mimarlık ofisi web sitesinin premium, modern ve erişilebilir bir aray
 
 ## Tasarım Sistemi (tek kaynak)
 
-Tokenlar `src/app/globals.css` içindeki `:root` altında tanımlıdır. Yeni renk veya gölge eklerken önce oraya ekle, ardından `tailwind.config.ts` ile eşleştir.
+Tokenlar `src/app/globals.css` içindeki `:root` / `html.dark` altında tanımlıdır. Yeni renk veya gölge eklerken önce oraya ekle, ardından `tailwind.config.ts` ile eşleştir.
+
+### Light
 
 | Rol | Değer |
 |-----|--------|
 | **Primary (ana metin / güçlü UI)** | `#0F172A` → `--color-primary-rgb` |
-| **Accent (vurgu, link hover, ince detay)** | `#A67C52` → `--color-accent-rgb` |
+| **Accent (vurgu, link hover)** | `#A67C52` → `--color-accent-rgb` |
 | **Surface (sayfa zemini)** | `#FAFAFA` → `--color-surface-rgb` |
+| **Panel (kart)** | `#FFFFFF` → `--color-panel-rgb` |
 | **Muted (ikincil metin)** | `#64748B` → `--color-muted-rgb` |
 | **Border** | `#E2E8F0` → `--color-border-rgb` |
-| **Ana font (gövde)** | Inter — `--font-sans` |
-| **Başlık fontu** | Outfit — `--font-display` |
+| **Solid CTA** | lacivert → `--color-solid-rgb` / `--color-on-solid-rgb` |
+
+### Warm dark (`html.dark` — “akşam, ahşap mekân”)
+
+| Rol | Değer |
+|-----|--------|
+| **Surface** | `#1A1815` |
+| **Panel** | `#242019` |
+| **Border** | `#3A342A` |
+| **Primary (başlık)** | `#F5F0E8` |
+| **Muted (gövde)** | `#C9C2B4` |
+| **Accent / Solid CTA** | `#D4A054` (hover `#E8BE7A`) |
+| **Sage (opsiyonel etiket)** | `#5C6B52` |
+
+Tema: Navbar `ThemeToggle` + `localStorage` (`samet-theme`). FOUC script `layout.tsx` head içinde.
+
+**Ana font (gövde)** Inter — `--font-sans` · **Başlık** Outfit — `--font-display` · Hero serif: Instrument Serif.
 
 Başlıklarda `font-display`, gövdede `font-sans`. Başlıklarda genişlik 600–700, mümkünse hafif negatif `tracking-tight`.
 

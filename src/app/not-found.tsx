@@ -22,7 +22,7 @@ export default async function NotFound() {
       <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
         <Link
           href={isEn ? "/en" : "/"}
-          className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-7 py-2.5 font-display text-[11px] font-medium uppercase tracking-[0.22em] text-surface transition hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="inline-flex min-h-11 items-center justify-center rounded-full bg-solid px-7 py-2.5 font-display text-[11px] font-medium uppercase tracking-[0.22em] text-on-solid transition hover:bg-solid/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           {isEn ? "Home" : "Ana sayfa"}
         </Link>

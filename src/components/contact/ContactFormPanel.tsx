@@ -233,7 +233,7 @@ export function ContactFormPanel() {
         <motion.button
           type="submit"
           disabled={isPending}
-          className="touch-manipulation w-full min-h-[48px] bg-primary py-4 font-display text-sm font-semibold uppercase tracking-[0.2em] text-surface transition-[box-shadow,transform,opacity] hover:shadow-[0_12px_40px_-8px_rgb(15_23_42/0.35)] disabled:cursor-not-allowed disabled:opacity-55"
+          className="touch-manipulation w-full min-h-[48px] bg-solid py-4 font-display text-sm font-semibold uppercase tracking-[0.2em] text-on-solid transition-[box-shadow,transform,opacity] hover:shadow-[0_12px_40px_-8px_rgb(15_23_42/0.35)] disabled:cursor-not-allowed disabled:opacity-55"
           whileHover={reduceMotion || isPending ? undefined : { scale: 1.01 }}
           whileTap={reduceMotion || isPending ? undefined : { scale: 0.995 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}

@@ -141,7 +141,7 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
   }, [selectedImageIndex]);
 
   return (
-    <div className="w-full bg-white">
+    <div className="w-full bg-surface">
       {/* HERO */}
       <section className="relative h-[50vh] w-full overflow-hidden bg-border/30">
         {isVideoUrl(project.imageUrl) ? (
@@ -305,14 +305,14 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
                   target="_blank"
                   rel="noopener noreferrer"
                   title={locale === "en" ? "Open WhatsApp chat" : "WhatsApp sohbetini aç"}
-                  className="inline-flex w-full items-center justify-center rounded-xl bg-primary px-5 py-3 font-display text-sm font-semibold uppercase tracking-[0.22em] text-white transition-colors hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                  className="inline-flex w-full items-center justify-center rounded-xl bg-solid px-5 py-3 font-display text-sm font-semibold uppercase tracking-[0.22em] text-on-solid transition-colors hover:bg-solid/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                 >
                   {locale === "en" ? "WhatsApp" : "WhatsApp"}
                 </Link>
                 <Link
                   href={withLocalePath("/iletisim", locale)}
                   title={locale === "en" ? "Go to contact page" : "İletişim sayfasına git"}
-                  className="inline-flex w-full items-center justify-center rounded-xl border border-border bg-white px-5 py-3 font-display text-sm font-semibold uppercase tracking-[0.22em] text-primary transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                  className="inline-flex w-full items-center justify-center rounded-xl border border-border bg-panel px-5 py-3 font-display text-sm font-semibold uppercase tracking-[0.22em] text-primary transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                 >
                   {locale === "en" ? "Get a Quote" : "Teklif Al / İletişim"}
                 </Link>
@@ -333,7 +333,7 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
               </div>
 
               {project.description?.trim() ? (
-                <div className="mt-8 rounded-xl border border-border bg-white/70 p-4">
+                <div className="mt-8 rounded-xl border border-border bg-panel/70 p-4">
                   <p className="text-sm leading-relaxed text-primary/70">
                     {locale === "en"
                       ? "Want a similar solution? Browse services or contact us with your constraints (site, budget, timeline)."
@@ -352,7 +352,7 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
                       <li key={p.href}>
                         <Link
                           href={p.href}
-                          className="inline-flex w-full rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium text-primary/85 transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                          className="inline-flex w-full rounded-lg border border-border bg-panel px-3 py-2 text-sm font-medium text-primary/85 transition-colors hover:border-primary/25 hover:bg-primary/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                         >
                           {p.title}
                         </Link>
@@ -394,8 +394,8 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
               onClick={close}
               className={cn(
                 "touch-manipulation absolute right-5 top-5 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full",
-                "border border-white/15 bg-white/5 text-white/90 backdrop-blur-sm",
-                "transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                "border border-white/15 bg-panel/5 text-white/90 backdrop-blur-sm",
+                "transition-colors hover:bg-panel/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
               )}
             >
               <X className="h-5 w-5" strokeWidth={1.8} />
@@ -409,8 +409,8 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
               disabled={!canPrev}
               className={cn(
                 "touch-manipulation absolute left-4 top-1/2 z-10 -translate-y-1/2 inline-flex h-12 w-12 items-center justify-center rounded-full",
-                "border border-white/15 bg-white/5 text-white/90 backdrop-blur-sm",
-                "transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                "border border-white/15 bg-panel/5 text-white/90 backdrop-blur-sm",
+                "transition-colors hover:bg-panel/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
                 !canPrev && "pointer-events-none opacity-0",
               )}
             >
@@ -424,8 +424,8 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
               disabled={!canNext}
               className={cn(
                 "touch-manipulation absolute right-4 top-1/2 z-10 -translate-y-1/2 inline-flex h-12 w-12 items-center justify-center rounded-full",
-                "border border-white/15 bg-white/5 text-white/90 backdrop-blur-sm",
-                "transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                "border border-white/15 bg-panel/5 text-white/90 backdrop-blur-sm",
+                "transition-colors hover:bg-panel/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
                 !canNext && "pointer-events-none opacity-0",
               )}
             >

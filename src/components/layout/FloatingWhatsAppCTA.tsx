@@ -100,11 +100,11 @@ export function FloatingWhatsAppCTA() {
         target="_blank"
         rel="noopener noreferrer"
         title="WhatsApp"
-        className="group touch-manipulation inline-flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-full border border-white/10 bg-primary px-3 py-2.5 text-[12px] font-semibold text-surface shadow-[0_14px_50px_-18px_rgb(15_23_42/0.6)] backdrop-blur-sm transition-[transform,box-shadow,background-color] hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_18px_70px_-22px_rgb(15_23_42/0.65)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:gap-3 sm:min-h-0 sm:min-w-0 sm:px-4 sm:py-3 sm:text-sm"
+        className="group touch-manipulation inline-flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-full border border-primary/10 bg-solid px-3 py-2.5 text-[12px] font-semibold text-on-solid shadow-card backdrop-blur-sm transition-[transform,box-shadow,background-color] hover:-translate-y-0.5 hover:bg-solid/90 hover:shadow-card-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:gap-3 sm:min-h-0 sm:min-w-0 sm:px-4 sm:py-3 sm:text-sm"
         aria-label={isEn ? "Contact via WhatsApp" : "WhatsApp ile iletişime geç"}
       >
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/10 sm:h-10 sm:w-10">
-          <WhatsAppGlyph className="h-[1.05rem] w-[1.05rem] text-surface/90 sm:h-[1.3rem] sm:w-[1.3rem]" strokeWidth={2} />
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-on-solid/10 sm:h-10 sm:w-10">
+          <WhatsAppGlyph className="h-[1.05rem] w-[1.05rem] text-on-solid/90 sm:h-[1.3rem] sm:w-[1.3rem]" strokeWidth={2} />
         </span>
         <span>WhatsApp</span>
       </Link>
