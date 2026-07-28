@@ -130,6 +130,8 @@ html.dark {
     display: flex;
     width: max-content;
     animation: marquee var(--marquee-duration, 38s) linear infinite;
+  }
+  .marquee:hover .marquee-track {
     will-change: transform;
   }
   .marquee-track[data-paused="true"] {
@@ -157,6 +159,9 @@ html.dark {
         translateZ(0);
       transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1),
         box-shadow 450ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .group:hover .tilt-card,
+    .tilt-card:hover {
       will-change: transform;
     }
 
@@ -178,6 +183,16 @@ html.dark {
 
     .group:hover .tilt-card::before {
       opacity: 1;
+    }
+  }
+
+  /* Optional hint for scroll-reveal hosts — no permanent compositor layer */
+  .reveal-ready {
+    transform: translateZ(0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-ready {
+      transform: none;
     }
   }
 

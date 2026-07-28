@@ -167,7 +167,7 @@ export function Navbar() {
         "fixed inset-x-0 top-0 border-b border-border/70 pt-[env(safe-area-inset-top,0px)]",
         "z-[250] isolate",
         "bg-surface/80 backdrop-blur-xl",
-        "will-change-transform transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+        "transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
         // Tailwind arbitrary calc() can be dropped by tooling; keep it robust.
         hiddenOnScroll && "-translate-y-full",
       )}
@@ -272,7 +272,7 @@ export function Navbar() {
               role="dialog"
               aria-modal="true"
               aria-label="Mobil menü"
-              className="relative mx-auto flex min-h-[100dvh] w-full flex-col bg-surface pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)] will-change-transform"
+              className="relative mx-auto flex min-h-[100dvh] w-full flex-col bg-surface pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)]"
               initial={reduceMotion ? false : { y: 18, scale: 0.995 }}
               animate={reduceMotion ? undefined : { y: 0, scale: 1 }}
               exit={reduceMotion ? undefined : { y: 18, scale: 0.995 }}
@@ -320,7 +320,7 @@ export function Navbar() {
                           href={href}
                           className={cn(
                             mobileMenuLinkClass,
-                            "bg-white/0",
+                            "bg-transparent",
                             active && "text-accent",
                           )}
                           onClick={() => setOpen(false)}

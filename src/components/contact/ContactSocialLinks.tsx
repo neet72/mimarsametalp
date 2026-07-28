@@ -14,9 +14,7 @@ import { usePathname } from "next/navigation";
 import { localeFromPathname } from "@/lib/locale";
 import { CONTACT_SOCIAL_HEADING } from "@/content/contact-page";
 import { CONTACT_SOCIAL_HEADING as CONTACT_SOCIAL_HEADING_EN } from "@/content/contact-page.en";
-
-const ease = [0.22, 1, 0.36, 1] as const;
-const spring = { type: "spring" as const, stiffness: 420, damping: 26 };
+import { easePremium, springSoft, viewportOnce } from "@/lib/motion";
 
 const list: Variants = {
   hidden: {},
@@ -26,12 +24,12 @@ const list: Variants = {
 };
 
 const item: Variants = {
-  hidden: { opacity: 0, y: 14, scale: 0.92 },
+  hidden: { opacity: 0, y: 14, scale: 0.96 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.55, ease },
+    transition: { duration: 0.5, ease: easePremium },
   },
 };
 
@@ -64,8 +62,8 @@ export function ContactSocialLinks() {
       className="mt-8 border-t border-border/50 pt-8"
       initial={reduceMotion ? false : { opacity: 0 }}
       whileInView={reduceMotion ? undefined : { opacity: 1 }}
-      viewport={{ once: false, amount: 0.4 }}
-      transition={{ duration: 0.5, ease }}
+      viewport={viewportOnce}
+      transition={{ duration: 0.5, ease: easePremium }}
     >
       <p className="font-display text-[10px] font-semibold uppercase tracking-[0.28em] text-primary/40">
         {isEn ? CONTACT_SOCIAL_HEADING_EN : CONTACT_SOCIAL_HEADING}
@@ -75,7 +73,7 @@ export function ContactSocialLinks() {
         variants={list}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.5 }}
+        viewport={viewportOnce}
         aria-label={isEn ? "Social media links" : "Sosyal medya bağlantıları"}
       >
         {social.map(({ href, label, Icon }) => (
@@ -94,7 +92,7 @@ export function ContactSocialLinks() {
               whileHover={
                 reduceMotion
                   ? undefined
-                  : { y: -3, scale: 1.06, transition: spring }
+                  : { y: -3, scale: 1.06, transition: springSoft }
               }
               whileTap={reduceMotion ? undefined : { scale: 0.94 }}
             >

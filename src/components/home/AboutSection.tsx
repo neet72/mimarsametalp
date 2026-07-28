@@ -9,9 +9,7 @@ import { ABOUT_SECTION_BODY as ABOUT_SECTION_BODY_EN } from "@/content/home-copy
 import { cn } from "@/lib/cn";
 import { pageContainerClass } from "@/lib/page-layout";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
-import { fadeUpSoft } from "@/lib/motion";
-
-const ease = [0.22, 1, 0.36, 1] as const;
+import { easePremium, fadeUp, viewportOnce } from "@/lib/motion";
 
 const ABOUT_IMAGE = "/images/hero-4.webp";
 
@@ -20,8 +18,8 @@ export function AboutSection() {
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
   const ABOUT_SECTION_BODY = locale === "en" ? ABOUT_SECTION_BODY_EN : ABOUT_SECTION_BODY_TR;
-  const xImage = reduceMotion ? 0 : -56;
-  const xText = reduceMotion ? 0 : 56;
+  const xImage = reduceMotion ? 0 : -40;
+  const xText = reduceMotion ? 0 : 40;
 
   return (
     <section
@@ -39,23 +37,21 @@ export function AboutSection() {
                     opacity: 0,
                     x: xImage,
                     y: 10,
-                    rotate: -0.35,
                     scale: 0.985,
-                    filter: "blur(10px)",
-                    clipPath: "inset(10% 12% 18% 12% round 20px)",
                   }
             }
-            whileInView={{
-              opacity: 1,
-              x: 0,
-              y: 0,
-              rotate: 0,
-              scale: 1,
-              filter: "blur(0px)",
-              clipPath: "inset(0% 0% 0% 0% round 20px)",
-            }}
-            viewport={{ once: false, margin: "-10% 0px", amount: 0.22 }}
-            transition={{ duration: 0.86, ease }}
+            whileInView={
+              reduceMotion
+                ? undefined
+                : {
+                    opacity: 1,
+                    x: 0,
+                    y: 0,
+                    scale: 1,
+                  }
+            }
+            viewport={viewportOnce}
+            transition={{ duration: 0.75, ease: easePremium }}
           >
             <div
               className={cn(
@@ -64,74 +60,30 @@ export function AboutSection() {
                 "lg:min-h-[min(72vh,640px)] lg:aspect-auto",
               )}
             >
-              <motion.div
-                className="absolute inset-0 origin-center will-change-transform [transform:translateZ(0)]"
-                animate={
-                  reduceMotion
-                    ? undefined
-                    : {
-                        scale: [1.025, 1.06, 1.025],
-                        x: [0, -12, 0],
-                        y: [0, 10, 0],
-                      }
-                }
-                transition={
-                  reduceMotion
-                    ? undefined
-                    : {
-                        duration: 16,
-                        ease: "easeInOut",
-                        repeat: Infinity,
-                        repeatType: "mirror",
-                      }
-                }
-              >
+              <div className="absolute inset-0 origin-center">
                 <Image
                   src={ABOUT_IMAGE}
                   alt="Samet Alp Mimarlık mimari proje görseli"
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03] motion-reduce:group-hover:scale-100"
                   sizes="(max-width: 1024px) 100vw, 42vw"
                   priority={false}
                 />
-              </motion.div>
+              </div>
 
               <div
                 aria-hidden
                 className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.16),transparent_48%),linear-gradient(to_top,rgba(0,0,0,0.22),transparent_55%)] opacity-80 transition-opacity duration-700 group-hover:opacity-100"
-              />
-
-              <motion.div
-                aria-hidden
-                className="pointer-events-none absolute -inset-y-8 -left-1/2 w-[55%] rotate-[18deg] bg-gradient-to-r from-transparent via-white/18 to-transparent opacity-0 mix-blend-overlay"
-                animate={
-                  reduceMotion
-                    ? undefined
-                    : {
-                        x: ["-60%", "170%"],
-                        opacity: [0, 0.8, 0],
-                      }
-                }
-                transition={
-                  reduceMotion
-                    ? undefined
-                    : {
-                        duration: 6.5,
-                        ease: ease,
-                        repeat: Infinity,
-                        repeatDelay: 2.2,
-                      }
-                }
               />
             </div>
           </motion.div>
 
           <motion.div
             className="flex flex-col justify-center lg:col-span-7"
-            initial={reduceMotion ? false : { opacity: 0, x: xText, filter: "blur(6px)" }}
-            whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-            viewport={{ once: false, margin: "-10% 0px" }}
-            transition={{ duration: 0.78, delay: reduceMotion ? 0 : 0.06, ease }}
+            initial={reduceMotion ? false : { opacity: 0, x: xText }}
+            whileInView={reduceMotion ? undefined : { opacity: 1, x: 0 }}
+            viewport={viewportOnce}
+            transition={{ duration: 0.72, delay: reduceMotion ? 0 : 0.06, ease: easePremium }}
           >
             <h2
               id="firma-hakkinda-baslik"
@@ -141,10 +93,10 @@ export function AboutSection() {
             </h2>
             <motion.p
               className="mt-6 max-w-3xl text-pretty text-base leading-[1.85] text-muted sm:text-lg"
-              variants={reduceMotion ? undefined : fadeUpSoft}
+              variants={reduceMotion ? undefined : fadeUp}
               initial={reduceMotion ? false : "hidden"}
               whileInView={reduceMotion ? undefined : "visible"}
-              viewport={{ once: false, margin: "-12% 0px" }}
+              viewport={viewportOnce}
             >
               {ABOUT_SECTION_BODY}
             </motion.p>

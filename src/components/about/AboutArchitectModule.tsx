@@ -32,19 +32,13 @@ const portraitReveal = {
   hidden: {
     opacity: 0,
     y: 18,
-    rotate: -0.35,
     scale: 0.985,
-    filter: "blur(10px)",
-    clipPath: "inset(10% 12% 18% 12% round 10px)",
   },
   show: {
     opacity: 1,
     y: 0,
-    rotate: 0,
     scale: 1,
-    filter: "blur(0px)",
-    clipPath: "inset(0% 0% 0% 0% round 10px)",
-    transition: { duration: 0.86, ease },
+    transition: { duration: 0.75, ease },
   },
 } satisfies Record<"hidden" | "show", Record<string, unknown>>;
 
@@ -106,7 +100,7 @@ export function AboutArchitectModule({ aboutCms }: { aboutCms?: AboutCmsDraft | 
               variants={reduceMotion ? undefined : (portraitReveal as Variants)}
               initial={reduceMotion ? false : "hidden"}
               whileInView={reduceMotion ? undefined : "show"}
-              viewport={{ once: false, amount: 0.35, margin: "-6% 0px" }}
+              viewport={{ once: true, amount: 0.35, margin: "-6% 0px" }}
               whileHover={
                 reduceMotion
                   ? undefined
@@ -118,11 +112,11 @@ export function AboutArchitectModule({ aboutCms }: { aboutCms?: AboutCmsDraft | 
               }
             >
               <motion.div
-                className="absolute inset-0 will-change-transform"
+                className="absolute inset-0"
                 style={{ y: innerImageY }}
                 initial={reduceMotion ? false : { scale: 1.035 }}
                 whileInView={reduceMotion ? undefined : { scale: 1 }}
-                viewport={{ once: false, amount: 0.35, margin: "-6% 0px" }}
+                viewport={{ once: true, amount: 0.35, margin: "-6% 0px" }}
                 transition={reduceMotion ? undefined : { duration: 1.05, ease }}
               >
                 <Image
@@ -145,10 +139,10 @@ export function AboutArchitectModule({ aboutCms }: { aboutCms?: AboutCmsDraft | 
 
           <div className="flex flex-col lg:col-span-7">
             <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 36, filter: "blur(8px)" }}
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              viewport={{ once: false, amount: 0.32 }}
-              transition={{ duration: 0.82, ease }}
+              initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+              whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.32 }}
+              transition={{ duration: 0.72, ease }}
             >
               <h2 className="font-display text-[2rem] font-semibold tracking-tight text-primary sm:text-4xl md:text-[2.35rem] md:leading-[1.12]">
                 {name}
@@ -161,9 +155,9 @@ export function AboutArchitectModule({ aboutCms }: { aboutCms?: AboutCmsDraft | 
             <motion.p
               className="mt-7 max-w-2xl text-pretty text-[0.9375rem] leading-[1.65] text-primary/70 sm:text-base sm:leading-relaxed md:text-lg md:leading-relaxed"
               initial={reduceMotion ? false : { opacity: 0, y: 26 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, margin: "0px 0px -14% 0px" }}
-              transition={{ duration: 0.92, ease, delay: reduceMotion ? 0 : 0.06 }}
+              whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -14% 0px" }}
+              transition={{ duration: 0.8, ease, delay: reduceMotion ? 0 : 0.06 }}
             >
               {bio}
             </motion.p>
@@ -171,9 +165,9 @@ export function AboutArchitectModule({ aboutCms }: { aboutCms?: AboutCmsDraft | 
             <motion.div
               className="mt-10 h-px max-w-[12rem] origin-left bg-gradient-to-r from-accent/50 to-transparent"
               initial={reduceMotion ? false : { scaleX: 0, opacity: 0 }}
-              whileInView={{ scaleX: 1, opacity: 1 }}
-              viewport={{ once: false, amount: 0.5 }}
-              transition={{ duration: 0.85, ease, delay: reduceMotion ? 0 : 0.12 }}
+              whileInView={reduceMotion ? undefined : { scaleX: 1, opacity: 1 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.75, ease, delay: reduceMotion ? 0 : 0.12 }}
             />
           </div>
         </div>

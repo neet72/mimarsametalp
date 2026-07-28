@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { Reveal } from "@/components/motion/FadeIn";
 import { cn } from "@/lib/cn";
 import { localeFromPathname } from "@/lib/locale";
 import { pageContainerClass } from "@/lib/page-layout";
@@ -23,7 +24,7 @@ export function Footer() {
     : address;
   return (
     <footer className="mt-auto border-t border-border bg-surface pb-[max(0px,env(safe-area-inset-bottom,0px))]">
-      <div className={cn("relative py-10 sm:py-12", pageContainerClass)}>
+      <Reveal className={cn("relative py-10 sm:py-12", pageContainerClass)}>
         <div className="grid gap-10 md:grid-cols-3 md:gap-8">
           <div className="space-y-4">
             <p className="font-display text-lg font-semibold uppercase tracking-[0.14em] text-primary">
@@ -111,7 +112,7 @@ export function Footer() {
             © {year} Samet Alp Mimarlık. {t ? "All rights reserved." : "Tüm hakları saklıdır."}
           </p>
         </div>
-      </div>
+      </Reveal>
     </footer>
   );
 }

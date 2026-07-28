@@ -4,6 +4,7 @@ import { Navbar } from "./Navbar";
 import { PageTransition } from "./PageTransition";
 import { ScrollManager } from "./ScrollManager";
 import { FloatingWhatsAppCTA } from "./FloatingWhatsAppCTA";
+import { SmoothScrollHost } from "./SmoothScrollHost";
 
 type MainLayoutProps = {
   children: ReactNode;
@@ -12,6 +13,7 @@ type MainLayoutProps = {
 export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="flex min-h-dvh flex-col">
+      <SmoothScrollHost />
       <ScrollManager />
       <Navbar />
       <div aria-hidden className="h-[var(--header-h)]" />

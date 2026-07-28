@@ -43,6 +43,7 @@ import { ContactSocialLinks } from "./ContactSocialLinks";
 import { ContactUnderlineField } from "./ContactUnderlineField";
 import { usePathname } from "next/navigation";
 import { localeFromPathname } from "@/lib/locale";
+import { viewportOnce } from "@/lib/motion";
 
 export function ContactFormPanel() {
   const reduceMotion = useReducedMotion();
@@ -115,8 +116,8 @@ export function ContactFormPanel() {
       className="flex flex-col px-4 sm:px-6 md:border-x md:border-border/60 md:px-7"
       initial={reduceMotion ? false : { opacity: 0, x: 44 }}
       whileInView={reduceMotion ? undefined : { opacity: 1, x: 0 }}
-      viewport={{ once: false, amount: 0.08 }}
-      transition={{ duration: 0.88, ease: [0.22, 1, 0.36, 1] }}
+      viewport={viewportOnce}
+      transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="space-y-1 border-b border-border/60 pb-8">
         <p className="font-display text-[10px] font-semibold uppercase tracking-[0.28em] text-primary/45">

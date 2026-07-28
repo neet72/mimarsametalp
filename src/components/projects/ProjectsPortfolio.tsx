@@ -1,32 +1,19 @@
 "use client";
 
-import Lenis from "lenis";
-import "lenis/dist/lenis.css";
-import {
-  motion,
-  useReducedMotion,
-  type Variants,
-} from "framer-motion";
-import { useEffect } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { ProjectCard } from "./ProjectCard";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { Reveal } from "@/components/motion/FadeIn";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
 import { cn } from "@/lib/cn";
-
-const ease = [0.22, 1, 0.36, 1] as const;
-
-const cardReveal: Variants = {
-  hidden: {
-    opacity: 0,
-    y: 28,
-  },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease },
-  },
-};
+import {
+  cardReveal,
+  headerItem,
+  headerReveal,
+  staggerDelay,
+  viewportOnce,
+} from "@/lib/motion";
 
 export type ProjectsPortfolioProject = {
   slug: string;
@@ -39,33 +26,6 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
   const hasProjects = projects.length > 0;
-
-  useEffect(() => {
-    if (reduceMotion) return;
-    if (typeof window !== "undefined") {
-      const isCoarse = window.matchMedia?.("(pointer: coarse)")?.matches === true;
-      if (isCoarse) return;
-    }
-
-    const lenis = new Lenis({
-      lerp: 0.09,
-      smoothWheel: true,
-      wheelMultiplier: 0.92,
-      touchMultiplier: 1.85,
-    });
-
-    let rafId = 0;
-    const tick = (time: number) => {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(tick);
-    };
-    rafId = requestAnimationFrame(tick);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      lenis.destroy();
-    };
-  }, [reduceMotion]);
 
   const title = locale === "en" ? "Projects" : "Projeler";
   const kicker = locale === "en" ? "Portfolio" : "Portfolyo";
@@ -82,29 +42,45 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
       />
 
       <div className="relative mx-auto w-full max-w-[1400px] px-5 sm:px-8 lg:px-12">
-        {/* Tek blok: kicker + başlık + kısa satır — CTA header’da değil */}
-        <header className="border-b border-border/70 pb-10 pt-12 sm:pb-12 sm:pt-16 md:pt-20">
+        <motion.header
+          className="border-b border-border/70 pb-10 pt-12 sm:pb-12 sm:pt-16 md:pt-20"
+          variants={reduceMotion ? undefined : headerReveal}
+          initial={reduceMotion ? false : "hidden"}
+          animate={reduceMotion ? undefined : "show"}
+        >
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-10">
             <div className="max-w-2xl">
-              <p className="font-display text-[10px] font-semibold uppercase tracking-[0.34em] text-accent sm:text-[11px]">
+              <motion.p
+                variants={reduceMotion ? undefined : headerItem}
+                className="font-display text-[10px] font-semibold uppercase tracking-[0.34em] text-accent sm:text-[11px]"
+              >
                 {kicker}
-              </p>
-              <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-primary sm:text-5xl md:text-6xl">
+              </motion.p>
+              <motion.h1
+                variants={reduceMotion ? undefined : headerItem}
+                className="mt-3 font-display text-4xl font-semibold tracking-tight text-primary sm:text-5xl md:text-6xl"
+              >
                 {title}
-              </h1>
-              <p className="mt-4 max-w-xl text-pretty text-base leading-relaxed text-muted sm:text-lg">
+              </motion.h1>
+              <motion.p
+                variants={reduceMotion ? undefined : headerItem}
+                className="mt-4 max-w-xl text-pretty text-base leading-relaxed text-muted sm:text-lg"
+              >
                 {description}
-              </p>
+              </motion.p>
             </div>
             {hasProjects ? (
-              <p className="shrink-0 font-display text-[11px] font-medium uppercase tracking-[0.28em] text-muted tabular-nums">
+              <motion.p
+                variants={reduceMotion ? undefined : headerItem}
+                className="shrink-0 font-display text-[11px] font-medium uppercase tracking-[0.28em] text-muted tabular-nums"
+              >
                 {locale === "en"
                   ? `${projects.length} works`
                   : `${projects.length} çalışma`}
-              </p>
+              </motion.p>
             ) : null}
           </div>
-        </header>
+        </motion.header>
 
         {hasProjects ? (
           <div className="grid grid-cols-1 gap-x-8 gap-y-12 py-12 sm:grid-cols-2 sm:gap-y-14 sm:py-14 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-16 lg:py-16">
@@ -114,9 +90,9 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
                 variants={reduceMotion ? undefined : cardReveal}
                 initial={reduceMotion ? false : "hidden"}
                 whileInView={reduceMotion ? undefined : "show"}
-                viewport={{ once: true, margin: "0px 0px -8% 0px", amount: 0.2 }}
+                viewport={viewportOnce}
                 transition={{
-                  delay: reduceMotion ? 0 : Math.min(index * 0.06, 0.42),
+                  delay: reduceMotion ? 0 : staggerDelay(index),
                 }}
               >
                 <ProjectCard project={project} index={index} />
@@ -124,11 +100,8 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-start gap-6 border-b border-border/70 py-14 sm:py-16">
-            <div
-              aria-hidden
-              className="h-px w-16 bg-accent/70"
-            />
+          <Reveal className="flex flex-col items-start gap-6 border-b border-border/70 py-14 sm:py-16">
+            <div aria-hidden className="h-px w-16 bg-accent/70" />
             <p className="max-w-md text-pretty text-base leading-relaxed text-muted sm:text-lg">
               {locale === "en"
                 ? "Selected works are being prepared for this page. In the meantime, explore our services or get in touch."
@@ -156,11 +129,10 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
                 {locale === "en" ? "Contact" : "İletişim"}
               </Link>
             </div>
-          </div>
+          </Reveal>
         )}
 
-        {/* Tek CTA bandı — sayfanın işi bittikten sonra */}
-        <div className="flex flex-col gap-5 border-t border-border/60 py-12 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:py-14 md:py-16">
+        <Reveal className="flex flex-col gap-5 border-t border-border/60 py-12 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:py-14 md:py-16">
           <p className="max-w-lg text-pretty text-sm leading-relaxed text-muted sm:text-base">
             {locale === "en"
               ? "Share the plot, budget, and timeline — we will propose a clear path forward."
@@ -176,7 +148,7 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
           >
             {locale === "en" ? "Start a conversation" : "Görüşme başlat"}
           </Link>
-        </div>
+        </Reveal>
       </div>
     </div>
   );

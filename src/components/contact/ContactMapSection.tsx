@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { localeFromPathname } from "@/lib/locale";
+import { easePremium, viewportOnce } from "@/lib/motion";
 
 /** Embed, API anahtarı gerektirmez */
 const OFFICE_ADDRESS = "Güzelevler, 2067/2 SK A blok no:32/3, 01220 Yüreğir/Adana";
@@ -39,8 +40,8 @@ export function ContactMapSection() {
       className="relative mt-20 w-full max-w-full border-t border-border/60 bg-border/20 md:mt-28"
       initial={reduceMotion ? false : { opacity: 0 }}
       whileInView={reduceMotion ? undefined : { opacity: 1 }}
-      viewport={{ once: false, amount: 0.2 }}
-      transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+      viewport={viewportOnce}
+      transition={{ duration: 0.7, ease: easePremium }}
       aria-label={isEn ? "Office location map" : "Ofis konumu haritası"}
     >
       <div

@@ -10,6 +10,13 @@ import { usePathname } from "next/navigation";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
 import { CONTACT_SOCIAL_WHATSAPP } from "@/content/contact-page";
 import { isVideoUrl } from "@/lib/media-url";
+import {
+  easePremium,
+  fadeUpShow,
+  sectionStagger,
+  viewportOnce,
+} from "@/lib/motion";
+import { Reveal } from "@/components/motion/FadeIn";
 
 type ProjectDetailClientProps = {
   project: {
@@ -25,8 +32,6 @@ type ProjectDetailClientProps = {
   };
   relatedProjects?: Array<{ title: string; href: string }>;
 };
-
-const easeInOut = [0.42, 0, 0.58, 1] as const;
 
 function projectPhotoAlt(
   locale: "tr" | "en",
@@ -166,9 +171,18 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
         )}
         <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/30 to-black/10" />
         <div className="relative z-10 flex h-full w-full items-center justify-center px-6 text-center">
-          <h1 className="font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl">
+          <motion.h1
+            className="font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl"
+            initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+            animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={
+              reduceMotion
+                ? { duration: 0.01 }
+                : { duration: 0.55, ease: easePremium }
+            }
+          >
             {project.title}
-          </h1>
+          </motion.h1>
         </div>
       </section>
 
@@ -176,27 +190,48 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
       <section className="mx-auto w-full max-w-[1440px] px-4 py-12 sm:px-6 sm:py-14 md:px-8 md:py-16 lg:px-10">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
           {/* SOL */}
-          <div className="lg:col-span-2">
-            <h2 className="font-display text-2xl font-semibold tracking-tight text-primary">
+          <motion.div
+            className="lg:col-span-2"
+            variants={sectionStagger}
+            initial={reduceMotion ? false : "hidden"}
+            whileInView={reduceMotion ? undefined : "show"}
+            viewport={viewportOnce}
+          >
+            <motion.h2
+              variants={fadeUpShow}
+              className="font-display text-2xl font-semibold tracking-tight text-primary"
+            >
               {locale === "en" ? "About the Project" : "Proje Hakkında"}
-            </h2>
-            <p className="mt-5 max-w-3xl text-pretty text-base leading-relaxed text-primary/70 sm:text-lg">
+            </motion.h2>
+            <motion.p
+              variants={fadeUpShow}
+              className="mt-5 max-w-3xl text-pretty text-base leading-relaxed text-muted sm:text-lg"
+            >
               {project.description?.trim()
                 ? project.description
                 : locale === "en"
                   ? "A concise project summary will be added here. For now, explore the gallery and key details on the right."
                   : "Bu alana proje özeti eklenecek. Şimdilik galeri ve sağ taraftaki proje bilgileri üzerinden inceleyebilirsiniz."}
-            </p>
-            <p className="mt-4 max-w-3xl text-pretty text-base leading-relaxed text-primary/65 sm:text-lg">
+            </motion.p>
+            <motion.p
+              variants={fadeUpShow}
+              className="mt-4 max-w-3xl text-pretty text-base leading-relaxed text-muted sm:text-lg"
+            >
               {locale === "en"
                 ? "We focus on a clear concept, functional planning, and a premium finish—balancing aesthetics with usability and execution quality."
                 : "Net konsept, fonksiyonel planlama ve premium bitişe odaklanıyor; estetik ile kullanılabilirliği uygulama kalitesiyle dengeliyoruz."}
-            </p>
+            </motion.p>
 
-            <h3 className="mt-12 font-display text-xl font-semibold tracking-tight text-primary">
+            <motion.h3
+              variants={fadeUpShow}
+              className="mt-12 font-display text-xl font-semibold tracking-tight text-primary"
+            >
               {locale === "en" ? "Gallery" : "Galeri"}
-            </h3>
-            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            </motion.h3>
+            <motion.div
+              variants={fadeUpShow}
+              className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            >
               {gallery.map((src, index) => (
                 <button
                   key={src}
@@ -244,13 +279,23 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
                   />
                 </button>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* SAĞ */}
-          <aside className="lg:col-span-1">
+          <motion.aside
+            className="lg:col-span-1"
+            initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            viewport={viewportOnce}
+            transition={
+              reduceMotion
+                ? { duration: 0.01 }
+                : { duration: 0.55, delay: 0.08, ease: easePremium }
+            }
+          >
             <div className="sticky top-24 rounded-2xl border border-border bg-surface p-6 shadow-[var(--shadow-card)]">
-              <h3 className="font-display text-base font-semibold uppercase tracking-[0.24em] text-primary/70">
+              <h3 className="font-display text-base font-semibold uppercase tracking-[0.24em] text-muted">
                 {locale === "en" ? "Project Information" : "Proje Bilgileri"}
               </h3>
 
@@ -334,7 +379,7 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
 
               {project.description?.trim() ? (
                 <div className="mt-8 rounded-xl border border-border bg-panel/70 p-4">
-                  <p className="text-sm leading-relaxed text-primary/70">
+                  <p className="text-sm leading-relaxed text-muted">
                     {locale === "en"
                       ? "Want a similar solution? Browse services or contact us with your constraints (site, budget, timeline)."
                       : "Benzer bir çözüm mü istiyorsunuz? Hizmetlerimizi inceleyin veya arsa/bütçe/zaman kısıtlarınızla bize yazın."}
@@ -344,7 +389,7 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
 
               {relatedProjects && relatedProjects.length > 0 ? (
                 <div className="mt-8">
-                  <h4 className="font-display text-xs font-semibold uppercase tracking-[0.24em] text-primary/70">
+                  <h4 className="font-display text-xs font-semibold uppercase tracking-[0.24em] text-muted">
                     {locale === "en" ? "Related Projects" : "Benzer Projeler"}
                   </h4>
                   <ul className="mt-4 space-y-2">
@@ -362,9 +407,29 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
                 </div>
               ) : null}
             </div>
-          </aside>
+          </motion.aside>
         </div>
       </section>
+
+      <Reveal className="mx-auto w-full max-w-[1440px] px-4 pb-14 sm:px-6 sm:pb-16 md:px-8 md:pb-20 lg:px-10">
+        <div className="flex flex-col gap-5 border-t border-border/60 pt-12 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:pt-14">
+          <p className="max-w-lg text-pretty text-sm leading-relaxed text-muted sm:text-base">
+            {locale === "en"
+              ? "Share the plot, budget, and timeline — we will propose a clear path forward."
+              : "Arsa, bütçe ve zaman planını paylaşın — net bir yol haritası çıkaralım."}
+          </p>
+          <Link
+            href={withLocalePath("/iletisim", locale)}
+            className={cn(
+              "inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-solid px-7 py-2.5",
+              "font-display text-[11px] font-medium uppercase tracking-[0.22em] text-on-solid",
+              "transition hover:bg-solid/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+            )}
+          >
+            {locale === "en" ? "Start a conversation" : "Görüşme başlat"}
+          </Link>
+        </div>
+      </Reveal>
 
       {/* LIGHTBOX */}
       <AnimatePresence>
@@ -378,7 +443,7 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: reduceMotion ? 0.01 : 0.3, ease: easeInOut }}
+            transition={{ duration: reduceMotion ? 0.01 : 0.3, ease: easePremium }}
           >
             <button
               type="button"
@@ -450,7 +515,7 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
                     initial={reduceMotion ? false : { opacity: 0, x: 16 }}
                     animate={reduceMotion ? undefined : { opacity: 1, x: 0 }}
                     exit={reduceMotion ? undefined : { opacity: 0, x: -16 }}
-                    transition={{ duration: reduceMotion ? 0.01 : 0.28, ease: easeInOut }}
+                    transition={{ duration: reduceMotion ? 0.01 : 0.28, ease: easePremium }}
                   >
                     {isVideoUrl(activeSrc) ? (
                       <video

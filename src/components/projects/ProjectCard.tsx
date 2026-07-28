@@ -8,8 +8,7 @@ import { useCallback } from "react";
 import { cn } from "@/lib/cn";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
 import { isVideoUrl } from "@/lib/media-url";
-
-const spring = { type: "spring" as const, stiffness: 380, damping: 28 };
+import { springSoft } from "@/lib/motion";
 
 export type ProjectCardModel = {
   slug: string;
@@ -57,10 +56,10 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       whileHover={
         reduceMotion
           ? undefined
-          : { y: -6, transition: spring }
+          : { y: -6, transition: springSoft }
       }
       whileTap={reduceMotion ? undefined : { scale: 0.985 }}
-      transition={spring}
+      transition={springSoft}
     >
       <Link
         href={withLocalePath(`/projeler/${project.slug}`, locale)}
@@ -84,7 +83,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
         >
           <div
             className={cn(
-              "absolute inset-0 origin-center transition-transform duration-[750ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform",
+              "absolute inset-0 origin-center transition-transform duration-[750ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
               "group-hover:scale-[1.03] motion-reduce:group-hover:scale-100",
             )}
           >

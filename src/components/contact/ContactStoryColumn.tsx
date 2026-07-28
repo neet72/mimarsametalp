@@ -17,8 +17,7 @@ import {
   CONTACT_STEPS_HEADING as CONTACT_STEPS_HEADING_EN,
 } from "@/content/contact-page.en";
 import { localeFromPathname } from "@/lib/locale";
-
-const ease = [0.22, 1, 0.36, 1] as const;
+import { easePremium, viewportOnce } from "@/lib/motion";
 
 const timelineContainer: Variants = {
   hidden: {},
@@ -32,7 +31,7 @@ const timelineItem: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.68, ease },
+    transition: { duration: 0.68, ease: easePremium },
   },
 };
 
@@ -50,10 +49,10 @@ export function ContactStoryColumn() {
   return (
     <motion.div
       className="flex flex-col"
-      initial={reduceMotion ? false : { opacity: 0, x: -44 }}
+      initial={reduceMotion ? false : { opacity: 0, x: -36 }}
       whileInView={reduceMotion ? undefined : { opacity: 1, x: 0 }}
-      viewport={{ once: false, amount: 0.08 }}
-      transition={{ duration: 0.88, ease }}
+      viewport={viewportOnce}
+      transition={{ duration: 0.75, ease: easePremium }}
     >
       <h1 className="font-display text-[2rem] font-semibold leading-tight tracking-tight text-primary sm:text-4xl md:text-[2.35rem]">
         {title}
@@ -63,8 +62,8 @@ export function ContactStoryColumn() {
         className="mt-8 max-w-xl text-pretty text-[0.9375rem] leading-[1.75] text-primary/68 sm:text-base md:text-lg md:leading-relaxed"
         initial={reduceMotion ? false : { opacity: 0, y: 18 }}
         whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-        viewport={{ once: false }}
-        transition={{ duration: 0.76, ease, delay: reduceMotion ? 0 : 0.08 }}
+        viewport={viewportOnce}
+        transition={{ duration: 0.65, ease: easePremium, delay: reduceMotion ? 0 : 0.08 }}
       >
         {intro}
       </motion.p>
@@ -73,8 +72,8 @@ export function ContactStoryColumn() {
         className="mt-12 font-display text-sm font-semibold uppercase tracking-[0.2em] text-primary/80 sm:text-[0.8125rem]"
         initial={reduceMotion ? false : { opacity: 0, y: 10 }}
         whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-        viewport={{ once: false }}
-        transition={{ duration: 0.6, ease, delay: reduceMotion ? 0 : 0.12 }}
+        viewport={viewportOnce}
+        transition={{ duration: 0.55, ease: easePremium, delay: reduceMotion ? 0 : 0.12 }}
       >
         {stepsHeading}
       </motion.h2>
@@ -84,7 +83,7 @@ export function ContactStoryColumn() {
         variants={timelineContainer}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.12 }}
+        viewport={viewportOnce}
       >
         <span
           aria-hidden
@@ -117,8 +116,8 @@ export function ContactStoryColumn() {
         className="mt-12 max-w-xl border-t border-border/80 pt-10 text-pretty text-[0.9375rem] leading-[1.75] text-primary/72 sm:text-base"
         initial={reduceMotion ? false : { opacity: 0, y: 14 }}
         whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-        viewport={{ once: false }}
-        transition={{ duration: 0.72, ease, delay: reduceMotion ? 0 : 0.06 }}
+        viewport={viewportOnce}
+        transition={{ duration: 0.65, ease: easePremium, delay: reduceMotion ? 0 : 0.06 }}
       >
         {closing}
       </motion.p>
