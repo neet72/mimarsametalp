@@ -99,7 +99,7 @@ export function ServiceDetailClient({ service, relatedServices }: Props) {
             <p className="mt-4 text-pretty text-base leading-relaxed text-primary/65 sm:text-lg">
               {locale === "en"
                 ? "We structure a transparent, measurable process that clarifies design decisions, keeps budget and timeline under control, and protects quality during execution."
-                : "Tasarım kararlarını netleştiren, bütçe ve zaman çizelgesini kontrollü ilerleten; uygulamada kaliteyi koruyan, şeffaf ve ölçülebilir bir süreç kurguluyoruz."}
+                : "Tasarım kararlarını netleştiren; bütçeyi ve zaman çizelgesini kontrol altında tutan; uygulamada kaliteyi koruyan, şeffaf ve ölçülebilir bir süreç kurguluyoruz."}
             </p>
           </motion.div>
 
@@ -137,7 +137,7 @@ export function ServiceDetailClient({ service, relatedServices }: Props) {
             <p className="mt-4 max-w-2xl text-pretty text-base leading-relaxed text-primary/65 sm:text-lg">
               {locale === "en"
                 ? "We define goals, deliverables, and approval checkpoints at each step—minimizing surprises and maximizing quality."
-                : "Her adımda hedef, çıktı ve onay noktalarını netleştirerek minimum sürprizle, maksimum kaliteyle ilerliyoruz."}
+                : "Her adımda hedefi, çıktıyı ve onay noktalarını netleştirerek sürprizleri azaltır, kaliteyi yükseltiriz."}
             </p>
           </div>
         </motion.div>
@@ -187,8 +187,8 @@ export function ServiceDetailClient({ service, relatedServices }: Props) {
           </h2>
           <p className="mt-4 max-w-2xl text-pretty text-base leading-relaxed text-primary/65 sm:text-lg">
             {locale === "en"
-              ? "We’ve gathered the most common questions about the process, deliverables, and communication flow."
-              : "Süreç, teslim kapsamı ve iletişim akışı hakkında en sık gelen soruları tek yerde topladık."}
+              ? "We have gathered the most common questions about the process, deliverables, and communication flow."
+              : "Süreç, teslim kapsamı ve iletişim akışı hakkında en sık gelen soruları bir araya getirdik."}
           </p>
         </motion.div>
 
@@ -257,12 +257,12 @@ export function ServiceDetailClient({ service, relatedServices }: Props) {
             <h3 className="font-display text-2xl font-semibold tracking-tight text-primary">
               {locale === "en"
                 ? "Request a free discovery call for your project"
-                : "Projeniz için ücretsiz keşif talep edin"}
+                : "Projeniz için ücretsiz keşif görüşmesi talep edin"}
             </h3>
             <p className="mt-3 max-w-2xl text-pretty text-base leading-relaxed text-primary/65">
               {locale === "en"
-                ? "With a short call, we’ll clarify scope and propose the best roadmap for you."
-                : "Kısa bir görüşme ile kapsamı netleştirip size en doğru yol haritasını çıkaralım."}
+                ? "With a short call, we will clarify scope and propose the best roadmap for you."
+                : "Kısa bir görüşmeyle kapsamı netleştirip size en uygun yol haritasını çıkaralım."}
             </p>
           </div>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">

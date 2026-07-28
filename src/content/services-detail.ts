@@ -7,10 +7,10 @@ export const SERVICES_DETAIL: Record<string, ServiceDetailData> = {
     name: "İç Mimarlık & Dekorasyon",
     heroImageUrl: "/images/hero-1.webp",
     shortDescription:
-      "Yaşam alanlarınızı estetik ve işlevsellikle yeniden tasarlıyoruz. Modern iç mimari ve dekorasyon projelerimiz — Adana ve çevresi için konseptten uygulamaya profesyonel destek.",
+      "Yaşam alanlarınızı estetik ve işlevsellikle yeniden tasarlıyoruz. Modern iç mimari ve dekorasyon projelerimizle Adana ve çevresinde konseptten uygulamaya profesyonel destek sunuyoruz.",
     hizmetKapsami: [
       "İhtiyaç analizi ve konsept kurgusu",
-      "Moodboard, renk & malzeme seçimleri",
+      "Moodboard, renk ve malzeme seçimleri",
       "Plan yerleşimi ve ölçülendirme",
       "3D görselleştirme ve revizyon döngüsü",
       "Özel imalat mobilya çizimleri",
@@ -23,8 +23,8 @@ export const SERVICES_DETAIL: Record<string, ServiceDetailData> = {
       { title: "Uygulama", description: "İmalat ve saha koordinasyonuyla kaliteyi sahada koruyoruz." },
     ],
     sss: [
-      { question: "Kaç revizyon hakkı var?", answer: "Proje kapsamında 2 ana revizyon döngüsü sunuyoruz; ek revizyonlar birlikte planlanır." },
-      { question: "Uygulama hizmeti zorunlu mu?", answer: "Hayır. Sadece tasarım teslimi veya tasarım + uygulama şeklinde ilerleyebiliriz." },
+      { question: "Kaç revizyon hakkı var?", answer: "Proje kapsamında iki ana revizyon döngüsü sunuyoruz; ek revizyonlar birlikte planlanır." },
+      { question: "Uygulama hizmeti zorunlu mu?", answer: "Hayır. Yalnızca tasarım teslimi veya tasarım ve uygulama birlikte ilerleyebilir." },
       { question: "Süre ortalama ne kadar?", answer: "Mekânın büyüklüğüne göre değişir; ilk tasarım teslimi genelde 2–4 hafta aralığındadır." },
     ],
   },
@@ -35,7 +35,7 @@ export const SERVICES_DETAIL: Record<string, ServiceDetailData> = {
     shortDescription:
       "Tasarım, planlama ve uygulamayı tek elden yöneterek bütçe ve zaman çizelgesine sadık, sorunsuz teslim süreçleri sağlıyoruz.",
     hizmetKapsami: [
-      "Kapsam & bütçe planlaması",
+      "Kapsam ve bütçe planlaması",
       "Tasarım ve uygulama koordinasyonu",
       "Satın alma ve tedarik yönetimi",
       "Şantiye organizasyonu ve kalite kontrol",
@@ -44,13 +44,13 @@ export const SERVICES_DETAIL: Record<string, ServiceDetailData> = {
     ],
     hizmetSureci: [
       { title: "Planlama", description: "Kapsam, bütçe ve iş programını netleştiriyoruz." },
-      { title: "Tasarım & Onay", description: "Tasarımı finalize edip uygulama kararlarını kilitliyoruz." },
-      { title: "Uygulama", description: "Şantiye, tedarik ve kalite kontrolü tek merkezden yürütüyoruz." },
+      { title: "Tasarım & Onay", description: "Tasarımı kesinleştirip uygulama kararlarını kilitliyoruz." },
+      { title: "Uygulama", description: "Şantiye, tedarik ve kalite kontrolünü tek merkezden yürütüyoruz." },
       { title: "Teslim", description: "Kontrol listeleriyle teslimi tamamlayıp destek sürecini başlatıyoruz." },
     ],
     sss: [
       { question: "Bütçe kontrolü nasıl yapılır?", answer: "Kalem kalem keşif ve tekliflerle, onaylı satın alma akışıyla ilerleriz." },
-      { question: "Teslim tarihinde sapma olur mu?", answer: "Riskleri baştan görünür kılıp alternatif planlarla minimum sapma hedefleriz." },
+      { question: "Teslim tarihinde sapma olur mu?", answer: "Riskleri baştan görünür kılıp alternatif planlarla sapmayı en aza indirmeyi hedefleriz." },
     ],
   },
   "mimari-kontrolorluk": {
@@ -58,22 +58,22 @@ export const SERVICES_DETAIL: Record<string, ServiceDetailData> = {
     name: "Mimari Kontrolörlük",
     heroImageUrl: "/images/hero-3.webp",
     shortDescription:
-      "Saha denetimi ve detay kontrolleriyle uygulamada tasarımın doğru ve kaliteli şekilde hayata geçmesini güvence altına alıyoruz.",
+      "Saha denetimi ve detay kontrolleriyle uygulamada tasarımın doğru ve kaliteli biçimde hayata geçmesini güvence altına alıyoruz.",
     hizmetKapsami: [
       "Uygulama detay kontrolü",
       "Şantiye toplantıları ve raporlama",
       "Kalite kontrol ve saha denetimi",
-      "İmalat/işçilik uygunluk takibi",
+      "İmalat ve işçilik uygunluk takibi",
       "İş programı koordinasyonu",
     ],
     hizmetSureci: [
       { title: "Başlangıç", description: "Uygulama setlerini ve kontrol kriterlerini netleştiriyoruz." },
       { title: "Periyodik Denetim", description: "Saha ziyaretleri ve raporlamayla ilerlemeyi takip ediyoruz." },
       { title: "Kritik Noktalar", description: "Detay ve malzeme kararlarında sahada doğrulama yapıyoruz." },
-      { title: "Teslim Kontrol", description: "Eksik/kusur listeleriyle final kalite kontrol sağlıyoruz." },
+      { title: "Teslim Kontrolü", description: "Eksik ve kusur listeleriyle final kalite kontrolü sağlıyoruz." },
     ],
     sss: [
-      { question: "Denetim sıklığı nedir?", answer: "İş programına göre haftalık/iki haftalık periyotlarla planlanır." },
+      { question: "Denetim sıklığı nedir?", answer: "İş programına göre haftalık veya iki haftalık periyotlarla planlanır." },
       { question: "Rapor formatı nedir?", answer: "Fotoğraflı kontrol listeleri ve aksiyon maddeleriyle düzenli raporlama yaparız." },
     ],
   },
@@ -82,9 +82,9 @@ export const SERVICES_DETAIL: Record<string, ServiceDetailData> = {
     name: "Mimari Tasarım & Ruhsat Projesi",
     heroImageUrl: "/images/hero-4.webp",
     shortDescription:
-      "Mevzuatla uyumlu, net ve uygulanabilir bir tasarım diliyle ruhsat sürecini hızlandıran proje setleri hazırlıyoruz.",
+      "Mevzuata uyumlu, net ve uygulanabilir bir tasarım diliyle ruhsat sürecini hızlandıran proje setleri hazırlıyoruz.",
     hizmetKapsami: [
-      "İmar/mevzuat ön analizi",
+      "İmar ve mevzuat ön analizi",
       "Konsept tasarım geliştirme",
       "Ruhsat proje seti hazırlığı",
       "Pafta standardizasyonu",
@@ -98,7 +98,7 @@ export const SERVICES_DETAIL: Record<string, ServiceDetailData> = {
     ],
     sss: [
       { question: "Ruhsat süresi neye bağlı?", answer: "Belediye yoğunluğu, parsel verileri ve proje kapsamına göre değişir." },
-      { question: "Diğer disiplin koordinasyonu var mı?", answer: "İhtiyaca göre statik/mekanik/elektrik ekipleriyle koordinasyon sağlarız." },
+      { question: "Diğer disiplinlerle koordinasyon var mı?", answer: "İhtiyaca göre statik, mekanik ve elektrik ekipleriyle koordinasyon sağlarız." },
     ],
   },
   "mimari-danismanlik": {
@@ -108,17 +108,17 @@ export const SERVICES_DETAIL: Record<string, ServiceDetailData> = {
     shortDescription:
       "Kritik tasarım kararlarında doğru yönde ilerlemeniz için hızlı analiz, alternatif üretimi ve karar desteği sunuyoruz.",
     hizmetKapsami: [
-      "Konsept yönlendirme ve review",
-      "Plan/cephe optimizasyonu",
+      "Konsept yönlendirme ve gözden geçirme",
+      "Plan ve cephe optimizasyonu",
       "Malzeme ve detay önerileri",
-      "Maliyet/performans değerlendirmesi",
+      "Maliyet ve performans değerlendirmesi",
       "Uygulama sürecinde karar desteği",
     ],
     hizmetSureci: [
       { title: "Brief", description: "Hedefi ve kısıtları netleştiriyoruz." },
-      { title: "Analiz", description: "Mevcut tasarımı/alternatifleri değerlendiriyoruz." },
+      { title: "Analiz", description: "Mevcut tasarımı ve alternatifleri değerlendiriyoruz." },
       { title: "Öneri", description: "Karar seti ve uygulanabilir aksiyonlar çıkarıyoruz." },
-      { title: "Takip", description: "Kritik noktalarda tekrar review ile ilerliyoruz." },
+      { title: "Takip", description: "Kritik noktalarda yeniden gözden geçirerek ilerliyoruz." },
     ],
     sss: [
       { question: "Tek seans mümkün mü?", answer: "Evet. Hızlı değerlendirme seansı veya proje boyunca periyodik danışmanlık verebiliriz." },
@@ -132,15 +132,15 @@ export const SERVICES_DETAIL: Record<string, ServiceDetailData> = {
       "Mevcut mekânı minimum yıkım ve maksimum etkiyle dönüştürerek yeni ihtiyaçlara uygun, modern ve dayanıklı çözümler üretiyoruz.",
     hizmetKapsami: [
       "Mevcut durum analizi",
-      "Bütçe & etap planlaması",
+      "Bütçe ve etap planlaması",
       "Malzeme ve işçilik seçimi",
       "Uygulama koordinasyonu",
-      "Teslim kontrol ve iyileştirme",
+      "Teslim kontrolü ve iyileştirme",
     ],
     hizmetSureci: [
       { title: "Keşif", description: "Mevcut durum ve kısıtları sahada tespit ediyoruz." },
-      { title: "Planlama", description: "Etaplar, bütçe ve iş programını netleştiriyoruz." },
-      { title: "Uygulama", description: "Saha yönetimi ve kalite kontrol ile dönüşümü gerçekleştiriyoruz." },
+      { title: "Planlama", description: "Etapları, bütçeyi ve iş programını netleştiriyoruz." },
+      { title: "Uygulama", description: "Saha yönetimi ve kalite kontrolü ile dönüşümü gerçekleştiriyoruz." },
       { title: "Teslim", description: "Kontrolleri tamamlayıp teslim ediyoruz." },
     ],
     sss: [
@@ -149,4 +149,3 @@ export const SERVICES_DETAIL: Record<string, ServiceDetailData> = {
     ],
   },
 };
-

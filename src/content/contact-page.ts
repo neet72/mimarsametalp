@@ -3,28 +3,28 @@
 export const CONTACT_PAGE_TITLE = "Bize Ulaşın";
 
 export const CONTACT_PAGE_INTRO =
-  "Samet Alp Mimarlık'ta yeni bir mimari projeye başlamanın hem heyecan verici hem de zorlayıcı olabileceğini anlıyoruz. İster bir konut alanı, ister ticari bir tesis planlıyor olun, yanınızda yetkin bir mimar bulundurmak vizyonunuzu gerçeğe dönüştürmek için son derece önemlidir. Ekibimiz anahtar teslim projeler, mimari danışmanlık ve iç dekorasyon tasarımı dahil olmak üzere kapsamlı mimari hizmetler sunmaya kendini adamıştır.";
+  "Samet Alp Mimarlık’ta yeni bir mimari projeye başlamanın hem heyecan verici hem de zorlayıcı olabileceğini anlıyoruz. İster bir konut alanı, ister ticari bir tesis planlıyor olun; yanınızda yetkin bir mimar bulundurmak, vizyonunuzu gerçeğe dönüştürmek için son derece önemlidir. Ekibimiz anahtar teslim projeler, mimari danışmanlık ve iç dekorasyon tasarımı dahil olmak üzere kapsamlı mimari hizmetler sunmaya kendini adamıştır.";
 
 export const CONTACT_STEPS_HEADING =
-  "Mimarlarımıza ulaşmak için şu adımları takip edebilirsiniz:";
+  "Mimarlarımıza ulaşmak için şu adımları izleyebilirsiniz:";
 
 export const CONTACT_STEPS = [
   {
     title: "İlk Danışma",
-    body: "Bizimle iletişime geçerek ilk danışma randevusu ayarlayın. Bu toplantı, ihtiyaçlarınızı anlamamız, fikirlerinizi tartışmamız ve varsa mevcut plan veya tasarımlarınızı gözden geçirmemiz için önemlidir.",
+    body: "Bizimle iletişime geçerek ilk danışma randevusunu ayarlayın. Bu toplantı; ihtiyaçlarınızı anlamamız, fikirlerinizi tartışmamız ve varsa mevcut plan veya tasarımlarınızı gözden geçirmemiz için önemlidir.",
   },
   {
     title: "Proje Taslağı",
-    body: "Beklentilerinizi, bütçenizi ve zaman çerçevenizi içeren kısa bir taslak hazırlayın. Bu bilgiler, hizmetlerimizi spesifik gereksinimlerinize uygun hale getirmek için kritik öneme sahiptir.",
+    body: "Beklentilerinizi, bütçenizi ve zaman çerçevenizi içeren kısa bir taslak hazırlayın. Bu bilgiler, hizmetlerimizi özel gereksinimlerinize uygun hale getirmek için kritik öneme sahiptir.",
   },
   {
     title: "Yer Ziyareti",
-    body: "Proje alanında bir ziyaret gerçekleştirin. Bu, hem mimarımızın projenizi daha iyi anlamasına yardımcı olacak hem de öneri ve çözümlerimizi şekillendirmemize olanak tanıyacaktır.",
+    body: "Proje alanında bir ziyaret gerçekleştirin. Bu hem mimarımızın projenizi daha iyi anlamasına yardımcı olur hem de öneri ve çözümlerimizi şekillendirmemize olanak tanır.",
   },
 ] as const;
 
 export const CONTACT_PAGE_CLOSING =
-  "Siz de hayallerinizi gerçekleştirmek için ilk adımı atmaktan çekinmeyin. Alanındaki uzmanlığıyla projelerinizi gerçeğe dönüştürmek için burada.";
+  "Hayallerinizi gerçekleştirmek için ilk adımı atmaktan çekinmeyin. Alanındaki uzmanlığıyla projelerinizi gerçeğe dönüştürmek için buradayız.";
 
 export const CONTACT_EMAIL = "info@mimarsametalp.com";
 export const CONTACT_PHONE_DISPLAY = "0 (541) 426 76 44";
@@ -52,4 +52,4 @@ export const CONTACT_FORM_HONEYPOT_LABEL = "Şirket";
 export const CONTACT_FORM_SUBMIT = "Gönder";
 export const CONTACT_FORM_SUBMIT_PENDING = "Gönderiliyor…";
 export const CONTACT_FORM_CLIENT_INVALID = "Lütfen formu kontrol edin.";
-export const CONTACT_FORM_WA_FALLBACK = "İstersen WhatsApp üzerinden de yazabilirsin:";
+export const CONTACT_FORM_WA_FALLBACK = "İsterseniz WhatsApp üzerinden de yazabilirsiniz:";

@@ -6,7 +6,7 @@ import { getServiceListingItems } from "@/lib/public/service-listing";
 
 const pageTitle = "Services | Samet Alp Architecture";
 const pageDescription =
-  "Architecture, interior design, 3D visualization, and urban planning — based in Adana, Turkey.";
+  "Architectural design, permit projects, interior architecture, turnkey delivery, and consulting — based in Adana, Turkey.";
 
 export const metadata: Metadata = {
   ...pageMetadata({

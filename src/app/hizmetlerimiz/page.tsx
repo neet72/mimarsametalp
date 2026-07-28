@@ -6,7 +6,7 @@ import { getServiceListingItems } from "@/lib/public/service-listing";
 
 const pageTitle = "Hizmetlerimiz | Samet Alp Mimarlık";
 const pageDescription =
-  "Adana merkezli mimari tasarım, iç mimarlık, 3D görselleştirme ve kentsel planlama hizmetlerimiz.";
+  "Adana merkezli mimari tasarım, ruhsat projesi, iç mimarlık, anahtar teslim ve danışmanlık hizmetlerimiz.";
 
 /** absolute: kök layout title şablonuna çift ekleme yapmaması için */
 export const metadata: Metadata = {

@@ -163,7 +163,7 @@ export function ProjectsPortfolio({ projects }: { projects: ProjectsPortfolioPro
         <div className="flex flex-col gap-5 border-t border-border/60 py-12 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:py-14 md:py-16">
           <p className="max-w-lg text-pretty text-sm leading-relaxed text-muted sm:text-base">
             {locale === "en"
-              ? "Share site, budget, and timeline — we’ll propose a clear path forward."
+              ? "Share the plot, budget, and timeline — we will propose a clear path forward."
               : "Arsa, bütçe ve zaman planını paylaşın — net bir yol haritası çıkaralım."}
           </p>
           <Link

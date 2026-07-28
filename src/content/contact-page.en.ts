@@ -23,7 +23,7 @@ export const CONTACT_STEPS = [
 ] as const;
 
 export const CONTACT_PAGE_CLOSING =
-  "Don’t hesitate to take the first step toward making your ideas real. We’re here to help bring your projects to life with expertise and care.";
+  "Don’t hesitate to take the first step toward making your ideas real. We are here to help bring your projects to life with expertise and care.";
 
 export const CONTACT_EMAIL = "info@mimarsametalp.com";
 export const CONTACT_PHONE_DISPLAY = "+90 (541) 426 76 44";
@@ -35,7 +35,7 @@ export const CONTACT_SOCIAL_LINKEDIN = "https://www.linkedin.com/company/mimarsa
 
 export const CONTACT_FORM_HEADING = "Send a message";
 export const CONTACT_FORM_HELPER =
-  "For project requests, appointments, and consulting questions, fill out the form below. We’ll respond via email.";
+  "For project requests, appointments, and consulting questions, fill out the form below. We will respond via email.";
 
 export const CONTACT_FORM_SECTION_KICKER = "Contact";
 export const CONTACT_SOCIAL_HEADING = "Social media";
