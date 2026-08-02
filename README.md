@@ -1,6 +1,35 @@
 # Samet Alp Mimarlık
 
-Next.js (App Router) + Prisma/MySQL + NextAuth + Cloudinary + Resend.
+Next.js (App Router) + Prisma/Supabase (Postgres) + NextAuth + Cloudinary + Resend.
+
+## Stack
+
+| Parça | Nerede |
+|-------|--------|
+| Kod / site | Vercel |
+| Veritabanı | Supabase Postgres |
+| Domain | Hostinger (DNS → Vercel) |
+| Görseller | Cloudinary |
+| E-posta | Resend |
+
+## Supabase kurulumu (bir kez)
+
+1. [supabase.com](https://supabase.com) → New project  
+2. **Project Settings → Database → Connection string**  
+3. İki URL al:
+   - **Transaction pooler** (port `6543`) → `DATABASE_URL` (+ `?pgbouncer=true`)
+   - **Direct** (port `5432`) → `DIRECT_URL` (migrate için)
+4. Lokal `.env` ve **Vercel → Environment Variables** içine ikisini de yapıştır  
+5. Tabloları oluştur:
+
+```bash
+npm run db:deploy
+# veya: npx prisma migrate deploy
+```
+
+6. Admin’den projeleri / hizmetleri yeniden ekle (eski Hostinger MySQL verisi gelmez).
+
+Auth için Supabase Auth **kullanılmıyor** — mevcut NextAuth + env admin kalır.
 
 ## Müşteri proje portalı
 
@@ -34,22 +63,6 @@ Portfolyo CMS (`Project`) ile karışmaz. Portal modelleri: `ClientUser`, `Clien
 - [ ] Admin action’larda `requireAdmin()`; panel action’larda `requireClient()`.
 - [ ] Middleware: `/admin/**` → admin; `/panel/**` → client; `mustChangePassword` → yalnızca `/panel/sifre`.
 - [ ] Cross-client: başka müşterinin `projectId` / `updateId` ile çıplak fetch yok.
-
-### Yayınlama (Vercel + Hostinger)
-
-- **Uygulama:** Vercel’den deploy edilir (git push / Vercel dashboard).
-- **Domain:** Hostinger’da; DNS Vercel’e yönlendirilir.
-- **MySQL:** Hostinger’daki veritabanı; Vercel env’de `DATABASE_URL` bu bağlantıyı gösterir.
-
-Yeni migration’ı üretime uygulamak için (Hostinger paneline “site yükleme” değil — `DATABASE_URL` ile Prisma):
-
-```bash
-# lokal veya CI’dan, production DATABASE_URL ile
-npm run db:deploy
-# veya: npx prisma migrate deploy
-```
-
-Vercel’de `SMS_*` / `SMS_PROVIDER` boş bırakılabilir.
 
 ### Cloudinary portal medyası
 

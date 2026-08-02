@@ -72,13 +72,28 @@ export async function createProject(formData: FormData) {
           select: { id: true },
         });
       } catch (e) {
+        const code =
+          e && typeof e === "object" && "code" in e ? String((e as { code?: string }).code) : "";
         logger.warn({
           msg: "project create failed",
           scope: "admin.project.create",
           actor: ctx.actor,
+          code,
           error: e instanceof Error ? { name: e.name, message: e.message } : String(e),
         });
-        throw new ActionError("Kayıt oluşturulamadı (slug benzersiz mi?).");
+        if (code === "P2002") {
+          throw new ActionError("Bu slug zaten var. Farklı bir web adresi deneyin.");
+        }
+        if (code === "P1001" || code === "P1017") {
+          throw new ActionError(
+            "Veritabanına bağlanılamadı. Vercel’de DATABASE_URL / DIRECT_URL (Supabase pooler) kontrol edin.",
+          );
+        }
+        throw new ActionError(
+          e instanceof Error && e.message
+            ? `Kayıt oluşturulamadı: ${e.message.slice(0, 180)}`
+            : "Kayıt oluşturulamadı.",
+        );
       }
 
       await auditAdmin({
