@@ -75,6 +75,7 @@ const uploadAction = createSafeAction({
       buffer: bytes,
       mimeType: file.type,
       actor: ctx.actor,
+      originalFilename: file.name,
     });
 
     logger.info({

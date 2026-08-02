@@ -5,14 +5,25 @@ import { uploadToCloudinary } from "@/lib/storage/cloudinary";
 import { logger } from "@/lib/observability/logger";
 
 export const runtime = "nodejs";
+/** Vercel / Node: büyük galeri yüklemeleri için */
+export const maxDuration = 60;
 
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024; // 50MB
-const IMAGE_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
-const VIDEO_MIME = new Set(["video/mp4", "video/webm"]);
+const IMAGE_MIME = new Set([
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+  "image/gif",
+  "image/heic",
+  "image/heif",
+]);
+const VIDEO_MIME = new Set(["video/mp4", "video/webm", "video/quicktime"]);
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
-const RATE_LIMIT_MAX = 120; // per window (per admin+ip) — batch gallery uploads
+const RATE_LIMIT_MAX = 200; // per window (per admin+ip) — batch gallery uploads
 
 type RateEntry = { count: number; resetAt: number };
 const rate = new Map<string, RateEntry>();
@@ -83,10 +94,12 @@ function looksLikeAvif(bytes: Buffer) {
 }
 
 function matchesMagic(type: string, bytes: Buffer) {
-  if (type === "image/jpeg") return looksLikeJpeg(bytes);
+  if (type === "image/jpeg" || type === "image/jpg") return looksLikeJpeg(bytes);
   if (type === "image/png") return looksLikePng(bytes);
   if (type === "image/webp") return looksLikeWebp(bytes);
   if (type === "image/avif") return looksLikeAvif(bytes);
+  // gif / heic / heif: imza kontrolü atlanır (cihaz varyasyonu yüksek)
+  if (type === "image/gif" || type === "image/heic" || type === "image/heif") return true;
   return false;
 }
 
@@ -123,7 +136,7 @@ export async function POST(req: Request) {
   if (!isImage && !isVideo) {
     logger.warn({ msg: "upload invalid mime", scope: "api.admin.upload", actor: email, ip, mime: file.type });
     return NextResponse.json(
-      { ok: false, error: "Desteklenmeyen dosya türü. (jpg/png/webp/avif/mp4/webm)" },
+      { ok: false, error: "Desteklenmeyen dosya türü. (jpg/png/webp/avif/gif/heic/mp4/webm)" },
       { status: 400 },
     );
   }
@@ -164,21 +177,33 @@ export async function POST(req: Request) {
 
   logger.info({ msg: "upload attempt", scope: "api.admin.upload", actor: email, ip, mime: file.type, size: file.size });
 
-  const uploaded = await uploadToCloudinary({
-    buffer: bytes,
-    mimeType: file.type,
-    actor: email,
-  });
+  try {
+    const uploaded = await uploadToCloudinary({
+      buffer: bytes,
+      mimeType: file.type,
+      actor: email,
+      originalFilename: file.name,
+    });
 
-  logger.info({
-    msg: "upload ok",
-    scope: "api.admin.upload",
-    actor: email,
-    ip,
-    publicId: uploaded.publicId,
-    resourceType: uploaded.resourceType,
-  });
+    logger.info({
+      msg: "upload ok",
+      scope: "api.admin.upload",
+      actor: email,
+      ip,
+      publicId: uploaded.publicId,
+      resourceType: uploaded.resourceType,
+    });
 
-  return NextResponse.json({ ok: true, url: uploaded.secureUrl });
+    return NextResponse.json({ ok: true, url: uploaded.secureUrl });
+  } catch (e) {
+    logger.error({
+      msg: "upload failed",
+      scope: "api.admin.upload",
+      actor: email,
+      ip,
+      error: e instanceof Error ? { name: e.name, message: e.message } : String(e),
+    });
+    return NextResponse.json({ ok: false, error: "Yükleme başarısız. Lütfen tekrar deneyin." }, { status: 500 });
+  }
 }
 

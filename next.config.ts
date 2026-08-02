@@ -20,6 +20,8 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "50mb",
     },
+    // Middleware / proxy katmanı (15.5+); büyük FormData yüklemeleri için
+    middlewareClientMaxBodySize: "50mb",
   },
   images: {
     formats: ["image/avif", "image/webp"],

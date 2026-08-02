@@ -3,6 +3,7 @@ import "server-only";
 import crypto from "node:crypto";
 import { v2 as cloudinary } from "cloudinary";
 import { logger } from "@/lib/observability/logger";
+import { extensionFromFilenameOrMime } from "@/lib/storage/cloudinary-url";
 
 const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME ?? "";
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY ?? "";
@@ -42,6 +43,8 @@ export async function uploadToCloudinary(opts: {
   actor?: string;
   /** Varsayılan portfolyo klasörleri; portal medyası için `portal` kullanın. */
   folderKind?: "portfolio" | "portal";
+  /** Orijinal dosya adı — public_id uzantısı ve indirme adı için. */
+  originalFilename?: string;
 }): Promise<CloudinaryUploadResult> {
   if (!configureCloudinary()) {
     logger.error({ msg: "cloudinary not configured", scope: "storage.cloudinary", actor: opts.actor });
@@ -64,8 +67,9 @@ export async function uploadToCloudinary(opts: {
         : isRawDoc
           ? "samet-alp/docs"
           : "samet-alp/images";
-  // Unguessable public_id (signed/authenticated delivery follow-up için hazır).
-  const publicId = `${folder}/${crypto.randomUUID()}`;
+  // UUID + uzantı: indirmede tarayıcı doğru tip/adı tanısın; folder ayrı verilir (çift yol yok).
+  const ext = extensionFromFilenameOrMime(opts.originalFilename, opts.mimeType);
+  const publicId = `${crypto.randomUUID()}${ext}`;
 
   type CloudinaryEagerItem = { secure_url?: string };
   type CloudinaryUploadApiResponse = {
@@ -82,6 +86,7 @@ export async function uploadToCloudinary(opts: {
         public_id: publicId,
         unique_filename: true,
         overwrite: false,
+        use_filename: false,
         // Dokümanlar (PDF/Word/Excel) raw; görsel/video auto.
         resource_type: isRawDoc ? "raw" : "auto",
         ...(isVideo

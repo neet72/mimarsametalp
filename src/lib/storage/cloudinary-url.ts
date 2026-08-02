@@ -1,0 +1,59 @@
+/**
+ * Cloudinary delivery URL yardımcıları (client + server güvenli).
+ * İndirmede tarayıcının UUID yerine okunabilir dosya adı kullanması için.
+ */
+
+/** MIME → varsayılan uzantı (orijinal ad yoksa). */
+const MIME_EXT: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/jpg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+  "image/avif": ".avif",
+  "image/gif": ".gif",
+  "image/heic": ".heic",
+  "image/heif": ".heif",
+  "video/mp4": ".mp4",
+  "video/webm": ".webm",
+  "video/quicktime": ".mov",
+  "application/pdf": ".pdf",
+  "application/msword": ".doc",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
+  "application/vnd.ms-excel": ".xls",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
+  "application/vnd.ms-powerpoint": ".ppt",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation": ".pptx",
+  "text/plain": ".txt",
+};
+
+export function extensionFromFilenameOrMime(filename?: string | null, mimeType?: string | null): string {
+  const fromName = filename?.trim().match(/(\.[a-zA-Z0-9]{1,10})$/)?.[1];
+  if (fromName) return fromName.toLowerCase();
+  if (mimeType && MIME_EXT[mimeType]) return MIME_EXT[mimeType];
+  return "";
+}
+
+/** İndirme / kaydetme için güvenli dosya adı (path traversal yok). */
+export function safeDownloadFilename(raw: string | null | undefined, fallback = "dosya"): string {
+  const base = (raw?.trim() || fallback)
+    .replace(/[/\\?%*:|"<>]/g, "-")
+    .replace(/\s+/g, " ")
+    .slice(0, 120)
+    .trim();
+  return base || fallback;
+}
+
+/**
+ * Cloudinary URL’ye `fl_attachment:dosya-adi` ekler.
+ * Tarayıcı indirmede Content-Disposition ile bu adı kullanır.
+ */
+export function withCloudinaryAttachment(url: string, filename: string): string {
+  const safe = safeDownloadFilename(filename);
+  if (!url.includes("/upload/") || !safe) return url;
+  // Zaten attachment varsa dokunma
+  if (/\/upload\/[^/]*fl_attachment/.test(url)) return url;
+
+  // Cloudinary: özel karakterler için URL-encode; boşluk → %20
+  const encoded = encodeURIComponent(safe).replace(/'/g, "%27");
+  return url.replace("/upload/", `/upload/fl_attachment:${encoded}/`);
+}

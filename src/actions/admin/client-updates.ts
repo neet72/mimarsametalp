@@ -190,6 +190,7 @@ export const uploadClientUpdateMedia = createSafeAction({
       mimeType: inferredType,
       actor: ctx.actor,
       folderKind: "portal",
+      originalFilename: input.file.name,
     });
 
     const mediaType = portalMediaKindFromMime(inferredType);

@@ -12,10 +12,24 @@ import {
 } from "@/actions/admin/client-updates";
 import { useAdminToast } from "@/components/admin/ui/toast";
 import { PORTAL_ACCEPT_ATTR, portalMediaKindLabel } from "@/lib/portal/media-types";
+import { withCloudinaryAttachment } from "@/lib/storage/cloudinary-url";
 import { FileText, ImageIcon, Video, Upload } from "lucide-react";
 
 type StageOpt = { id: string; name: string };
 type MediaRow = { id: string; cloudinaryUrl: string; mediaType: string; caption: string | null };
+
+function mediaDownloadName(m: MediaRow) {
+  if (m.caption?.trim()) return m.caption.trim();
+  const ext =
+    m.mediaType === "pdf"
+      ? ".pdf"
+      : m.mediaType === "doc"
+        ? ".docx"
+        : m.mediaType === "sheet"
+          ? ".xlsx"
+          : "";
+  return `${portalMediaKindLabel(m.mediaType)}${ext}`;
+}
 
 export function AdminClientUpdateEditor({
   projectId,
@@ -358,7 +372,8 @@ function MediaCard({
         <video src={m.cloudinaryUrl} controls className="aspect-video w-full bg-black" />
       ) : (
         <a
-          href={m.cloudinaryUrl}
+          href={withCloudinaryAttachment(m.cloudinaryUrl, mediaDownloadName(m))}
+          download={mediaDownloadName(m)}
           target="_blank"
           rel="noreferrer"
           className="flex aspect-[4/3] flex-col items-center justify-center gap-2 bg-zinc-900 px-3 text-center"

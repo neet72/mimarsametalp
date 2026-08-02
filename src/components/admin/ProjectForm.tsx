@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { createProject, updateProject } from "@/actions/admin/projects";
-import { uploadAdminMedia } from "@/actions/admin/upload";
 import { ADMIN_PROJECT_CATEGORIES, ADMIN_PROJECT_CATEGORIES_EN } from "@/lib/admin/project-categories";
+import { uploadAdminMediaViaApi } from "@/lib/admin/upload-client";
 import type { Project } from "@prisma/client";
 import { slugify } from "@/lib/slugify";
 import { ArrowDown, ArrowUp, ExternalLink, ImagePlus, Trash2, UploadCloud } from "lucide-react";
@@ -69,6 +69,7 @@ export default function ProjectForm({
   const [sortOrder, setSortOrder] = useState(String(project?.sortOrder ?? 0));
   const [newImageUrl, setNewImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
@@ -105,35 +106,45 @@ export default function ProjectForm({
   async function uploadFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
     setUploadError(null);
+    setUploadProgress(null);
     setUploading(true);
+    const list = Array.from(files);
+    const urls: string[] = [];
+    const failures: string[] = [];
     try {
-      const urls: string[] = [];
-      for (const f of Array.from(files)) {
-        const fd = new FormData();
-        fd.set("file", f);
-        const json = await uploadAdminMedia(fd);
-        if (!json.ok || !json.data?.url) {
-          const fieldMsg =
-            !json.ok && json.fieldErrors && "file" in json.fieldErrors
-              ? (json.fieldErrors as Record<string, string[] | undefined>).file?.[0]
-              : undefined;
-          const msg = json.ok ? "Yükleme başarısız." : fieldMsg || json.error;
-          throw new Error(msg || "Yükleme başarısız.");
+      for (let i = 0; i < list.length; i++) {
+        const f = list[i]!;
+        setUploadProgress(`${i + 1} / ${list.length}: ${f.name}`);
+        const json = await uploadAdminMediaViaApi(f);
+        if (!json.ok) {
+          failures.push(`${f.name}: ${json.error}`);
+          continue;
         }
-        urls.push(json.data.url);
+        urls.push(json.url);
       }
-      setImageUrlsRaw((prev) => {
-        const current = parseLines(prev);
-        const isPlaceholderOnly =
-          current.length === 1 && (current[0] === "/images/hero-1.webp" || current[0].endsWith("/images/hero-1.webp"));
-        const base = current.length === 0 || isPlaceholderOnly ? [] : current;
-        // Put newly uploaded media to the front so cover updates immediately.
-        return toLines([...urls, ...base]);
-      });
+      if (urls.length > 0) {
+        setImageUrlsRaw((prev) => {
+          const current = parseLines(prev);
+          const isPlaceholderOnly =
+            current.length === 1 &&
+            (current[0] === "/images/hero-1.webp" || current[0].endsWith("/images/hero-1.webp"));
+          const base = current.length === 0 || isPlaceholderOnly ? [] : current;
+          // Put newly uploaded media to the front so cover updates immediately.
+          return toLines([...urls, ...base]);
+        });
+      }
+      if (failures.length > 0) {
+        setUploadError(
+          urls.length
+            ? `${urls.length} yüklendi; ${failures.length} başarısız:\n${failures.slice(0, 5).join("\n")}`
+            : failures.slice(0, 5).join("\n"),
+        );
+      }
     } catch (e) {
       setUploadError(e instanceof Error ? e.message : "Yükleme başarısız.");
     } finally {
       setUploading(false);
+      setUploadProgress(null);
     }
   }
 
@@ -525,9 +536,14 @@ export default function ProjectForm({
               <p className="text-xs text-zinc-500">
                 İpucu: Dosyaları bu alana sürükleyip bırakabilirsin.
               </p>
+              {uploadProgress ? (
+                <p className="text-xs text-zinc-400" aria-live="polite">
+                  {uploadProgress}
+                </p>
+              ) : null}
 
               {uploadError ? (
-                <p className="rounded-md border border-red-900/50 bg-red-950/30 px-3 py-2 text-xs text-red-300">
+                <p className="whitespace-pre-wrap rounded-md border border-red-900/50 bg-red-950/30 px-3 py-2 text-xs text-red-300">
                   {uploadError}
                 </p>
               ) : null}

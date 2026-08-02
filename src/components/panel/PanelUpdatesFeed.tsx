@@ -7,6 +7,7 @@ import { renderMarkdownSafe } from "@/lib/portal/markdown";
 import { shouldUnoptimizeImage } from "@/lib/media/next-image";
 import { panelFieldClass } from "@/lib/portal/labels";
 import { portalMediaKindLabel } from "@/lib/portal/media-types";
+import { withCloudinaryAttachment } from "@/lib/storage/cloudinary-url";
 import { FileText } from "lucide-react";
 
 export type PanelUpdateItem = {
@@ -23,6 +24,19 @@ export type PanelUpdateItem = {
     caption: string | null;
   }>;
 };
+
+function mediaDownloadName(m: PanelUpdateItem["media"][number]) {
+  if (m.caption?.trim()) return m.caption.trim();
+  const ext =
+    m.mediaType === "pdf"
+      ? ".pdf"
+      : m.mediaType === "doc"
+        ? ".docx"
+        : m.mediaType === "sheet"
+          ? ".xlsx"
+          : "";
+  return `${portalMediaKindLabel(m.mediaType)}${ext}`;
+}
 
 export function PanelUpdatesFeed({ updates }: { updates: PanelUpdateItem[] }) {
   const projects = useMemo(() => {
@@ -142,7 +156,8 @@ export function PanelUpdatesFeed({ updates }: { updates: PanelUpdateItem[] }) {
                           <video src={m.cloudinaryUrl} controls className="aspect-video w-full bg-black" />
                         ) : (
                           <a
-                            href={m.cloudinaryUrl}
+                            href={withCloudinaryAttachment(m.cloudinaryUrl, mediaDownloadName(m))}
+                            download={mediaDownloadName(m)}
                             target="_blank"
                             rel="noreferrer"
                             className="flex min-h-[8rem] flex-col items-center justify-center gap-2 px-4 py-6 text-center transition-colors hover:bg-primary/[0.03]"
