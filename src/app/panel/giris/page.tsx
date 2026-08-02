@@ -10,38 +10,27 @@ export const metadata: Metadata = {
 
 export default function PanelLoginPage() {
   return (
-    <div className="relative flex min-h-dvh flex-col overflow-hidden">
+    <div className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-4 py-12">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgb(166_124_82_/_0.14),_transparent_55%),radial-gradient(ellipse_at_bottom_right,_rgb(15_23_42_/_0.06),_transparent_50%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgb(166_124_82_/_0.16),_transparent_55%),radial-gradient(ellipse_at_bottom,_rgb(15_23_42_/_0.05),_transparent_45%)]"
       />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-16 bottom-10 h-80 w-80 rounded-full bg-primary/5 blur-3xl"
-      />
-
-      <header className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-6 sm:px-6">
+      <div className="relative z-10 mb-8 text-center">
         <Link
           href="/"
-          className="font-display text-[0.6875rem] font-semibold uppercase tracking-[0.24em] text-primary transition-colors hover:text-accent"
+          className="font-display text-[0.6875rem] font-semibold uppercase tracking-[0.28em] text-primary transition-colors hover:text-accent"
         >
           Samet Alp Mimarlık
         </Link>
-        <Link
-          href="/iletisim"
-          className="text-xs font-medium text-muted transition-colors hover:text-primary"
-        >
-          Destek
-        </Link>
-      </header>
-
-      <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-10 sm:py-16">
+      </div>
+      <div className="relative z-10 w-full max-w-md">
         <PanelLoginForm />
       </div>
+      <p className="relative z-10 mt-8 text-center text-xs text-muted">
+        <Link href="/iletisim" className="hover:text-primary">
+          Destek / iletişim
+        </Link>
+      </p>
     </div>
   );
 }

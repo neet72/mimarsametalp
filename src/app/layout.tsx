@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Instrument_Serif, Inter, Outfit } from "next/font/google";
 import { headers } from "next/headers";
 import { ThemeProvider, THEME_BOOT_SCRIPT } from "@/components/theme/ThemeProvider";
-import { MainLayout } from "@/components/layout/MainLayout";
+import { PublicChrome } from "@/components/layout/PublicChrome";
 import { metadataBase, siteName } from "@/lib/seo";
 import { jsonLdScriptProps, localBusinessJsonLd, organizationJsonLd, siteNavigationJsonLd, websiteJsonLd } from "@/lib/seo-jsonld";
 import { Analytics } from "@vercel/analytics/react";
@@ -159,7 +159,7 @@ export default async function RootLayout({
           </>
         ) : null}
         <ThemeProvider>
-          {isAppShell ? children : <MainLayout key="main-layout">{children}</MainLayout>}
+          <PublicChrome>{children}</PublicChrome>
           {isAppShell ? null : <Analytics key="analytics" />}
           {isAppShell ? null : <SpeedInsights key="speed-insights" />}
         </ThemeProvider>

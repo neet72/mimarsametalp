@@ -12,8 +12,8 @@ import { logger } from "@/lib/observability/logger";
 export const createClientProjectUpdate = createSafeAction({
   scope: "admin.client-update.create",
   schema: z.object({
-    projectId: z.string().cuid(),
-    stageId: z.string().cuid().optional().nullable(),
+    projectId: z.string().min(1),
+    stageId: z.string().min(1).optional().nullable(),
     title: z.string().trim().min(2).max(200),
     body: z.string().trim().min(1).max(50_000),
   }),
@@ -45,8 +45,8 @@ export const createClientProjectUpdate = createSafeAction({
 export const updateClientProjectUpdate = createSafeAction({
   scope: "admin.client-update.update",
   schema: z.object({
-    id: z.string().cuid(),
-    stageId: z.string().cuid().optional().nullable(),
+    id: z.string().min(1),
+    stageId: z.string().min(1).optional().nullable(),
     title: z.string().trim().min(2).max(200),
     body: z.string().trim().min(1).max(50_000),
   }),
@@ -76,7 +76,7 @@ export const updateClientProjectUpdate = createSafeAction({
 
 export const publishClientProjectUpdate = createSafeAction({
   scope: "admin.client-update.publish",
-  schema: z.object({ id: z.string().cuid() }),
+  schema: z.object({ id: z.string().min(1) }),
   authorize: async () => {
     const session = await requireAdmin();
     return { actor: session.user.email ?? "unknown" };
@@ -109,7 +109,7 @@ export const publishClientProjectUpdate = createSafeAction({
 
 export const unpublishClientProjectUpdate = createSafeAction({
   scope: "admin.client-update.unpublish",
-  schema: z.object({ id: z.string().cuid() }),
+  schema: z.object({ id: z.string().min(1) }),
   authorize: async () => {
     const session = await requireAdmin();
     return { actor: session.user.email ?? "unknown" };
@@ -132,7 +132,7 @@ export const unpublishClientProjectUpdate = createSafeAction({
 export const uploadClientUpdateMedia = createSafeAction({
   scope: "admin.client-update.media",
   schema: z.object({
-    updateId: z.string().cuid(),
+    updateId: z.string().min(1),
     file: z.instanceof(File),
     caption: z.string().trim().max(200).optional().or(z.literal("")),
   }),
@@ -194,7 +194,7 @@ export const uploadClientUpdateMedia = createSafeAction({
 
 export const deleteClientUpdateMedia = createSafeAction({
   scope: "admin.client-update.media.delete",
-  schema: z.object({ id: z.string().cuid() }),
+  schema: z.object({ id: z.string().min(1) }),
   authorize: async () => {
     const session = await requireAdmin();
     return { actor: session.user.email ?? "unknown" };

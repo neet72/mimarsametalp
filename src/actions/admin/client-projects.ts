@@ -10,20 +10,28 @@ import { auditAdmin } from "@/lib/observability/audit";
 const statusSchema = z.nativeEnum(ClientProjectStatus);
 const stageStatusSchema = z.nativeEnum(ClientStageStatus);
 
+const optionalText = z.preprocess(
+  (v) => (typeof v === "string" ? v.trim() : v),
+  z.union([z.literal(""), z.string().max(2000)]),
+);
+
+const idList = z.array(z.string().min(1));
+
 export const createClientProject = createSafeAction({
   scope: "admin.client-project.create",
   schema: z.object({
-    title: z.string().trim().min(2).max(200),
-    address: z.string().trim().max(300).optional().or(z.literal("")),
+    title: z.string().trim().min(2, "Başlık gerekli").max(200),
+    address: optionalText,
     status: statusSchema.optional(),
-    coverImageUrl: z.string().trim().max(2000).optional(),
-    clientIds: z.array(z.string().cuid()).optional(),
+    coverImageUrl: optionalText,
+    clientIds: idList.optional(),
   }),
   authorize: async () => {
     const session = await requireAdmin();
     return { actor: session.user.email ?? "unknown" };
   },
   toFieldErrors: (err) => err.flatten().fieldErrors,
+  invalidMessage: "Geçersiz veri — başlık ve alanları kontrol edin.",
   handler: async (input, ctx) => {
     const project = await prisma.clientProject.create({
       data: {
@@ -52,18 +60,19 @@ export const createClientProject = createSafeAction({
 export const updateClientProject = createSafeAction({
   scope: "admin.client-project.update",
   schema: z.object({
-    id: z.string().cuid(),
+    id: z.string().min(1),
     title: z.string().trim().min(2).max(200),
-    address: z.string().trim().max(300).optional().or(z.literal("")),
+    address: optionalText,
     status: statusSchema,
-    coverImageUrl: z.string().trim().max(2000).optional(),
-    clientIds: z.array(z.string().cuid()),
+    coverImageUrl: optionalText,
+    clientIds: idList,
   }),
   authorize: async () => {
     const session = await requireAdmin();
     return { actor: session.user.email ?? "unknown" };
   },
   toFieldErrors: (err) => err.flatten().fieldErrors,
+  invalidMessage: "Geçersiz veri — alanları kontrol edin.",
   handler: async (input, ctx) => {
     await prisma.$transaction(async (tx) => {
       await tx.clientProject.update({
@@ -94,22 +103,37 @@ export const updateClientProject = createSafeAction({
   },
 });
 
+function parseOptionalDate(v: string | null | undefined): Date | null {
+  if (!v || !String(v).trim()) return null;
+  const s = String(v).trim();
+  // HTML date → YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(`${s}T12:00:00.000Z`);
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+const optionalDateInput = z.preprocess(
+  (v) => (v === "" || v === null || v === undefined ? null : v),
+  z.union([z.string(), z.null()]).optional(),
+);
+
 export const upsertClientProjectStage = createSafeAction({
   scope: "admin.client-project.stage.upsert",
   schema: z.object({
-    id: z.string().cuid().optional(),
-    projectId: z.string().cuid(),
+    id: z.string().min(1).optional(),
+    projectId: z.string().min(1),
     name: z.string().trim().min(1).max(120),
-    orderIndex: z.number().int().min(0).max(999),
+    orderIndex: z.coerce.number().int().min(0).max(999),
     status: stageStatusSchema,
-    targetDate: z.string().datetime().optional().nullable(),
-    completedDate: z.string().datetime().optional().nullable(),
+    targetDate: optionalDateInput,
+    completedDate: optionalDateInput,
   }),
   authorize: async () => {
     const session = await requireAdmin();
     return { actor: session.user.email ?? "unknown" };
   },
   toFieldErrors: (err) => err.flatten().fieldErrors,
+  invalidMessage: "Aşama verisi geçersiz.",
   handler: async (input, ctx) => {
     const project = await prisma.clientProject.findUnique({
       where: { id: input.projectId },
@@ -121,8 +145,8 @@ export const upsertClientProjectStage = createSafeAction({
       name: input.name,
       orderIndex: input.orderIndex,
       status: input.status,
-      targetDate: input.targetDate ? new Date(input.targetDate) : null,
-      completedDate: input.completedDate ? new Date(input.completedDate) : null,
+      targetDate: parseOptionalDate(input.targetDate ?? null),
+      completedDate: parseOptionalDate(input.completedDate ?? null),
     };
 
     const stage = input.id
@@ -144,7 +168,7 @@ export const upsertClientProjectStage = createSafeAction({
 
 export const deleteClientProjectStage = createSafeAction({
   scope: "admin.client-project.stage.delete",
-  schema: z.object({ id: z.string().cuid() }),
+  schema: z.object({ id: z.string().min(1) }),
   authorize: async () => {
     const session = await requireAdmin();
     return { actor: session.user.email ?? "unknown" };
@@ -164,8 +188,8 @@ export const deleteClientProjectStage = createSafeAction({
 export const reorderClientProjectStages = createSafeAction({
   scope: "admin.client-project.stage.reorder",
   schema: z.object({
-    projectId: z.string().cuid(),
-    orderedIds: z.array(z.string().cuid()).min(1),
+    projectId: z.string().min(1),
+    orderedIds: z.array(z.string().min(1)).min(1),
   }),
   authorize: async () => {
     const session = await requireAdmin();

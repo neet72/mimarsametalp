@@ -22,6 +22,15 @@ type ClientRow = {
   projectIds: string[];
 };
 
+function fieldErrorText(fe: Record<string, string[] | undefined> | undefined) {
+  if (!fe) return null;
+  const parts: string[] = [];
+  for (const [k, v] of Object.entries(fe)) {
+    if (v?.[0]) parts.push(`${k}: ${v[0]}`);
+  }
+  return parts.length ? parts.join(" · ") : null;
+}
+
 export function AdminClientForm({
   mode,
   initial,
@@ -35,6 +44,7 @@ export function AdminClientForm({
   const toast = useAdminToast();
   const [pending, startTransition] = useTransition();
   const [tempPassword, setTempPassword] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>(initial?.projectIds ?? []);
 
   function toggleProject(id: string) {
@@ -43,6 +53,7 @@ export function AdminClientForm({
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setFormError(null);
     const fd = new FormData(e.currentTarget);
     startTransition(async () => {
       if (mode === "create") {
@@ -56,7 +67,12 @@ export function AdminClientForm({
           projectIds: selected,
         });
         if (!res.ok) {
-          toast.error({ title: res.error });
+          const detail = fieldErrorText(
+            "fieldErrors" in res ? (res.fieldErrors as Record<string, string[] | undefined>) : undefined,
+          );
+          const msg = detail ? `${res.error} (${detail})` : res.error;
+          setFormError(msg);
+          toast.error({ title: msg });
           return;
         }
         setTempPassword(res.data?.tempPassword ?? null);
@@ -77,7 +93,12 @@ export function AdminClientForm({
         projectIds: selected,
       });
       if (!res.ok) {
-        toast.error({ title: res.error });
+        const detail = fieldErrorText(
+          "fieldErrors" in res ? (res.fieldErrors as Record<string, string[] | undefined>) : undefined,
+        );
+        const msg = detail ? `${res.error} (${detail})` : res.error;
+        setFormError(msg);
+        toast.error({ title: msg });
         return;
       }
       toast.success({ title: "Kaydedildi." });
@@ -114,6 +135,12 @@ export function AdminClientForm({
         </div>
       ) : null}
 
+      {formError ? (
+        <p className="rounded-lg border border-red-900/50 bg-red-950/30 px-3 py-2 text-sm text-red-300">
+          {formError}
+        </p>
+      ) : null}
+
       <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-950/40 p-5">
         <label className="block text-sm">
           <span className="mb-1 block text-zinc-500">Ad soyad</span>
@@ -130,8 +157,13 @@ export function AdminClientForm({
             <input
               name="username"
               required
+              autoComplete="off"
+              placeholder="ornek.musteri"
               className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-zinc-100"
             />
+            <span className="mt-1 block text-xs text-zinc-600">
+              E-posta yazmayın — sadece harf, rakam, nokta, _ veya - (örn. ahmet.yilmaz)
+            </span>
           </label>
         ) : (
           <p className="text-sm text-zinc-500">
@@ -139,7 +171,7 @@ export function AdminClientForm({
           </p>
         )}
         <label className="block text-sm">
-          <span className="mb-1 block text-zinc-500">E-posta</span>
+          <span className="mb-1 block text-zinc-500">E-posta (bildirim için, opsiyonel)</span>
           <input
             name="email"
             type="email"
@@ -148,7 +180,7 @@ export function AdminClientForm({
           />
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block text-zinc-500">Telefon</span>
+          <span className="mb-1 block text-zinc-500">Telefon (opsiyonel)</span>
           <input
             name="phone"
             defaultValue={initial?.phone ?? ""}
@@ -174,7 +206,7 @@ export function AdminClientForm({
         </div>
 
         <fieldset>
-          <legend className="mb-2 text-sm text-zinc-500">Projeler</legend>
+          <legend className="mb-2 text-sm text-zinc-500">Portal projeleri</legend>
           <div className="grid gap-2 sm:grid-cols-2">
             {projects.map((p) => (
               <label key={p.id} className="flex items-center gap-2 text-sm text-zinc-300">
@@ -187,7 +219,7 @@ export function AdminClientForm({
               </label>
             ))}
             {projects.length === 0 ? (
-              <p className="text-sm text-zinc-600">Önce müşteri projesi oluşturun.</p>
+              <p className="text-sm text-zinc-600">Önce portal projesi oluşturun (opsiyonel).</p>
             ) : null}
           </div>
         </fieldset>
