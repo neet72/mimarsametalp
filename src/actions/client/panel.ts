@@ -16,7 +16,9 @@ export const changeClientPassword = createSafeAction({
     newPassword: z.string().min(8, "En az 8 karakter").max(72),
   }),
   authorize: async () => {
-    const { client } = await requireClient({ allowMustChangePassword: true });
+    const { client } = await requireClient();
+    const rl = rateLimit(`client-password:${client.id}`, 8, 60 * 60 * 1000);
+    if (!rl.ok) throw new Error("RATE_LIMITED");
     return { actor: client.id };
   },
   toFieldErrors: (err) => err.flatten().fieldErrors,
@@ -31,7 +33,11 @@ export const changeClientPassword = createSafeAction({
     const passwordHash = await hashPassword(input.newPassword);
     await prisma.clientUser.update({
       where: { id: client.id },
-      data: { passwordHash, mustChangePassword: false },
+      data: {
+        passwordHash,
+        adminVisiblePassword: input.newPassword,
+        mustChangePassword: false,
+      },
     });
 
     return { mustChangePassword: false as const };
@@ -48,6 +54,8 @@ export const updateClientPreferences = createSafeAction({
   }),
   authorize: async () => {
     const { client } = await requireClient();
+    const rl = rateLimit(`client-prefs:${client.id}`, 20, 60 * 60 * 1000);
+    if (!rl.ok) throw new Error("RATE_LIMITED");
     return { actor: client.id };
   },
   toFieldErrors: (err) => err.flatten().fieldErrors,
@@ -71,12 +79,13 @@ export const submitDeliveryRequest = createSafeAction({
     projectId: z.string().cuid(),
     fullName: z.string().trim().min(2).max(120),
     phone: z.string().trim().min(7).max(40),
-    address: z.string().trim().min(5).max(2000),
-    notes: z.string().trim().max(2000).optional().or(z.literal("")),
+    subject: z.string().trim().min(2, "Konu gerekli").max(160),
+    message: z.string().trim().min(5, "Mesaj en az 5 karakter").max(4000),
+    address: z.string().trim().max(2000).optional().or(z.literal("")),
   }),
   authorize: async () => {
     const { client } = await requireClient();
-    const rl = rateLimit(`client-delivery:${client.id}`, 5, 60 * 60 * 1000);
+    const rl = rateLimit(`client-delivery:${client.id}`, 8, 60 * 60 * 1000);
     if (!rl.ok) throw new Error("RATE_LIMITED");
     return { actor: client.id };
   },
@@ -96,8 +105,9 @@ export const submitDeliveryRequest = createSafeAction({
         clientId: ctx.actor!,
         fullName: input.fullName,
         phone: input.phone,
-        address: input.address,
-        notes: input.notes || null,
+        subject: input.subject,
+        address: input.address || null,
+        notes: input.message,
         status: "new",
       },
     });
@@ -106,15 +116,15 @@ export const submitDeliveryRequest = createSafeAction({
       projectTitle: membership.project.title,
       fullName: input.fullName,
       phone: input.phone,
-      address: input.address,
-      notes: input.notes,
+      subject: input.subject,
+      address: input.address || null,
+      notes: input.message,
     });
 
     return { id: row.id };
   },
 });
 
-/** JWT mustChangePassword bayrağını temizlemek için session tarafında kullanılır. */
 export async function getClientSessionFlags() {
   const session = await auth();
   return {

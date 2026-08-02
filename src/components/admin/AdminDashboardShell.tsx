@@ -25,7 +25,7 @@ const navSite = [
 const navPortal = [
   { href: "/admin/clients", label: "Müşteriler", icon: Users },
   { href: "/admin/client-projects", label: "Portal projeleri", icon: Briefcase },
-  { href: "/admin/delivery-requests", label: "Teslimler", icon: Package },
+  { href: "/admin/delivery-requests", label: "İstekler", icon: Package },
 ] as const;
 
 function NavLinks({

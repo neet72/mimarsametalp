@@ -13,7 +13,7 @@ const nav = [
   { href: "/panel", label: "Özet" },
   { href: "/panel/guncellemeler", label: "Güncellemeler" },
   { href: "/panel/tercihler", label: "Tercihler" },
-  { href: "/panel/teslim", label: "Teslim" },
+  { href: "/panel/istekler", label: "İstekler" },
 ] as const;
 
 export function PanelShell({ children, userName }: { children: ReactNode; userName: string }) {

@@ -16,6 +16,7 @@ type ClientRow = {
   username: string;
   email: string | null;
   phone: string | null;
+  adminVisiblePassword: string | null;
   notifyEmail: boolean;
   notifySms: boolean;
   active: boolean;
@@ -123,7 +124,7 @@ export function AdminClientForm({
     <div className="space-y-4">
       {tempPassword ? (
         <div className="rounded-lg border border-amber-800/60 bg-amber-950/40 px-4 py-3 text-sm text-amber-100">
-          Geçici şifre:{" "}
+          Portal şifresi:{" "}
           <code className="select-all font-mono text-base">{tempPassword}</code>
           <button
             type="button"
@@ -133,6 +134,22 @@ export function AdminClientForm({
             Kopyala
           </button>
         </div>
+      ) : mode === "edit" && initial?.adminVisiblePassword ? (
+        <div className="rounded-lg border border-zinc-700 bg-zinc-900/50 px-4 py-3 text-sm text-zinc-200">
+          Portal şifresi:{" "}
+          <code className="select-all font-mono text-base text-amber-100">{initial.adminVisiblePassword}</code>
+          <button
+            type="button"
+            className="ml-3 text-zinc-400 underline hover:text-zinc-200"
+            onClick={() => void navigator.clipboard.writeText(initial.adminVisiblePassword!)}
+          >
+            Kopyala
+          </button>
+        </div>
+      ) : mode === "edit" ? (
+        <p className="rounded-lg border border-zinc-800 px-4 py-3 text-sm text-zinc-500">
+          Kayıtlı düz metin şifre yok — sıfırlayınca yeni şifre burada görünür.
+        </p>
       ) : null}
 
       {formError ? (

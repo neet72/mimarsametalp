@@ -1,5 +1,7 @@
-import { sanitizeHtml } from "@/lib/security/sanitize-html";
-
+/**
+ * Hafif markdown → HTML (başlık, kalın, italik, link, liste, paragraf).
+ * Metin escape edilir; DOMPurify’ye bağımlı değil (panel 500 önlemi).
+ */
 function escapeText(s: string) {
   return s
     .replace(/&/g, "&amp;")
@@ -8,10 +10,6 @@ function escapeText(s: string) {
     .replace(/"/g, "&quot;");
 }
 
-/**
- * Hafif markdown → HTML (başlık, kalın, italik, link, liste, paragraf).
- * Çıktı her zaman sanitize edilir.
- */
 export function renderMarkdownSafe(markdown: string): string {
   if (!markdown) return "";
 
@@ -28,7 +26,10 @@ export function renderMarkdownSafe(markdown: string): string {
 
   const inline = (text: string) => {
     let t = escapeText(text);
-    t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" rel="noopener noreferrer" target="_blank">$1</a>');
+    t = t.replace(
+      /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+      '<a href="$2" rel="noopener noreferrer" target="_blank">$1</a>',
+    );
     t = t.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
     t = t.replace(/\*([^*]+)\*/g, "<em>$1</em>");
     t = t.replace(/`([^`]+)`/g, "<code>$1</code>");
@@ -74,5 +75,5 @@ export function renderMarkdownSafe(markdown: string): string {
   }
 
   flushList();
-  return sanitizeHtml(htmlParts.join("\n"));
+  return htmlParts.join("\n");
 }

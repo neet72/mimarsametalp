@@ -161,7 +161,7 @@ export default async function AdminDashboardPage() {
             className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3 transition-colors hover:border-zinc-700"
           >
             <div className="flex items-center justify-between">
-              <p className="text-xs text-zinc-500">Yeni teslim</p>
+              <p className="text-xs text-zinc-500">Yeni istek</p>
               <Package className="h-4 w-4 text-zinc-600" aria-hidden />
             </div>
             <p className="mt-1 text-2xl font-semibold tabular-nums text-[rgb(200,170,130)]">{deliveryNewCount}</p>
@@ -177,7 +177,7 @@ export default async function AdminDashboardPage() {
             { href: "/admin/services/new", label: "Yeni hizmet" },
             { href: "/admin/clients", label: "Yeni müşteri" },
             { href: "/admin/client-projects/new", label: "Portal projesi" },
-            { href: "/admin/delivery-requests", label: "Teslimler" },
+            { href: "/admin/delivery-requests", label: "İstekler" },
             { href: "/admin/about", label: "Hakkımızda" },
             { href: "/admin/contact", label: "İletişim metinleri" },
           ].map((l) => (

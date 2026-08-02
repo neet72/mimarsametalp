@@ -43,7 +43,7 @@ export function PanelLoginForm() {
           Müşteri paneli
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          Proje durumunuz, güncellemeler ve teslim talepleri için güvenli giriş.
+          Proje durumunuz, güncellemeler ve istekleriniz için güvenli giriş.
         </p>
       </div>
 

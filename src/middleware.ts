@@ -103,9 +103,6 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const email = req.auth?.user?.email;
   const role = (req.auth?.user as { role?: string } | undefined)?.role;
-  const mustChangePassword = Boolean(
-    (req.auth?.user as { mustChangePassword?: boolean } | undefined)?.mustChangePassword,
-  );
   const isAdmin = isLoggedIn && (role === "admin" || isAdminEmail(email ?? null));
   const isClient = isLoggedIn && role === "client";
 
@@ -130,8 +127,7 @@ export default auth((req) => {
   // --- Client portal ---
   if (pathname === "/panel/giris") {
     if (isClient) {
-      const dest = mustChangePassword ? "/panel/sifre" : "/panel";
-      return applySecurityHeaders(NextResponse.redirect(new URL(dest, req.nextUrl.origin)));
+      return applySecurityHeaders(NextResponse.redirect(new URL("/panel", req.nextUrl.origin)));
     }
     return applySecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }));
   }
@@ -139,9 +135,6 @@ export default auth((req) => {
   if (pathname.startsWith("/panel")) {
     if (!isClient) {
       return applySecurityHeaders(NextResponse.redirect(new URL("/panel/giris", req.nextUrl.origin)));
-    }
-    if (mustChangePassword && pathname !== "/panel/sifre") {
-      return applySecurityHeaders(NextResponse.redirect(new URL("/panel/sifre", req.nextUrl.origin)));
     }
   }
 

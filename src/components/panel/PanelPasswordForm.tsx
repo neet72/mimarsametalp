@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { changeClientPassword } from "@/actions/client/panel";
 
-export function PanelPasswordForm({ forced }: { forced?: boolean }) {
+export function PanelPasswordForm() {
   const router = useRouter();
   const { update } = useSession();
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +25,7 @@ export function PanelPasswordForm({ forced }: { forced?: boolean }) {
         return;
       }
       await update({ mustChangePassword: false });
-      router.replace("/panel");
+      router.replace("/panel/tercihler");
       router.refresh();
     });
   }
@@ -34,9 +34,7 @@ export function PanelPasswordForm({ forced }: { forced?: boolean }) {
     <form onSubmit={onSubmit} className="mx-auto max-w-md space-y-5 rounded-2xl border border-border bg-white/50 p-8">
       <div>
         <h1 className="font-display text-2xl font-semibold tracking-tight text-primary">Şifre değiştir</h1>
-        {forced ? (
-          <p className="mt-2 text-sm text-muted">İlk girişte güvenli bir şifre belirlemeniz gerekiyor.</p>
-        ) : null}
+        <p className="mt-2 text-sm text-muted">İsterseniz güncelleyin — zorunlu değil. Tercihler sayfasından da değiştirebilirsiniz.</p>
       </div>
       {error ? (
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>

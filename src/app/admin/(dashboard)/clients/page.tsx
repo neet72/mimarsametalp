@@ -54,13 +54,11 @@ export default async function AdminClientsPage() {
                     <AdminStatusPill tone={c.active ? "ok" : "danger"}>
                       {c.active ? "aktif" : "pasif"}
                     </AdminStatusPill>
-                    {c.mustChangePassword ? (
-                      <AdminStatusPill tone="accent">şifre zorunlu</AdminStatusPill>
-                    ) : null}
                   </div>
                   <p className="mt-1 truncate text-zinc-500">
                     @{c.username}
                     {c.email ? ` · ${c.email}` : ""}
+                    {c.adminVisiblePassword ? ` · şifre: ${c.adminVisiblePassword}` : ""}
                     {` · ${c.projects.length} proje`}
                   </p>
                 </div>

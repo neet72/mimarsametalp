@@ -37,8 +37,8 @@ export async function sendClientTempPasswordEmail(input: {
     <h1>Samet Alp Mimarlık — Müşteri paneli</h1>
     <p>Merhaba ${escapeHtml(input.fullName)},</p>
     <p>Kullanıcı adınız: <strong>${escapeHtml(input.username)}</strong></p>
-    <p>Geçici şifreniz: <strong>${escapeHtml(input.tempPassword)}</strong></p>
-    <p>Girişten sonra şifrenizi değiştirmeniz gerekecek.</p>
+    <p>Şifreniz: <strong>${escapeHtml(input.tempPassword)}</strong></p>
+    <p>Panele giriş: kullanıcı adınız ve bu şifre ile.</p>
   `;
 
   const { error } = await resend.emails.send({
@@ -59,7 +59,8 @@ export async function sendDeliveryRequestAdminEmail(input: {
   projectTitle: string;
   fullName: string;
   phone: string;
-  address: string;
+  subject: string;
+  address?: string | null;
   notes?: string | null;
 }): Promise<void> {
   if (!resend) {
@@ -68,18 +69,19 @@ export async function sendDeliveryRequestAdminEmail(input: {
   }
 
   const html = `
-    <h1>Yeni teslim talebi</h1>
+    <h1>Yeni müşteri isteği</h1>
     <p><strong>Proje:</strong> ${escapeHtml(input.projectTitle)}</p>
+    <p><strong>Konu:</strong> ${escapeHtml(input.subject)}</p>
     <p><strong>Ad:</strong> ${escapeHtml(input.fullName)}</p>
     <p><strong>Telefon:</strong> ${escapeHtml(input.phone)}</p>
-    <p><strong>Adres:</strong> ${escapeHtml(input.address)}</p>
-    ${input.notes ? `<p><strong>Not:</strong> ${escapeHtml(input.notes)}</p>` : ""}
+    ${input.address ? `<p><strong>Adres:</strong> ${escapeHtml(input.address)}</p>` : ""}
+    ${input.notes ? `<p><strong>Mesaj:</strong> ${escapeHtml(input.notes)}</p>` : ""}
   `;
 
   const { error } = await resend.emails.send({
     from,
     to: [adminInbox],
-    subject: `Teslim talebi: ${input.projectTitle}`,
+    subject: `İstek: ${input.subject} — ${input.projectTitle}`,
     html,
   });
 

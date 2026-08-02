@@ -64,7 +64,8 @@ export const createClientUser = createSafeAction({
         email,
         phone: input.phone || null,
         passwordHash,
-        mustChangePassword: true,
+        adminVisiblePassword: tempPassword,
+        mustChangePassword: false,
         notifyEmail: input.notifyEmail ?? true,
         notifySms: input.notifySms ?? true,
         projects:
@@ -160,7 +161,7 @@ export const resetClientPassword = createSafeAction({
 
     await prisma.clientUser.update({
       where: { id: client.id },
-      data: { passwordHash, mustChangePassword: true },
+      data: { passwordHash, adminVisiblePassword: tempPassword, mustChangePassword: false },
     });
 
     if (client.email) {

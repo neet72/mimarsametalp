@@ -8,7 +8,7 @@ export default async function PanelPreferencesPage() {
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-semibold tracking-tight text-primary">Tercihler</h1>
-        <p className="mt-2 text-muted">Bildirim ve iletişim bilgileri.</p>
+        <p className="mt-2 text-muted">Bildirim, iletişim ve isteğe bağlı şifre güncelleme.</p>
       </div>
       <PanelPreferencesForm
         initial={{
