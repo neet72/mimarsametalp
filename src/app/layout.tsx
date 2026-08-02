@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Instrument_Serif, Inter, Outfit } from "next/font/google";
 import { headers } from "next/headers";
 import { ThemeProvider, THEME_BOOT_SCRIPT } from "@/components/theme/ThemeProvider";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -18,6 +18,14 @@ const inter = Inter({
 const outfit = Outfit({
   subsets: ["latin", "latin-ext"],
   variable: "--font-outfit",
+  display: "swap",
+});
+
+const instrumentSerif = Instrument_Serif({
+  weight: "400",
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-instrument-serif",
   display: "swap",
 });
 
@@ -110,23 +118,15 @@ export default async function RootLayout({
   const h = await headers();
   const locale = (h.get("x-locale") ?? "") === "en" ? "en" : "tr";
   const pathname = h.get("x-pathname") ?? "";
-  const isAdmin = pathname.startsWith("/admin");
+  const isAppShell = pathname.startsWith("/admin") || pathname.startsWith("/panel");
   return (
     <html
       lang={locale === "en" ? "en" : "tr"}
-      className={`${inter.variable} ${outfit.variable}`}
+      className={`${inter.variable} ${outfit.variable} ${instrumentSerif.variable}`}
       suppressHydrationWarning
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
-        {/* Instrument Serif — App Router `head.tsx` kullanılmaz; CSP ile Google Fonts açık */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font -- Instrument Serif next/font'ta yok */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap"
-          rel="stylesheet"
-        />
         <link rel="dns-prefetch" href="//res.cloudinary.com" />
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="" />
       </head>
@@ -134,30 +134,34 @@ export default async function RootLayout({
         className="font-sans [--font-display:var(--font-outfit)] [--font-sans:var(--font-inter)]"
         suppressHydrationWarning
       >
-        <script key="jsonld-org" {...jsonLdScriptProps(organizationJsonLd())} />
-        <script key="jsonld-local" {...jsonLdScriptProps(localBusinessJsonLd())} />
-        <script
-          key="jsonld-website"
-          {...jsonLdScriptProps(
-            websiteJsonLd({
-              inLanguage: locale === "en" ? "en-US" : "tr-TR",
-              path: locale === "en" ? "/en" : "/",
-            }),
-          )}
-        />
-        <script
-          key="jsonld-nav"
-          {...jsonLdScriptProps(
-            siteNavigationJsonLd({
-              inLanguage: locale === "en" ? "en-US" : "tr-TR",
-              pathPrefix: locale === "en" ? "/en" : "",
-            }),
-          )}
-        />
+        {!isAppShell ? (
+          <>
+            <script key="jsonld-org" {...jsonLdScriptProps(organizationJsonLd())} />
+            <script key="jsonld-local" {...jsonLdScriptProps(localBusinessJsonLd())} />
+            <script
+              key="jsonld-website"
+              {...jsonLdScriptProps(
+                websiteJsonLd({
+                  inLanguage: locale === "en" ? "en-US" : "tr-TR",
+                  path: locale === "en" ? "/en" : "/",
+                }),
+              )}
+            />
+            <script
+              key="jsonld-nav"
+              {...jsonLdScriptProps(
+                siteNavigationJsonLd({
+                  inLanguage: locale === "en" ? "en-US" : "tr-TR",
+                  pathPrefix: locale === "en" ? "/en" : "",
+                }),
+              )}
+            />
+          </>
+        ) : null}
         <ThemeProvider>
-          <MainLayout key="main-layout">{children}</MainLayout>
-          {isAdmin ? null : <Analytics key="analytics" />}
-          {isAdmin ? null : <SpeedInsights key="speed-insights" />}
+          {isAppShell ? children : <MainLayout key="main-layout">{children}</MainLayout>}
+          {isAppShell ? null : <Analytics key="analytics" />}
+          {isAppShell ? null : <SpeedInsights key="speed-insights" />}
         </ThemeProvider>
       </body>
     </html>

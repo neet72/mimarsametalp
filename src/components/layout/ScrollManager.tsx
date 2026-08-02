@@ -20,31 +20,18 @@ export function ScrollManager() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    // Hash hedeflerine izin ver (örn. #section)
     if (window.location.hash) return;
 
-    const goTop = () => {
+    scrollToTopImmediate();
+    const raf = window.requestAnimationFrame(() => {
       scrollToTopImmediate();
-    };
-
-    // Senkron + layout sonrası: Lenis/next soft-nav bazen bir frame gecikmeli ölçer.
-    goTop();
-    const raf1 = window.requestAnimationFrame(() => {
-      goTop();
-      window.requestAnimationFrame(() => {
-        goTop();
-        window.dispatchEvent(new Event("scroll"));
-        window.dispatchEvent(new Event("resize"));
-      });
     });
-    const t1 = window.setTimeout(goTop, 40);
-    const t2 = window.setTimeout(goTop, 120);
+    // Lenis soft-nav için tek gecikmeli yedek (önceki 3× raf + 2 timeout sadeleştirildi).
+    const t = window.setTimeout(scrollToTopImmediate, 80);
 
     return () => {
-      window.cancelAnimationFrame(raf1);
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
+      window.cancelAnimationFrame(raf);
+      window.clearTimeout(t);
     };
   }, [pathname]);
 

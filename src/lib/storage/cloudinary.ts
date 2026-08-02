@@ -40,6 +40,8 @@ export async function uploadToCloudinary(opts: {
   buffer: Buffer;
   mimeType: string;
   actor?: string;
+  /** Varsayılan portfolyo klasörleri; portal medyası için `portal` kullanın. */
+  folderKind?: "portfolio" | "portal";
 }): Promise<CloudinaryUploadResult> {
   if (!configureCloudinary()) {
     logger.error({ msg: "cloudinary not configured", scope: "storage.cloudinary", actor: opts.actor });
@@ -47,7 +49,19 @@ export async function uploadToCloudinary(opts: {
   }
 
   const isVideo = opts.mimeType.startsWith("video/");
-  const folder = isVideo ? "samet-alp/videos" : "samet-alp/images";
+  const isPdf = opts.mimeType === "application/pdf";
+  const kind = opts.folderKind ?? "portfolio";
+  const folder =
+    kind === "portal"
+      ? isVideo
+        ? "samet-alp/portal/videos"
+        : isPdf
+          ? "samet-alp/portal/docs"
+          : "samet-alp/portal/images"
+      : isVideo
+        ? "samet-alp/videos"
+        : "samet-alp/images";
+  // Unguessable public_id (signed/authenticated delivery follow-up için hazır).
   const publicId = `${folder}/${crypto.randomUUID()}`;
 
   type CloudinaryEagerItem = { secure_url?: string };

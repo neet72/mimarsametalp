@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { stripLocalePrefix } from "@/lib/locale";
 
 export const siteName = "Samet Alp Mimarlık";
 
@@ -16,13 +17,14 @@ type PageMetaInput = {
   path: `/${string}`;
 };
 
-function toTrPath(path: `/${string}`) {
-  return (path.startsWith("/en/") ? (path.slice(3) as `/${string}`) : path) as `/${string}`;
+function toTrPath(path: `/${string}`): `/${string}` {
+  const stripped = stripLocalePrefix(path);
+  return (stripped.startsWith("/") ? stripped : `/${stripped}`) as `/${string}`;
 }
 
 function toEnPath(path: `/${string}`) {
-  if (path === "/") return "/en";
-  return (path.startsWith("/en/") ? path : (`/en${path}` as `/${string}`)) as `/${string}`;
+  if (path === "/" || path === "/en") return "/en";
+  return (path.startsWith("/en/") ? path : (`/en${toTrPath(path)}` as `/${string}`)) as `/${string}`;
 }
 
 /**

@@ -9,6 +9,13 @@ import {
   CONTACT_SOCIAL_LINKEDIN,
   CONTACT_SOCIAL_WHATSAPP,
 } from "@/content/contact-page";
+import {
+  OFFICE_COUNTRY_CODE,
+  OFFICE_LOCALITY,
+  OFFICE_POSTAL,
+  OFFICE_REGION,
+  OFFICE_STREET_TR,
+} from "@/content/kvkk-page";
 
 type JsonLd = Record<string, unknown>;
 
@@ -29,7 +36,7 @@ export function organizationJsonLd() {
     "@type": "Organization",
     name: siteName,
     url: base,
-    logo: `${base}/icon.svg`,
+    logo: `${base}/favicon.svg`,
     email: CONTACT_EMAIL,
     telephone: CONTACT_PHONE_TEL,
     sameAs: [CONTACT_SOCIAL_INSTAGRAM, CONTACT_SOCIAL_WHATSAPP, CONTACT_SOCIAL_LINKEDIN].filter(Boolean),
@@ -54,7 +61,7 @@ export function localBusinessJsonLd() {
     name: siteName,
     url: base,
     image: `${base}/opengraph-image`,
-    logo: `${base}/icon.svg`,
+    logo: `${base}/favicon.svg`,
     telephone: CONTACT_PHONE_TEL,
     email: CONTACT_EMAIL,
     sameAs: [CONTACT_SOCIAL_INSTAGRAM, CONTACT_SOCIAL_WHATSAPP, CONTACT_SOCIAL_LINKEDIN].filter(Boolean),
@@ -62,19 +69,19 @@ export function localBusinessJsonLd() {
       "@type": "Country",
       name: "Türkiye",
     },
-    // Local SEO (mock — sonra kolayca güncelleyebilmen için)
+    // Local SEO — adres tek kaynak: src/content/kvkk-page.ts
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Güzelevler, 2067/2 SK A blok No: 32/3",
-      addressLocality: "Yüreğir",
-      addressRegion: "Adana",
-      postalCode: "01220",
-      addressCountry: "TR",
+      streetAddress: OFFICE_STREET_TR,
+      addressLocality: OFFICE_LOCALITY,
+      addressRegion: OFFICE_REGION,
+      postalCode: OFFICE_POSTAL,
+      addressCountry: OFFICE_COUNTRY_CODE,
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: 37.0,
-      longitude: 35.32,
+      latitude: 36.9914,
+      longitude: 35.3308,
     },
     openingHoursSpecification: [
       {

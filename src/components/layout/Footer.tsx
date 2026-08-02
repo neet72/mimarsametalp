@@ -6,12 +6,10 @@ import { Reveal } from "@/components/motion/FadeIn";
 import { cn } from "@/lib/cn";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
 import { pageContainerClass } from "@/lib/page-layout";
+import { OFFICE_ADDRESS_EN, OFFICE_ADDRESS_TR } from "@/content/kvkk-page";
 
 const services =
   "Mimarlık, İç Mimarlık, Dekorasyon, Anahtar Teslim Proje, Mimari Danışmanlık, Yenileme ve Tadilat";
-
-const address =
-  "Güzelevler Mahallesi 2067/2 Sokak A blok No: 32/3 Adana / Türkiye";
 
 export function Footer() {
   const pathname = usePathname();
@@ -21,9 +19,7 @@ export function Footer() {
   const servicesText = t
     ? "Architecture, Interior Architecture, Decoration, Turnkey Projects, Architectural Consulting, Renovation & Remodeling"
     : services;
-  const addressText = t
-    ? "Güzelevler District, 2067/2 Street A Block No: 32/3, Adana / Türkiye"
-    : address;
+  const addressText = t ? OFFICE_ADDRESS_EN : OFFICE_ADDRESS_TR;
   return (
     <footer className="mt-auto border-t border-border bg-surface pb-[max(0px,env(safe-area-inset-bottom,0px))]">
       <Reveal className={cn("relative py-10 sm:py-12", pageContainerClass)}>

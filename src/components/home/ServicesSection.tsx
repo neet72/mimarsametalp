@@ -215,7 +215,7 @@ export function ServicesSection({ serviceItems }: { serviceItems?: ServiceListin
                           }
                           fill
                           sizes="(max-width: 768px) 78vw, (max-width: 1200px) 340px, 380px"
-                          priority={index === 0}
+                          priority={false}
                           className="object-cover object-center"
                           draggable={false}
                         />

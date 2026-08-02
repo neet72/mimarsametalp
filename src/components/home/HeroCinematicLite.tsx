@@ -109,10 +109,9 @@ export function HeroCinematicLite() {
           loop
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
           disablePictureInPicture
           disableRemotePlayback
-          fetchPriority="high"
         >
           {HERO_VIDEO_OVERRIDE ? (
             <source src={HERO_VIDEO_OVERRIDE} type={videoMimeFromUrl(HERO_VIDEO_OVERRIDE)} />
@@ -143,12 +142,9 @@ export function HeroCinematicLite() {
         <h1
           className={cn(
             "max-w-[80rem] text-balance font-normal text-5xl leading-[0.95] tracking-[-0.154rem] sm:text-7xl md:text-8xl",
-            "font-[family-name:var(--font-instrument-serif,'Instrument_Serif',var(--font-display),serif)]",
+            "font-[family-name:var(--font-instrument-serif),var(--font-display),serif]",
             motionOn && "animate-fade-rise-video",
           )}
-          style={{
-            fontFamily: "'Instrument Serif', var(--font-display), serif",
-          }}
         >
           {headline}
         </h1>

@@ -1,12 +1,19 @@
 /** Ofis adresi — tek kaynak (NAP tutarlılığı) */
+export const OFFICE_STREET_TR = "Güzelevler Mahallesi 2067/2 Sokak A blok No: 32/3";
+export const OFFICE_STREET_EN = "Güzelevler District, 2067/2 Street A Block No: 32/3";
+export const OFFICE_LOCALITY = "Yüreğir";
+export const OFFICE_REGION = "Adana";
+export const OFFICE_POSTAL = "01220";
+export const OFFICE_COUNTRY_CODE = "TR";
+
 export const OFFICE_ADDRESS_TR =
-  "Güzelevler Mahallesi 2067/2 Sokak A blok No: 32/3, 01220 Yüreğir / Adana / Türkiye";
+  `${OFFICE_STREET_TR}, ${OFFICE_POSTAL} ${OFFICE_LOCALITY} / ${OFFICE_REGION} / Türkiye`;
 
 export const OFFICE_ADDRESS_EN =
-  "Güzelevler District, 2067/2 Street A Block No: 32/3, 01220 Yüreğir / Adana / Türkiye";
+  `${OFFICE_STREET_EN}, ${OFFICE_POSTAL} ${OFFICE_LOCALITY} / ${OFFICE_REGION} / Türkiye`;
 
 export const OFFICE_ADDRESS_MAP_QUERY =
-  "Güzelevler, 2067/2 SK A blok no:32/3, 01220 Yüreğir/Adana";
+  `Güzelevler, 2067/2 SK A blok no:32/3, ${OFFICE_POSTAL} ${OFFICE_LOCALITY}/${OFFICE_REGION}`;
 
 export const KVKK_PAGE_TITLE = "KVKK Aydınlatma Metni ve Gizlilik";
 export const KVKK_PAGE_DESCRIPTION =

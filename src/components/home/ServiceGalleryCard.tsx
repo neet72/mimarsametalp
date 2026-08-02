@@ -69,7 +69,7 @@ export function ServiceGalleryCard({ service, index }: ServiceGalleryCardProps) 
             }
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            priority={index === 0}
+            priority={false}
             className={cn(
               "object-cover object-center transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform",
               "group-hover:scale-[1.12] motion-reduce:group-hover:scale-100",

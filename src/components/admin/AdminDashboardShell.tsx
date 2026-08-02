@@ -9,11 +9,11 @@ import type { ReactNode } from "react";
 import { SessionProvider } from "next-auth/react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, FolderKanban, Inbox, LogOut, Wrench, Info, Phone, Menu, X } from "lucide-react";
+import { LayoutDashboard, FolderKanban, Inbox, LogOut, Wrench, Info, Phone, Menu, X, Users, Briefcase, Package } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { AdminToastProvider } from "@/components/admin/ui/toast";
 
-const nav = [
+const navSite = [
   { href: "/admin", label: "Özet", icon: LayoutDashboard },
   { href: "/admin/projects", label: "Projeler", icon: FolderKanban },
   { href: "/admin/services", label: "Hizmetler", icon: Wrench },
@@ -21,6 +21,47 @@ const nav = [
   { href: "/admin/contact", label: "İletişim", icon: Phone },
   { href: "/admin/messages", label: "Mesajlar", icon: Inbox },
 ] as const;
+
+const navPortal = [
+  { href: "/admin/clients", label: "Müşteriler", icon: Users },
+  { href: "/admin/client-projects", label: "Müşteri projeleri", icon: Briefcase },
+  { href: "/admin/delivery-requests", label: "Teslim talepleri", icon: Package },
+] as const;
+
+function NavLinks({
+  pathname,
+  items,
+  onNavigate,
+}: {
+  pathname: string;
+  items: readonly { href: string; label: string; icon: typeof LayoutDashboard }[];
+  onNavigate?: () => void;
+}) {
+  return (
+    <>
+      {items.map(({ href, label, icon: Icon }) => {
+        const active = pathname === href || (href !== "/admin" && pathname.startsWith(href));
+        return (
+          <Link
+            key={href}
+            href={href}
+            onClick={onNavigate}
+            className={cn(
+              "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+              active
+                ? "bg-zinc-800/80 text-zinc-100"
+                : "text-zinc-500 hover:bg-zinc-900 hover:text-zinc-300",
+            )}
+          >
+            <Icon className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
+            {label}
+          </Link>
+        );
+      })}
+    </>
+  );
+}
+
 
 export function AdminDashboardShell({
   children,
@@ -60,25 +101,12 @@ export function AdminDashboardShell({
               </p>
               <p className="mt-1 truncate text-xs text-zinc-500">{userEmail}</p>
             </div>
-            <nav className="flex flex-1 flex-col gap-0.5 p-2">
-              {nav.map(({ href, label, icon: Icon }) => {
-                const active = pathname === href || (href !== "/admin" && pathname.startsWith(href));
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    className={cn(
-                      "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
-                      active
-                        ? "bg-zinc-800/80 text-zinc-100"
-                        : "text-zinc-500 hover:bg-zinc-900 hover:text-zinc-300",
-                    )}
-                  >
-                    <Icon className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
-                    {label}
-                  </Link>
-                );
-              })}
+            <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2">
+              <NavLinks pathname={pathname} items={navSite} />
+              <p className="mb-1 mt-3 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600">
+                Portal
+              </p>
+              <NavLinks pathname={pathname} items={navPortal} />
             </nav>
             <div className="border-t border-zinc-800 p-2">
               <button
@@ -153,25 +181,12 @@ export function AdminDashboardShell({
                     </button>
                   </div>
 
-                  <nav className="flex flex-1 flex-col gap-0.5 p-2">
-                    {nav.map(({ href, label, icon: Icon }) => {
-                      const active = pathname === href || (href !== "/admin" && pathname.startsWith(href));
-                      return (
-                        <Link
-                          key={href}
-                          href={href}
-                          className={cn(
-                            "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
-                            active
-                              ? "bg-zinc-800/80 text-zinc-100"
-                              : "text-zinc-500 hover:bg-zinc-900 hover:text-zinc-300",
-                          )}
-                        >
-                          <Icon className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
-                          {label}
-                        </Link>
-                      );
-                    })}
+                  <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2">
+                    <NavLinks pathname={pathname} items={navSite} onNavigate={() => setOpen(false)} />
+                    <p className="mb-1 mt-3 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600">
+                      Portal
+                    </p>
+                    <NavLinks pathname={pathname} items={navPortal} onNavigate={() => setOpen(false)} />
                   </nav>
 
                   <div className="border-t border-zinc-800 p-2">

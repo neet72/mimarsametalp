@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { isAdminEmail } from "@/lib/security/admin";
 
 const AdminDashboardShell = dynamic(
   () =>
@@ -22,9 +23,11 @@ export default async function AdminDashboardLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  if (!session?.user?.email) {
+  const email = session?.user?.email;
+  const isAdmin = session?.user?.role === "admin" || isAdminEmail(email ?? null);
+  if (!email || !isAdmin) {
     redirect("/admin/login");
   }
 
-  return <AdminDashboardShell userEmail={session.user.email}>{children}</AdminDashboardShell>;
+  return <AdminDashboardShell userEmail={email}>{children}</AdminDashboardShell>;
 }

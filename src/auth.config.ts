@@ -53,6 +53,15 @@ export default {
       },
       authorize: async () => null,
     }),
+    Credentials({
+      id: "client-credentials",
+      name: "Müşteri",
+      credentials: {
+        username: { label: "Kullanıcı adı", type: "text" },
+        password: { label: "Şifre", type: "password" },
+      },
+      authorize: async () => null,
+    }),
   ],
   session: {
     strategy: "jwt",
@@ -62,11 +71,20 @@ export default {
     signIn: "/admin/login",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.sub = user.id;
         token.email = user.email;
-        token.isAdmin = isAdminEmail(user.email);
+        token.role = user.role ?? (isAdminEmail(user.email) ? "admin" : "client");
+        token.isAdmin = token.role === "admin";
+        token.mustChangePassword = Boolean(user.mustChangePassword);
+      }
+      // Panel şifre değişince session.update ile bayrağı temizle
+      if (trigger === "update" && session && typeof session === "object") {
+        const s = session as { mustChangePassword?: boolean };
+        if (typeof s.mustChangePassword === "boolean") {
+          token.mustChangePassword = s.mustChangePassword;
+        }
       }
       return token;
     },
@@ -74,7 +92,14 @@ export default {
       if (session.user) {
         session.user.id = token.sub ?? "admin";
         session.user.email = token.email as string;
-        session.user.isAdmin = Boolean(token.isAdmin);
+        session.user.role =
+          token.role === "admin" || token.role === "client"
+            ? token.role
+            : token.isAdmin
+              ? "admin"
+              : "client";
+        session.user.isAdmin = Boolean(token.isAdmin) || session.user.role === "admin";
+        session.user.mustChangePassword = Boolean(token.mustChangePassword);
       }
       return session;
     },

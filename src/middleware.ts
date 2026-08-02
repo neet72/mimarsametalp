@@ -21,7 +21,7 @@ function buildCspHeaderValue(): string {
     "frame-ancestors 'none'",
     "form-action 'self'",
     // Next.js injects styles; nonce plumbing is non-trivial in App Router, so allow inline styles only.
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "style-src 'self' 'unsafe-inline'",
     // Next.js (App Router) uses inline scripts for hydration/runtime in production builds.
     // Nonce/hashes would be ideal but require plumbing; keep eval disabled in prod.
     `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}${analyticsScriptSrc}`,
@@ -29,7 +29,7 @@ function buildCspHeaderValue(): string {
     `script-src-elem 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}${analyticsScriptSrc}`,
     "img-src 'self' data: blob: https://res.cloudinary.com",
     "media-src 'self' blob: https://res.cloudinary.com",
-    "font-src 'self' data: https://fonts.gstatic.com",
+    "font-src 'self' data:",
     // Vercel Analytics / Web Vitals
     `connect-src 'self' https://vitals.vercel-insights.com${devConnectExtras}`,
     // Google Maps iframe + yaygın alt çerçeve kaynakları
@@ -102,7 +102,12 @@ export default auth((req) => {
 
   const isLoggedIn = !!req.auth;
   const email = req.auth?.user?.email;
-  const isAdmin = isLoggedIn && isAdminEmail(email ?? null);
+  const role = (req.auth?.user as { role?: string } | undefined)?.role;
+  const mustChangePassword = Boolean(
+    (req.auth?.user as { mustChangePassword?: boolean } | undefined)?.mustChangePassword,
+  );
+  const isAdmin = isLoggedIn && (role === "admin" || isAdminEmail(email ?? null));
+  const isClient = isLoggedIn && role === "client";
 
   // Pass locale to Server Components (root layout) without breaking routing.
   const requestHeaders = new Headers(req.headers);
@@ -122,9 +127,30 @@ export default auth((req) => {
     }
   }
 
+  // --- Client portal ---
+  if (pathname === "/panel/giris") {
+    if (isClient) {
+      const dest = mustChangePassword ? "/panel/sifre" : "/panel";
+      return applySecurityHeaders(NextResponse.redirect(new URL(dest, req.nextUrl.origin)));
+    }
+    return applySecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }));
+  }
+
+  if (pathname.startsWith("/panel")) {
+    if (!isClient) {
+      return applySecurityHeaders(NextResponse.redirect(new URL("/panel/giris", req.nextUrl.origin)));
+    }
+    if (mustChangePassword && pathname !== "/panel/sifre") {
+      return applySecurityHeaders(NextResponse.redirect(new URL("/panel/sifre", req.nextUrl.origin)));
+    }
+  }
+
   return applySecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }));
 });
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|api/).*)"],
+  // Statik dosyalar + Next asset’leri auth/CSP middleware’inden geçmesin (özellikle /videos hero).
+  matcher: [
+    "/((?!_next/static|_next/image|api/|videos/|images/|favicon\\.ico|favicon\\.svg|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|mp4|webm|pdf|txt|xml|webmanifest)$).*)",
+  ],
 };

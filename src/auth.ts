@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import authConfig from "./auth.config";
 import { rateLimit } from "@/lib/security/rate-limit";
 import { logger } from "@/lib/observability/logger";
+import { prisma } from "@/lib/db/prisma";
 
 function stripEnvQuotes(value: string): string {
   const t = value.trim();
@@ -97,7 +98,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           const email = String(credentials.email).toLowerCase().trim();
 
-          // Brute-force koruması (email bazlı) — 10 dakikada 8 deneme.
           const rl = rateLimit(`admin-login:${email}`, 8, 10 * 60 * 1000);
           if (!rl.ok) return null;
 
@@ -115,11 +115,54 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             id: "admin",
             name: "Yönetici",
             email: adminEmail,
+            role: "admin" as const,
+            mustChangePassword: false,
           };
         } catch (e) {
           logger.error({
             msg: "authorize failed",
             scope: "auth.authorize",
+            error: e instanceof Error ? { name: e.name, message: e.message, stack: e.stack } : String(e),
+          });
+          return null;
+        }
+      },
+    }),
+    Credentials({
+      id: "client-credentials",
+      name: "Müşteri",
+      credentials: {
+        username: { label: "Kullanıcı adı", type: "text" },
+        password: { label: "Şifre", type: "password" },
+      },
+      async authorize(credentials) {
+        try {
+          if (!credentials?.username || !credentials?.password) return null;
+
+          const username = String(credentials.username).trim().toLowerCase();
+          const rl = rateLimit(`client-login:${username}`, 8, 10 * 60 * 1000);
+          if (!rl.ok) return null;
+
+          const client = await prisma.clientUser.findUnique({
+            where: { username },
+          });
+          if (!client || !client.active) return null;
+
+          const { compare } = await import("bcryptjs");
+          const ok = await compare(String(credentials.password), client.passwordHash);
+          if (!ok) return null;
+
+          return {
+            id: client.id,
+            name: client.fullName,
+            email: client.email ?? undefined,
+            role: "client" as const,
+            mustChangePassword: client.mustChangePassword,
+          };
+        } catch (e) {
+          logger.error({
+            msg: "client authorize failed",
+            scope: "auth.authorize.client",
             error: e instanceof Error ? { name: e.name, message: e.message, stack: e.stack } : String(e),
           });
           return null;

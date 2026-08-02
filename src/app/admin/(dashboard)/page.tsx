@@ -112,6 +112,28 @@ export default async function AdminDashboardPage() {
         </Link>
       </div>
 
+      <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+        <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Hızlı bağlantılar</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {[
+            { href: "/admin/projects/new", label: "Yeni proje" },
+            { href: "/admin/services/new", label: "Yeni hizmet" },
+            { href: "/admin/about", label: "Hakkımızda" },
+            { href: "/admin/contact", label: "İletişim metinleri" },
+            { href: "/admin/clients", label: "Müşteriler" },
+            { href: "/admin/delivery-requests", label: "Teslim talepleri" },
+          ].map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs font-medium text-zinc-300 transition-colors hover:border-zinc-600 hover:text-zinc-100"
+            >
+              {l.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-5">
           <div className="flex items-center justify-between gap-3">
