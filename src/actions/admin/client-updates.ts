@@ -8,6 +8,11 @@ import { auditAdmin } from "@/lib/observability/audit";
 import { uploadToCloudinary } from "@/lib/storage/cloudinary";
 import { notifyClientsOfUpdate } from "@/lib/notifications/notifyClientsOfUpdate";
 import { logger } from "@/lib/observability/logger";
+import {
+  isPortalAllowedMime,
+  MAX_PORTAL_MEDIA_BYTES,
+  portalMediaKindFromMime,
+} from "@/lib/portal/media-types";
 
 export const createClientProjectUpdate = createSafeAction({
   scope: "admin.client-update.create",
@@ -148,29 +153,55 @@ export const uploadClientUpdateMedia = createSafeAction({
     });
     if (!update) throw new ActionError("Güncelleme bulunamadı.");
 
-    const type = input.file.type;
-    const allowed =
-      type.startsWith("image/") ||
-      type.startsWith("video/") ||
-      type === "application/pdf";
-    if (!allowed) throw new ActionError("Desteklenmeyen dosya türü.");
-    if (input.file.size > 50 * 1024 * 1024) throw new ActionError("Dosya çok büyük (max 50MB).");
+    const type = input.file.type || "application/octet-stream";
+    // Bazı tarayıcılar Office MIME’ı boş bırakır — uzantıdan tamamla.
+    const name = input.file.name.toLowerCase();
+    const inferredType =
+      type && type !== "application/octet-stream"
+        ? type
+        : name.endsWith(".pdf")
+          ? "application/pdf"
+          : name.endsWith(".doc")
+            ? "application/msword"
+            : name.endsWith(".docx")
+              ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              : name.endsWith(".xls")
+                ? "application/vnd.ms-excel"
+                : name.endsWith(".xlsx")
+                  ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                  : name.endsWith(".ppt")
+                    ? "application/vnd.ms-powerpoint"
+                    : name.endsWith(".pptx")
+                      ? "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                      : name.endsWith(".txt")
+                        ? "text/plain"
+                        : type;
+
+    if (!isPortalAllowedMime(inferredType)) {
+      throw new ActionError("Desteklenmeyen dosya. Görsel, video, PDF, Word, Excel veya metin kullanın.");
+    }
+    if (input.file.size > MAX_PORTAL_MEDIA_BYTES) {
+      throw new ActionError("Dosya çok büyük (max 50MB).");
+    }
 
     const bytes = Buffer.from(await input.file.arrayBuffer());
     const uploaded = await uploadToCloudinary({
       buffer: bytes,
-      mimeType: type,
+      mimeType: inferredType,
       actor: ctx.actor,
       folderKind: "portal",
     });
 
-    const mediaType =
-      type.startsWith("image/") ? "image" : type.startsWith("video/") ? "video" : type === "application/pdf" ? "pdf" : "other";
+    const mediaType = portalMediaKindFromMime(inferredType);
 
     const maxOrder = await prisma.clientUpdateMedia.aggregate({
       where: { updateId: input.updateId },
       _max: { orderIndex: true },
     });
+
+    const caption =
+      input.caption?.trim() ||
+      (mediaType === "image" || mediaType === "video" ? null : input.file.name.slice(0, 200));
 
     const media = await prisma.clientUpdateMedia.create({
       data: {
@@ -178,7 +209,7 @@ export const uploadClientUpdateMedia = createSafeAction({
         cloudinaryUrl: uploaded.secureUrl,
         cloudinaryPublicId: uploaded.publicId,
         mediaType,
-        caption: input.caption || null,
+        caption,
         orderIndex: (maxOrder._max.orderIndex ?? -1) + 1,
       },
     });
@@ -187,6 +218,7 @@ export const uploadClientUpdateMedia = createSafeAction({
       id: media.id,
       url: media.cloudinaryUrl,
       mediaType: media.mediaType,
+      caption: media.caption,
       thumbnailUrl: uploaded.thumbnailUrl,
     };
   },

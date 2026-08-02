@@ -12,7 +12,7 @@ const IMAGE_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/avif
 const VIDEO_MIME = new Set(["video/mp4", "video/webm"]);
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
-const RATE_LIMIT_MAX = 20; // per window (per admin+ip)
+const RATE_LIMIT_MAX = 120; // per window (per admin+ip) — batch gallery uploads
 
 type RateEntry = { count: number; resetAt: number };
 const rate = new Map<string, RateEntry>();

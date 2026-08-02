@@ -6,6 +6,8 @@ import { cn } from "@/lib/cn";
 import { renderMarkdownSafe } from "@/lib/portal/markdown";
 import { shouldUnoptimizeImage } from "@/lib/media/next-image";
 import { panelFieldClass } from "@/lib/portal/labels";
+import { portalMediaKindLabel } from "@/lib/portal/media-types";
+import { FileText } from "lucide-react";
 
 export type PanelUpdateItem = {
   id: string;
@@ -143,9 +145,13 @@ export function PanelUpdatesFeed({ updates }: { updates: PanelUpdateItem[] }) {
                             href={m.cloudinaryUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="block px-4 py-6 text-sm text-accent underline"
+                            className="flex min-h-[8rem] flex-col items-center justify-center gap-2 px-4 py-6 text-center transition-colors hover:bg-primary/[0.03]"
                           >
-                            {m.caption || "Dosyayı aç (PDF)"}
+                            <FileText className="h-7 w-7 text-accent" aria-hidden />
+                            <span className="text-sm font-medium text-accent underline-offset-2 hover:underline">
+                              {m.caption || portalMediaKindLabel(m.mediaType)}
+                            </span>
+                            <span className="text-xs text-muted">{portalMediaKindLabel(m.mediaType)} · indir / aç</span>
                           </a>
                         )}
                         {m.caption && m.mediaType === "image" ? (

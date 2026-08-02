@@ -605,33 +605,34 @@ export default function ProjectForm({
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                {imageUrls.slice(0, 9).map((src, idx) => (
-                  <div
-                    key={`${src}-${idx}`}
-                    className={cn(
-                      "group relative aspect-[4/3] overflow-hidden rounded-lg border bg-zinc-950",
-                      dragOverIdx === idx ? "border-[rgb(166,124,82)]/60" : "border-zinc-800",
-                    )}
-                    draggable
-                    onDragStart={() => setDragIdx(idx)}
-                    onDragEnd={() => {
-                      setDragIdx(null);
-                      setDragOverIdx(null);
-                    }}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      if (dragIdx == null) return;
-                      setDragOverIdx(idx);
-                    }}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      if (dragIdx == null) return;
-                      moveImage(dragIdx, idx);
-                      setDragIdx(null);
-                      setDragOverIdx(null);
-                    }}
-                  >
+              <div className="max-h-[28rem] overflow-y-auto overscroll-contain pr-0.5">
+                <div className="grid grid-cols-3 gap-3">
+                  {imageUrls.map((src, idx) => (
+                    <div
+                      key={`${src}-${idx}`}
+                      className={cn(
+                        "group relative aspect-[4/3] overflow-hidden rounded-lg border bg-zinc-950",
+                        dragOverIdx === idx ? "border-[rgb(166,124,82)]/60" : "border-zinc-800",
+                      )}
+                      draggable
+                      onDragStart={() => setDragIdx(idx)}
+                      onDragEnd={() => {
+                        setDragIdx(null);
+                        setDragOverIdx(null);
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        if (dragIdx == null) return;
+                        setDragOverIdx(idx);
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        if (dragIdx == null) return;
+                        moveImage(dragIdx, idx);
+                        setDragIdx(null);
+                        setDragOverIdx(null);
+                      }}
+                    >
                     {isVideoUrl(src) ? (
                       <video
                         src={src}
@@ -712,6 +713,7 @@ export default function ProjectForm({
                     </div>
                   </div>
                 ))}
+                </div>
               </div>
             </div>
           </div>

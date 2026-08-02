@@ -11,8 +11,9 @@ export async function requireAdmin() {
     redirect("/admin/login");
   }
 
-  // Admin action flood koruması — kullanıcı başına 60sn'de 40 istek.
-  const rl = rateLimit(`admin-action:${session.user.email}`, 40, 60 * 1000);
+  // Admin action flood koruması — kullanıcı başına 60sn'de 120 istek
+  // (çoklu görsel yüklemede her dosya ayrı server action).
+  const rl = rateLimit(`admin-action:${session.user.email}`, 120, 60 * 1000);
   if (!rl.ok) {
     throw new Error("RATE_LIMITED");
   }

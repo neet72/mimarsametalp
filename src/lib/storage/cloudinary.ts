@@ -49,18 +49,21 @@ export async function uploadToCloudinary(opts: {
   }
 
   const isVideo = opts.mimeType.startsWith("video/");
-  const isPdf = opts.mimeType === "application/pdf";
+  const isImage = opts.mimeType.startsWith("image/");
+  const isRawDoc = !isVideo && !isImage;
   const kind = opts.folderKind ?? "portfolio";
   const folder =
     kind === "portal"
       ? isVideo
         ? "samet-alp/portal/videos"
-        : isPdf
+        : isRawDoc
           ? "samet-alp/portal/docs"
           : "samet-alp/portal/images"
       : isVideo
         ? "samet-alp/videos"
-        : "samet-alp/images";
+        : isRawDoc
+          ? "samet-alp/docs"
+          : "samet-alp/images";
   // Unguessable public_id (signed/authenticated delivery follow-up için hazır).
   const publicId = `${folder}/${crypto.randomUUID()}`;
 
@@ -79,7 +82,8 @@ export async function uploadToCloudinary(opts: {
         public_id: publicId,
         unique_filename: true,
         overwrite: false,
-        resource_type: "auto",
+        // Dokümanlar (PDF/Word/Excel) raw; görsel/video auto.
+        resource_type: isRawDoc ? "raw" : "auto",
         ...(isVideo
           ? {
               // Derive a poster/thumbnail from the first frame.
@@ -106,13 +110,14 @@ export async function uploadToCloudinary(opts: {
   const secureUrl = typeof res?.secure_url === "string" ? res.secure_url : "";
   if (!secureUrl) throw new Error("CLOUDINARY_UPLOAD_FAILED");
 
-  const resourceType = (res?.resource_type as "image" | "video" | "raw" | undefined) ?? "raw";
+  const resourceType = (res?.resource_type as "image" | "video" | "raw" | undefined) ?? (isRawDoc ? "raw" : "image");
   const eagerThumb = isVideo ? (res?.eager?.[0]?.secure_url as string | undefined) : undefined;
 
   return {
     publicId: String(res?.public_id ?? publicId),
     resourceType,
-    secureUrl: withAutoFormatQuality(secureUrl),
+    // f_auto raw/PDF URL’lerini bozabilir — sadece görsel/video.
+    secureUrl: isRawDoc ? secureUrl : withAutoFormatQuality(secureUrl),
     thumbnailUrl: eagerThumb ? withAutoFormatQuality(eagerThumb) : undefined,
   };
 }
