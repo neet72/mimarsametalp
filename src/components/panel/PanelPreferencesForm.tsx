@@ -1,8 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { changeClientPassword, updateClientPreferences } from "@/actions/client/panel";
+import { panelCardClass, panelFieldClass } from "@/lib/portal/labels";
+import { cn } from "@/lib/cn";
 
 export function PanelPreferencesForm({
   initial,
@@ -15,6 +18,7 @@ export function PanelPreferencesForm({
   };
 }) {
   const router = useRouter();
+  const { update } = useSession();
   const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pwMsg, setPwMsg] = useState<string | null>(null);
@@ -58,6 +62,7 @@ export function PanelPreferencesForm({
         setPwError(res.error);
         return;
       }
+      await update({ mustChangePassword: false });
       setPwMsg("Şifre güncellendi.");
       form.reset();
       router.refresh();
@@ -65,9 +70,9 @@ export function PanelPreferencesForm({
   }
 
   return (
-    <div className="grid max-w-3xl gap-8 lg:grid-cols-2">
-      <form onSubmit={onSubmit} className="space-y-5 rounded-2xl border border-border bg-white/50 p-6">
-        <div>
+    <div className="mx-auto grid w-full max-w-3xl gap-6 sm:gap-8 lg:grid-cols-2">
+      <form onSubmit={onSubmit} className={cn(panelCardClass, "space-y-5 text-left")}>
+        <div className="text-center sm:text-left">
           <h2 className="font-display text-lg font-semibold text-primary">İletişim</h2>
           <p className="mt-1 text-sm text-muted">Bildirim tercihleri.</p>
         </div>
@@ -75,40 +80,31 @@ export function PanelPreferencesForm({
         {msg ? <p className="text-sm text-accent">{msg}</p> : null}
         <label className="block text-sm">
           <span className="mb-1 block text-muted">E-posta</span>
-          <input
-            name="email"
-            type="email"
-            defaultValue={initial.email}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2.5"
-          />
+          <input name="email" type="email" defaultValue={initial.email} className={panelFieldClass} />
         </label>
         <label className="block text-sm">
           <span className="mb-1 block text-muted">Telefon</span>
-          <input
-            name="phone"
-            defaultValue={initial.phone}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2.5"
-          />
+          <input name="phone" defaultValue={initial.phone} className={panelFieldClass} />
         </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input name="notifyEmail" type="checkbox" defaultChecked={initial.notifyEmail} />
+        <label className="flex min-h-11 items-center gap-2 text-sm">
+          <input name="notifyEmail" type="checkbox" defaultChecked={initial.notifyEmail} className="h-4 w-4" />
           E-posta bildirimi
         </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input name="notifySms" type="checkbox" defaultChecked={initial.notifySms} />
+        <label className="flex min-h-11 items-center gap-2 text-sm">
+          <input name="notifySms" type="checkbox" defaultChecked={initial.notifySms} className="h-4 w-4" />
           SMS bildirimi (yakında)
         </label>
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+          className="inline-flex min-h-11 items-center rounded-lg bg-accent px-4 text-sm font-semibold text-white disabled:opacity-50"
         >
           Kaydet
         </button>
       </form>
 
-      <form onSubmit={onPassword} className="space-y-5 rounded-2xl border border-border bg-white/50 p-6">
-        <div>
+      <form onSubmit={onPassword} className={cn(panelCardClass, "space-y-5 text-left")}>
+        <div className="text-center sm:text-left">
           <h2 className="font-display text-lg font-semibold text-primary">Şifre değiştir</h2>
           <p className="mt-1 text-sm text-muted">İsterseniz güncelleyin — zorunlu değil.</p>
         </div>
@@ -121,7 +117,7 @@ export function PanelPreferencesForm({
             type="password"
             required
             autoComplete="current-password"
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2.5"
+            className={panelFieldClass}
           />
         </label>
         <label className="block text-sm">
@@ -132,13 +128,13 @@ export function PanelPreferencesForm({
             required
             minLength={8}
             autoComplete="new-password"
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2.5"
+            className={panelFieldClass}
           />
         </label>
         <button
           type="submit"
           disabled={pwPending}
-          className="rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-primary transition-colors hover:border-accent/40 disabled:opacity-50"
+          className="inline-flex min-h-11 items-center rounded-lg border border-border px-4 text-sm font-semibold text-primary transition-colors hover:border-accent/40 disabled:opacity-50"
         >
           Şifreyi güncelle
         </button>

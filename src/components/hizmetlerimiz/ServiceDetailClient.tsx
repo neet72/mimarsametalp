@@ -8,6 +8,7 @@ import { useMemo, useState } from "react";
 import { cn } from "@/lib/cn";
 import { usePathname } from "next/navigation";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
+import { shouldUnoptimizeImage } from "@/lib/media/next-image";
 import {
   easePremium,
   fadeUpShow,
@@ -58,6 +59,7 @@ export function ServiceDetailClient({ service, relatedServices }: Props) {
           fill
           priority
           sizes="100vw"
+          unoptimized={shouldUnoptimizeImage(service.heroImageUrl)}
           className="object-cover object-center"
         />
         <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/35 to-black/10" />

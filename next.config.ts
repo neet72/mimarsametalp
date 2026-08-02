@@ -26,10 +26,6 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "mpm.ph",
-      },
-      {
-        protocol: "https",
         hostname: "res.cloudinary.com",
       },
     ],

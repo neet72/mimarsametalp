@@ -9,6 +9,7 @@ import { ProjectPublishedToggle, ProjectSortOrderInput } from "@/components/admi
 import { ActionMenu, ActionMenuItem } from "@/components/admin/ui/action-menu";
 import { cn } from "@/lib/cn";
 import { isVideoUrl } from "@/lib/media-url";
+import { shouldUnoptimizeImage } from "@/lib/media/next-image";
 
 type Row = {
   id: string;
@@ -84,7 +85,7 @@ export function AdminProjectsTableClient({ items }: { items: Row[] }) {
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-zinc-800">
+    <div className="overflow-x-auto rounded-xl border border-zinc-800">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 bg-zinc-950/60 px-4 py-3">
         <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Tablo</p>
         <div className="flex items-center gap-2">
@@ -169,6 +170,7 @@ export function AdminProjectsTableClient({ items }: { items: Row[] }) {
                           alt={altBase}
                           fill
                           sizes="64px"
+                          unoptimized={shouldUnoptimizeImage(src)}
                           className="object-cover object-center"
                         />
                       );

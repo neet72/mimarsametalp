@@ -153,6 +153,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const ok = await compare(String(credentials.password), client.passwordHash);
           if (!ok) return null;
 
+          try {
+            await prisma.clientUser.update({
+              where: { id: client.id },
+              data: { lastLoginAt: new Date() },
+            });
+          } catch (e) {
+            logger.warn({
+              msg: "client lastLoginAt update failed",
+              scope: "auth.authorize.client",
+              error: e instanceof Error ? e.message : String(e),
+            });
+          }
+
           return {
             id: client.id,
             name: client.fullName,

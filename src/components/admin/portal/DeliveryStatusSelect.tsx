@@ -21,7 +21,7 @@ export function DeliveryStatusSelect({ id, status }: { id: string; status: strin
     <select
       disabled={pending}
       value={status}
-      className="h-9 rounded-lg border border-zinc-800 bg-zinc-950 px-2 text-sm"
+      className="min-h-11 min-w-[8.5rem] rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-100"
       onChange={(e) => {
         const next = e.target.value as (typeof STATUSES)[number]["value"];
         startTransition(async () => {

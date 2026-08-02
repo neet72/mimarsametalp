@@ -36,6 +36,7 @@ export default async function AdminClientEditPage({ params }: Props) {
           email: client.email,
           phone: client.phone,
           adminVisiblePassword: client.adminVisiblePassword,
+          lastLoginAt: client.lastLoginAt?.toISOString() ?? null,
           notifyEmail: client.notifyEmail,
           notifySms: client.notifySms,
           active: client.active,

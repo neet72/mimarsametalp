@@ -7,7 +7,7 @@ import { rateLimit } from "@/lib/security/rate-limit";
 
 export async function requireAdmin() {
   const session = await auth();
-  if (!session?.user?.email || !isAdminEmail(session.user.email)) {
+  if (!session?.user?.email || session.user.role !== "admin" || !isAdminEmail(session.user.email)) {
     redirect("/admin/login");
   }
 

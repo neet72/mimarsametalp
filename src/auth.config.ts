@@ -75,7 +75,12 @@ export default {
       if (user) {
         token.sub = user.id;
         token.email = user.email;
-        token.role = user.role ?? (isAdminEmail(user.email) ? "admin" : "client");
+        token.role =
+          user.role === "admin" || user.role === "client"
+            ? user.role
+            : isAdminEmail(user.email)
+              ? "admin"
+              : "client";
         token.isAdmin = token.role === "admin";
         token.mustChangePassword = Boolean(user.mustChangePassword);
       }

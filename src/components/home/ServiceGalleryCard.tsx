@@ -7,13 +7,13 @@ import { useCallback } from "react";
 import { cn } from "@/lib/cn";
 import type { ServiceGalleryItem } from "@/content/services-gallery";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
+import { shouldUnoptimizeImage } from "@/lib/media/next-image";
 
 type ServiceGalleryCardProps = {
   service: ServiceGalleryItem;
-  index: number;
 };
 
-export function ServiceGalleryCard({ service, index }: ServiceGalleryCardProps) {
+export function ServiceGalleryCard({ service }: ServiceGalleryCardProps) {
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
 
@@ -70,6 +70,7 @@ export function ServiceGalleryCard({ service, index }: ServiceGalleryCardProps) 
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority={false}
+            unoptimized={shouldUnoptimizeImage(service.imageUrl)}
             className={cn(
               "object-cover object-center transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform",
               "group-hover:scale-[1.12] motion-reduce:group-hover:scale-100",

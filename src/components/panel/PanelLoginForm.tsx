@@ -4,6 +4,9 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { normalizeUsername } from "@/lib/security/username";
+import { panelFieldClass } from "@/lib/portal/labels";
+import { cn } from "@/lib/cn";
 
 export function PanelLoginForm() {
   const router = useRouter();
@@ -17,7 +20,7 @@ export function PanelLoginForm() {
     setError(null);
     startTransition(async () => {
       const res = await signIn("client-credentials", {
-        username: username.trim().toLowerCase(),
+        username: normalizeUsername(username),
         password,
         redirect: false,
       });
@@ -66,7 +69,7 @@ export function PanelLoginForm() {
             onChange={(e) => setUsername(e.target.value)}
             autoComplete="username"
             required
-            className="w-full rounded-xl border border-border bg-white/70 px-3.5 py-3 text-primary outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-accent/35"
+            className={cn(panelFieldClass, "rounded-xl bg-white/70 py-3")}
           />
         </label>
         <label className="block text-sm">
@@ -79,7 +82,7 @@ export function PanelLoginForm() {
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
             required
-            className="w-full rounded-xl border border-border bg-white/70 px-3.5 py-3 text-primary outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-accent/35"
+            className={cn(panelFieldClass, "rounded-xl bg-white/70 py-3")}
           />
         </label>
       </div>
@@ -87,7 +90,7 @@ export function PanelLoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-full bg-accent py-3.5 text-sm font-semibold uppercase tracking-[0.18em] text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+        className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-accent text-sm font-semibold uppercase tracking-[0.18em] text-white transition-opacity hover:opacity-90 disabled:opacity-50"
       >
         {pending ? "Giriş yapılıyor…" : "Giriş yap"}
       </button>

@@ -175,8 +175,8 @@ export default async function AdminDashboardPage() {
           {[
             { href: "/admin/projects/new", label: "Yeni proje" },
             { href: "/admin/services/new", label: "Yeni hizmet" },
-            { href: "/admin/clients", label: "Yeni müşteri" },
-            { href: "/admin/client-projects/new", label: "Portal projesi" },
+            { href: "/admin/clients", label: "Müşteriler" },
+            { href: "/admin/client-projects/new", label: "Yeni portal projesi" },
             { href: "/admin/delivery-requests", label: "İstekler" },
             { href: "/admin/about", label: "Hakkımızda" },
             { href: "/admin/contact", label: "İletişim metinleri" },

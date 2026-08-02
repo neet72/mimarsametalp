@@ -17,7 +17,7 @@ export async function getCurrentClient() {
 }
 
 /** Sayfa okumaları için — rate limit yok (RSC refresh 500 üretmesin). */
-export async function requireClient(_opts?: { allowMustChangePassword?: boolean }) {
+export async function requireClient() {
   const session = await auth();
   if (!session?.user?.id || session.user.role !== "client") {
     redirect("/panel/giris");

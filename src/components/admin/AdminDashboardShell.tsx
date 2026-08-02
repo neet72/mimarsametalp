@@ -19,42 +19,58 @@ const navSite = [
   { href: "/admin/services", label: "Hizmetler", icon: Wrench },
   { href: "/admin/about", label: "Hakkımızda", icon: Info },
   { href: "/admin/contact", label: "İletişim", icon: Phone },
-  { href: "/admin/messages", label: "Mesajlar", icon: Inbox },
+  { href: "/admin/messages", label: "Mesajlar", icon: Inbox, badgeKey: "messages" as const },
 ] as const;
 
 const navPortal = [
   { href: "/admin/clients", label: "Müşteriler", icon: Users },
   { href: "/admin/client-projects", label: "Portal projeleri", icon: Briefcase },
-  { href: "/admin/delivery-requests", label: "İstekler", icon: Package },
+  { href: "/admin/delivery-requests", label: "İstekler", icon: Package, badgeKey: "requests" as const },
 ] as const;
+
+type BadgeMap = { messages?: number; requests?: number };
 
 function NavLinks({
   pathname,
   items,
   onNavigate,
+  badges,
 }: {
   pathname: string;
-  items: readonly { href: string; label: string; icon: typeof LayoutDashboard }[];
+  items: readonly {
+    href: string;
+    label: string;
+    icon: typeof LayoutDashboard;
+    badgeKey?: keyof BadgeMap;
+  }[];
   onNavigate?: () => void;
+  badges?: BadgeMap;
 }) {
   return (
     <>
-      {items.map(({ href, label, icon: Icon }) => {
+      {items.map(({ href, label, icon: Icon, badgeKey }) => {
         const active = pathname === href || (href !== "/admin" && pathname.startsWith(href));
+        const count = badgeKey && badges ? badges[badgeKey] ?? 0 : 0;
         return (
           <Link
             key={href}
             href={href}
             onClick={onNavigate}
+            aria-current={active ? "page" : undefined}
             className={cn(
-              "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+              "flex min-h-11 items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(166,124,82)]/40",
               active
                 ? "bg-zinc-800/80 text-zinc-100"
                 : "text-zinc-500 hover:bg-zinc-900 hover:text-zinc-300",
             )}
           >
             <Icon className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
-            {label}
+            <span className="min-w-0 flex-1 truncate">{label}</span>
+            {count > 0 ? (
+              <span className="rounded-full bg-[rgb(166,124,82)]/20 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-[rgb(200,170,130)]">
+                {count > 99 ? "99+" : count}
+              </span>
+            ) : null}
           </Link>
         );
       })}
@@ -66,9 +82,11 @@ function NavLinks({
 export function AdminDashboardShell({
   children,
   userEmail,
+  badges,
 }: {
   children: ReactNode;
   userEmail: string;
+  badges?: BadgeMap;
 }) {
   const pathname = usePathname();
   const reduceMotion = useReducedMotion();
@@ -89,6 +107,15 @@ export function AdminDashboardShell({
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   return (
     <SessionProvider>
       <AdminToastProvider>
@@ -101,12 +128,12 @@ export function AdminDashboardShell({
               </p>
               <p className="mt-1 truncate text-xs text-zinc-500">{userEmail}</p>
             </div>
-            <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2">
-              <NavLinks pathname={pathname} items={navSite} />
+            <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2" aria-label="Admin menü">
+              <NavLinks pathname={pathname} items={navSite} badges={badges} />
               <p className="mb-1 mt-3 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600">
                 Portal
               </p>
-              <NavLinks pathname={pathname} items={navPortal} />
+              <NavLinks pathname={pathname} items={navPortal} badges={badges} />
             </nav>
             <div className="border-t border-zinc-800 p-2">
               <button
@@ -138,7 +165,7 @@ export function AdminDashboardShell({
               <div className="h-10 w-10" aria-hidden />
             </div>
 
-            <div className="min-w-0 overflow-auto p-6 md:p-10">{children}</div>
+            <div className="min-w-0 overflow-x-auto p-4 sm:p-6 md:p-10">{children}</div>
           </div>
 
           {/* Mobile drawer */}
@@ -158,7 +185,10 @@ export function AdminDashboardShell({
                   aria-label="Menüyü kapat"
                 />
                 <motion.aside
-                  className="absolute left-0 top-0 h-full w-[min(86vw,320px)] border-r border-zinc-800 bg-zinc-950 shadow-[0_30px_120px_-40px_rgb(0_0_0/0.85)]"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Admin menü"
+                  className="absolute left-0 top-0 flex h-full w-[min(86vw,320px)] flex-col border-r border-zinc-800 bg-zinc-950 shadow-[0_30px_120px_-40px_rgb(0_0_0/0.85)]"
                   initial={reduceMotion ? false : { x: -24, opacity: 0 }}
                   animate={reduceMotion ? undefined : { x: 0, opacity: 1 }}
                   exit={reduceMotion ? undefined : { x: -24, opacity: 0 }}
@@ -181,12 +211,12 @@ export function AdminDashboardShell({
                     </button>
                   </div>
 
-                  <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2">
-                    <NavLinks pathname={pathname} items={navSite} onNavigate={() => setOpen(false)} />
+                  <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2" aria-label="Admin mobil menü">
+                    <NavLinks pathname={pathname} items={navSite} onNavigate={() => setOpen(false)} badges={badges} />
                     <p className="mb-1 mt-3 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600">
                       Portal
                     </p>
-                    <NavLinks pathname={pathname} items={navPortal} onNavigate={() => setOpen(false)} />
+                    <NavLinks pathname={pathname} items={navPortal} onNavigate={() => setOpen(false)} badges={badges} />
                   </nav>
 
                   <div className="border-t border-zinc-800 p-2">

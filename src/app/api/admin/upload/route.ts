@@ -93,7 +93,7 @@ function matchesMagic(type: string, bytes: Buffer) {
 export async function POST(req: Request) {
   const session = await auth();
   const email = session?.user?.email ?? null;
-  if (!email || !isAdminEmail(email)) {
+  if (!email || session?.user?.role !== "admin" || !isAdminEmail(email)) {
     return NextResponse.json({ ok: false, error: "Yetkisiz." }, { status: 401 });
   }
 

@@ -23,6 +23,7 @@ import type { AboutCmsDraft } from "@/lib/site-content/about-cms";
 import { cn } from "@/lib/cn";
 import { usePathname } from "next/navigation";
 import { localeFromPathname } from "@/lib/locale";
+import { shouldUnoptimizeImage } from "@/lib/media/next-image";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -123,6 +124,7 @@ export function AboutArchitectModule({ aboutCms }: { aboutCms?: AboutCmsDraft | 
                   src={portraitSrc}
                   alt={locale === "en" ? `${name} portrait` : `${name} portre`}
                   fill
+                  unoptimized={shouldUnoptimizeImage(portraitSrc)}
                   className={cn(
                     "object-cover object-[center_22%] transition-transform duration-[880ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
                     "hover:scale-[1.02] motion-reduce:hover:scale-100",

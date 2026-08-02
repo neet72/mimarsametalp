@@ -8,6 +8,7 @@ import { Reveal } from "@/components/motion/FadeIn";
 import { cn } from "@/lib/cn";
 import type { ServiceListingItem } from "@/lib/service-listing-item";
 import { withLocalePath } from "@/lib/locale";
+import { shouldUnoptimizeImage } from "@/lib/media/next-image";
 import {
   cardReveal,
   headerItem,
@@ -91,6 +92,7 @@ function HizmetCard({
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               priority={index === 0}
+              unoptimized={shouldUnoptimizeImage(service.imageUrl)}
               className={cn(
                 "object-cover object-center transition-[filter] duration-700 ease-out",
                 "group-hover:brightness-[1.03] motion-reduce:group-hover:brightness-100",

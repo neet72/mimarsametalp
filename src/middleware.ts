@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import authConfig from "@/auth.config";
 import { NextResponse } from "next/server";
-import { isAdminEmail } from "@/lib/security/admin";
 import { getSiteUrl } from "@/lib/seo";
 
 const { auth } = NextAuth(authConfig);
@@ -101,9 +100,8 @@ export default auth((req) => {
   }
 
   const isLoggedIn = !!req.auth;
-  const email = req.auth?.user?.email;
   const role = (req.auth?.user as { role?: string } | undefined)?.role;
-  const isAdmin = isLoggedIn && (role === "admin" || isAdminEmail(email ?? null));
+  const isAdmin = isLoggedIn && role === "admin";
   const isClient = isLoggedIn && role === "client";
 
   // Pass locale to Server Components (root layout) without breaking routing.

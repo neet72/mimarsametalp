@@ -8,6 +8,7 @@ import { useCallback } from "react";
 import { cn } from "@/lib/cn";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
 import { isVideoUrl } from "@/lib/media-url";
+import { shouldUnoptimizeImage } from "@/lib/media/next-image";
 import { springSoft } from "@/lib/motion";
 
 export type ProjectCardModel = {
@@ -112,6 +113,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 priority={index === 0}
+                unoptimized={shouldUnoptimizeImage(project.imageUrl)}
                 className={cn(
                   "object-cover object-center transition-[filter] duration-700 ease-out",
                   "group-hover:brightness-[1.03] motion-reduce:group-hover:brightness-100",

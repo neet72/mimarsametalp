@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { submitDeliveryRequest } from "@/actions/client/panel";
+import { panelCardClass, panelFieldClass } from "@/lib/portal/labels";
+import { cn } from "@/lib/cn";
 
 export function PanelDeliveryForm({
   projects,
@@ -43,7 +45,7 @@ export function PanelDeliveryForm({
 
   if (projects.length === 0) {
     return (
-      <div className="rounded-2xl border border-border bg-white/50 px-6 py-12 text-center">
+      <div className={cn(panelCardClass, "mx-auto max-w-xl px-6 py-12 text-center")}>
         <p className="font-display text-lg font-semibold text-primary">Proje atanmamış</p>
         <p className="mt-2 text-sm text-muted">
           İstek göndermek için size atanmış bir portal projesi gerekir. Ofisle iletişime geçin.
@@ -53,12 +55,12 @@ export function PanelDeliveryForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="mx-auto max-w-xl space-y-5 rounded-2xl border border-border bg-white/50 p-6 sm:p-8">
+    <form onSubmit={onSubmit} className={cn(panelCardClass, "mx-auto max-w-xl space-y-5")}>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {msg ? <p className="text-sm text-accent">{msg}</p> : null}
       <label className="block text-sm">
         <span className="mb-1 block text-muted">Proje</span>
-        <select name="projectId" required className="w-full rounded-lg border border-border bg-surface px-3 py-2.5">
+        <select name="projectId" required className={panelFieldClass}>
           {projects.map((p) => (
             <option key={p.id} value={p.id}>
               {p.title}
@@ -72,7 +74,7 @@ export function PanelDeliveryForm({
           name="subject"
           required
           placeholder="Örn. Malzeme seçimi, randevu, değişiklik talebi"
-          className="w-full rounded-lg border border-border bg-surface px-3 py-2.5"
+          className={panelFieldClass}
         />
       </label>
       <label className="block text-sm">
@@ -82,7 +84,7 @@ export function PanelDeliveryForm({
           required
           rows={5}
           placeholder="İsteğinizi veya sorunuzu yazın…"
-          className="w-full rounded-lg border border-border bg-surface px-3 py-2.5"
+          className={panelFieldClass}
         />
       </label>
       <div className="grid gap-5 sm:grid-cols-2">
@@ -92,7 +94,7 @@ export function PanelDeliveryForm({
             name="fullName"
             required
             defaultValue={defaults.fullName}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2.5"
+            className={panelFieldClass}
           />
         </label>
         <label className="block text-sm">
@@ -101,7 +103,7 @@ export function PanelDeliveryForm({
             name="phone"
             required
             defaultValue={defaults.phone}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2.5"
+            className={panelFieldClass}
           />
         </label>
       </div>
@@ -111,13 +113,13 @@ export function PanelDeliveryForm({
           name="address"
           rows={2}
           placeholder="Gerekirse adres veya konum notu"
-          className="w-full rounded-lg border border-border bg-surface px-3 py-2.5"
+          className={panelFieldClass}
         />
       </label>
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+        className="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-accent px-5 text-sm font-semibold text-white disabled:opacity-50 sm:w-auto"
       >
         Gönder
       </button>

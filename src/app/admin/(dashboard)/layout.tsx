@@ -2,6 +2,7 @@ import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { isAdminEmail } from "@/lib/security/admin";
+import { getAdminPortalBadges } from "@/lib/portal/queries";
 
 const AdminDashboardShell = dynamic(
   () =>
@@ -24,10 +25,25 @@ export default async function AdminDashboardLayout({
 }) {
   const session = await auth();
   const email = session?.user?.email;
-  const isAdmin = session?.user?.role === "admin" || isAdminEmail(email ?? null);
+  const isAdmin = session?.user?.role === "admin" && isAdminEmail(email ?? null);
   if (!email || !isAdmin) {
     redirect("/admin/login");
   }
 
-  return <AdminDashboardShell userEmail={email}>{children}</AdminDashboardShell>;
+  const badges = await getAdminPortalBadges().catch(() => ({
+    newRequests: 0,
+    unreadMessages: 0,
+  }));
+
+  return (
+    <AdminDashboardShell
+      userEmail={email}
+      badges={{
+        messages: badges.unreadMessages,
+        requests: badges.newRequests,
+      }}
+    >
+      {children}
+    </AdminDashboardShell>
+  );
 }

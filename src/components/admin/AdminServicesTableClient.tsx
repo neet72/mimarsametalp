@@ -8,6 +8,7 @@ import { DeleteServiceButton } from "@/components/admin/DeleteServiceButton";
 import { ServicePublishedToggle, ServiceSortOrderInput } from "@/components/admin/ServiceQuickActions";
 import { ActionMenu, ActionMenuItem } from "@/components/admin/ui/action-menu";
 import { cn } from "@/lib/cn";
+import { shouldUnoptimizeImage } from "@/lib/media/next-image";
 
 type Row = {
   id: string;
@@ -70,7 +71,7 @@ export function AdminServicesTableClient({ items }: { items: Row[] }) {
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-zinc-800">
+    <div className="overflow-x-auto rounded-xl border border-zinc-800">
       <p className="border-b border-zinc-800 bg-zinc-950/40 px-4 py-3 text-sm leading-relaxed text-zinc-400">
         <span className="font-medium text-zinc-300">Nasıl okunur?</span> Satır menüsünden «Düzenle» ile içeriği
         değiştirin. «Yayında» düğmesi ziyaretçinin görüp görmeyeceğini belirler. «Sıra» kutusuna sayı yazıp
@@ -160,6 +161,7 @@ export function AdminServicesTableClient({ items }: { items: Row[] }) {
                       alt={`${s.title} — önizleme`}
                       fill
                       sizes="64px"
+                      unoptimized={shouldUnoptimizeImage(coverUrl(s.heroImageUrl))}
                       className="object-cover object-center"
                     />
                   </div>

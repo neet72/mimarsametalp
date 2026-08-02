@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 import { localeFromPathname, withLocalePath } from "@/lib/locale";
 import { CONTACT_SOCIAL_WHATSAPP } from "@/content/contact-page";
 import { isVideoUrl } from "@/lib/media-url";
+import { shouldUnoptimizeImage } from "@/lib/media/next-image";
 import {
   easePremium,
   fadeUpShow,
@@ -166,6 +167,7 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
             fill
             priority
             sizes="100vw"
+            unoptimized={shouldUnoptimizeImage(project.imageUrl)}
             className="object-cover object-center"
           />
         )}
@@ -270,6 +272,7 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
                       alt={`${project.title} | ${locale === "en" ? "Gallery image" : "Galeri görseli"} ${index + 1}`}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      unoptimized={shouldUnoptimizeImage(src)}
                       className="object-cover object-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02]"
                     />
                   )}
@@ -534,6 +537,7 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
                         }
                         fill
                         sizes="(max-width: 768px) 92vw, 1200px"
+                        unoptimized={shouldUnoptimizeImage(activeSrc)}
                         className="object-contain object-center"
                         priority={false}
                       />

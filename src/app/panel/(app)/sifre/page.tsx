@@ -1,9 +1,6 @@
-import { PanelPasswordForm } from "@/components/panel/PanelPasswordForm";
+import { redirect } from "next/navigation";
 
-export default function PanelPasswordPage() {
-  return (
-    <div className="py-6">
-      <PanelPasswordForm />
-    </div>
-  );
+/** Şifre değişimi Tercihler’de; eski URL’yi yönlendir. */
+export default function PanelPasswordRedirect() {
+  redirect("/panel/tercihler");
 }
