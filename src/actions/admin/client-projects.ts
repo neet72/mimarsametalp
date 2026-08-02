@@ -207,3 +207,28 @@ export const reorderClientProjectStages = createSafeAction({
     return { ok: true as const };
   },
 });
+
+export const deleteClientProject = createSafeAction({
+  scope: "admin.client-project.delete",
+  schema: z.object({ id: z.string().min(1) }),
+  authorize: async () => {
+    const session = await requireAdmin();
+    return { actor: session.user.email ?? "unknown" };
+  },
+  handler: async (input, ctx) => {
+    const existing = await prisma.clientProject.findUnique({
+      where: { id: input.id },
+      select: { id: true, title: true },
+    });
+    if (!existing) throw new ActionError("Proje bulunamadı.");
+
+    await prisma.clientProject.delete({ where: { id: input.id } });
+    await auditAdmin({
+      actor: ctx.actor ?? "unknown",
+      action: "client-project.delete",
+      entity: "ClientProject",
+      entityId: input.id,
+    });
+    return { id: input.id, title: existing.title };
+  },
+});

@@ -9,14 +9,25 @@ import { cn } from "@/lib/cn";
 export function PanelDeliveryForm({
   projects,
   defaults,
+  initial,
 }: {
   projects: { id: string; title: string }[];
   defaults: { fullName: string; phone: string };
+  initial?: {
+    projectId?: string;
+    subject?: string;
+    message?: string;
+  };
 }) {
   const router = useRouter();
   const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+
+  const defaultProjectId =
+    initial?.projectId && projects.some((p) => p.id === initial.projectId)
+      ? initial.projectId
+      : projects[0]?.id;
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -56,11 +67,21 @@ export function PanelDeliveryForm({
 
   return (
     <form onSubmit={onSubmit} className={cn(panelCardClass, "mx-auto max-w-xl space-y-5")}>
+      {initial?.subject || initial?.message ? (
+        <p className="rounded-lg border border-accent/25 bg-accent/5 px-3 py-2 text-xs text-muted">
+          Güncellemeden yönlendirildiniz — konu ve mesajı düzenleyip gönderebilirsiniz.
+        </p>
+      ) : null}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {msg ? <p className="text-sm text-accent">{msg}</p> : null}
       <label className="block text-sm">
         <span className="mb-1 block text-muted">Proje</span>
-        <select name="projectId" required className={panelFieldClass}>
+        <select
+          name="projectId"
+          required
+          defaultValue={defaultProjectId}
+          className={panelFieldClass}
+        >
           {projects.map((p) => (
             <option key={p.id} value={p.id}>
               {p.title}
@@ -73,6 +94,7 @@ export function PanelDeliveryForm({
         <input
           name="subject"
           required
+          defaultValue={initial?.subject ?? ""}
           placeholder="Örn. Malzeme seçimi, randevu, değişiklik talebi"
           className={panelFieldClass}
         />
@@ -83,6 +105,7 @@ export function PanelDeliveryForm({
           name="message"
           required
           rows={5}
+          defaultValue={initial?.message ?? ""}
           placeholder="İsteğinizi veya sorunuzu yazın…"
           className={panelFieldClass}
         />
@@ -119,9 +142,9 @@ export function PanelDeliveryForm({
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-accent px-5 text-sm font-semibold text-white disabled:opacity-50 sm:w-auto"
+        className="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-accent px-4 text-sm font-semibold text-white disabled:opacity-50"
       >
-        Gönder
+        {pending ? "Gönderiliyor…" : "İsteği gönder"}
       </button>
     </form>
   );

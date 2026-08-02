@@ -9,12 +9,29 @@ const STATUS_TR: Record<string, string> = {
   cancelled: "İptal",
 };
 
-export default async function PanelRequestsPage() {
+type PageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+function firstParam(v: string | string[] | undefined): string | undefined {
+  if (typeof v === "string") return v;
+  if (Array.isArray(v) && typeof v[0] === "string") return v[0];
+  return undefined;
+}
+
+export default async function PanelRequestsPage({ searchParams }: PageProps) {
   const { client } = await requireClient();
+  const sp = (await searchParams) ?? {};
   const [projects, requests] = await Promise.all([
     listClientProjectsForUser(client.id),
     listClientRequestsForUser(client.id),
   ]);
+
+  const initial = {
+    projectId: firstParam(sp.projectId),
+    subject: firstParam(sp.subject),
+    message: firstParam(sp.message),
+  };
 
   return (
     <div className="mx-auto max-w-xl space-y-10">
@@ -29,6 +46,7 @@ export default async function PanelRequestsPage() {
       <PanelDeliveryForm
         projects={projects.map((p) => ({ id: p.id, title: p.title }))}
         defaults={{ fullName: client.fullName, phone: client.phone ?? "" }}
+        initial={initial}
       />
 
       {requests.length > 0 ? (

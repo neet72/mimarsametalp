@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db/prisma";
 import { AdminClientUpdateEditor } from "@/components/admin/portal/AdminClientUpdateEditor";
+import { AdminClientUpdatesList } from "@/components/admin/portal/AdminClientUpdatesList";
 
 export const dynamic = "force-dynamic";
 
@@ -65,22 +66,14 @@ export default async function AdminClientProjectUpdatesPage({ params, searchPara
 
       <section>
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-zinc-500">Kayıtlar</h2>
-        <ul className="divide-y divide-zinc-800 rounded-xl border border-zinc-800">
-          {project.updates.map((u) => (
-            <li key={u.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-              <div>
-                <p className="text-zinc-100">{u.title}</p>
-                <p className="text-zinc-500">{u.isPublished ? "Yayında" : "Taslak"}</p>
-              </div>
-              <Link
-                href={`/admin/client-projects/${projectId}/updates?id=${u.id}`}
-                className="text-[rgb(166,124,82)] hover:underline"
-              >
-                Düzenle
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <AdminClientUpdatesList
+          projectId={projectId}
+          updates={project.updates.map((u) => ({
+            id: u.id,
+            title: u.title,
+            isPublished: u.isPublished,
+          }))}
+        />
       </section>
     </div>
   );

@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { deleteClientUser } from "@/actions/admin/clients";
+import { AdminConfirmDeleteButton } from "@/components/admin/portal/AdminConfirmDeleteButton";
 import { AdminEmptyState, AdminStatusPill } from "@/components/admin/ui/AdminPageChrome";
 
 type ClientRow = {
@@ -113,12 +115,22 @@ export function AdminClientsList({ clients }: { clients: ClientRow[] }) {
                   {` · ${c.projectCount} proje`}
                 </p>
               </div>
-              <Link
-                href={`/admin/clients/${c.id}`}
-                className="inline-flex min-h-10 items-center rounded-lg border border-zinc-800 px-3 text-xs font-semibold text-[rgb(200,170,130)] transition-colors hover:border-zinc-600"
-              >
-                Düzenle
-              </Link>
+              <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  href={`/admin/clients/${c.id}`}
+                  className="inline-flex min-h-10 items-center rounded-lg border border-zinc-800 px-3 text-xs font-semibold text-[rgb(200,170,130)] transition-colors hover:border-zinc-600"
+                >
+                  Düzenle
+                </Link>
+                <AdminConfirmDeleteButton
+                  confirmText={`“${c.fullName}” müşterisi silinsin mi? İstekler ve üyelikler de silinir.`}
+                  successTitle="Müşteri silindi"
+                  onDelete={async () => {
+                    const r = await deleteClientUser({ id: c.id });
+                    return r.ok ? { ok: true } : { ok: false, error: r.error };
+                  }}
+                />
+              </div>
             </li>
           ))}
         </ul>

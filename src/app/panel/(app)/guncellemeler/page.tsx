@@ -9,11 +9,14 @@ export default async function PanelUpdatesPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
-      <div className="text-center sm:text-left">
-        <h1 className="font-display text-3xl font-semibold tracking-tight text-primary">Güncellemeler</h1>
-        <p className="mx-auto mt-2 max-w-xl text-muted sm:mx-0">
-          Projenize ait yayınlanmış gelişmeler, raporlar ve görseller burada listelenir.
-        </p>
+      <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-gradient-to-br from-surface via-surface to-accent/[0.06] px-5 py-6 sm:px-7 sm:py-8">
+        <div className="text-center sm:text-left">
+          <h1 className="font-display text-3xl font-semibold tracking-tight text-primary">Güncellemeler</h1>
+          <p className="mx-auto mt-2 max-w-xl text-muted sm:mx-0">
+            Projenize ait yayınlanmış gelişmeler, raporlar ve görseller. Her kartın altından doğrudan hata
+            bildirimi veya istek gönderebilirsiniz.
+          </p>
+        </div>
       </div>
 
       {updates.length === 0 ? (

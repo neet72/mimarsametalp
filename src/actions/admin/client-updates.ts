@@ -237,3 +237,28 @@ export const deleteClientUpdateMedia = createSafeAction({
     return { id: input.id };
   },
 });
+
+export const deleteClientProjectUpdate = createSafeAction({
+  scope: "admin.client-update.delete",
+  schema: z.object({ id: z.string().min(1) }),
+  authorize: async () => {
+    const session = await requireAdmin();
+    return { actor: session.user.email ?? "unknown" };
+  },
+  handler: async (input, ctx) => {
+    const existing = await prisma.clientProjectUpdate.findUnique({
+      where: { id: input.id },
+      select: { id: true, title: true, projectId: true },
+    });
+    if (!existing) throw new ActionError("Güncelleme bulunamadı.");
+
+    await prisma.clientProjectUpdate.delete({ where: { id: input.id } });
+    await auditAdmin({
+      actor: ctx.actor ?? "unknown",
+      action: "client-update.delete",
+      entity: "ClientProjectUpdate",
+      entityId: input.id,
+    });
+    return { id: input.id, title: existing.title, projectId: existing.projectId };
+  },
+});

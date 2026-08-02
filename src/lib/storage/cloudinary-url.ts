@@ -44,18 +44,33 @@ export function safeDownloadFilename(raw: string | null | undefined, fallback = 
 }
 
 /**
- * Cloudinary URL’ye `fl_attachment:dosya-adi` ekler.
- * Tarayıcı indirmede Content-Disposition ile bu adı kullanır.
+ * Cloudinary URL’ye `fl_attachment` ekler.
+ * Türkçe / özel karakterler için URL-safe Base64 (aksi halde HTTP 400).
  */
 export function withCloudinaryAttachment(url: string, filename: string): string {
   const safe = safeDownloadFilename(filename);
   if (!url.includes("/upload/") || !safe) return url;
-  // Zaten attachment varsa dokunma
   if (/\/upload\/[^/]*fl_attachment/.test(url)) return url;
 
-  // Cloudinary: özel karakterler için URL-encode; boşluk → %20
-  const encoded = encodeURIComponent(safe).replace(/'/g, "%27");
-  return url.replace("/upload/", `/upload/fl_attachment:${encoded}/`);
+  const b64 = toCloudinaryUrlSafeBase64(safe);
+  if (!b64) return url;
+  return url.replace("/upload/", `/upload/fl_attachment:b64_${b64}/`);
+}
+
+/** Cloudinary fl_attachment için URL-safe Base64 (padding yok). */
+function toCloudinaryUrlSafeBase64(text: string): string {
+  try {
+    const bytes = new TextEncoder().encode(text);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]!);
+    const b64 =
+      typeof btoa === "function"
+        ? btoa(binary)
+        : Buffer.from(text, "utf8").toString("base64");
+    return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  } catch {
+    return "";
+  }
 }
 
 /** Görsel/video delivery URL’lerine f_auto,q_auto ekler (raw dokunulmaz). */

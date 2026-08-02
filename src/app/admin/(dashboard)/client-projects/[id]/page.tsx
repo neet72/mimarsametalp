@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db/prisma";
 import { AdminClientProjectForm } from "@/components/admin/portal/AdminClientProjectForm";
+import { AdminClientProjectHeaderActions } from "@/components/admin/portal/AdminClientProjectHeaderActions";
 
 export const dynamic = "force-dynamic";
 
@@ -28,14 +28,7 @@ export default async function AdminClientProjectDetailPage({ params }: Props) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-semibold text-zinc-100">{project.title}</h1>
-        <div className="flex gap-3 text-sm">
-          <Link href={`/admin/client-projects/${project.id}/updates`} className="text-[rgb(166,124,82)]">
-            Güncellemeler
-          </Link>
-          <Link href="/admin/client-projects" className="text-zinc-500">
-            ← Liste
-          </Link>
-        </div>
+        <AdminClientProjectHeaderActions projectId={project.id} title={project.title} />
       </div>
       <AdminClientProjectForm
         mode="edit"
