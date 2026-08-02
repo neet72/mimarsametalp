@@ -83,6 +83,14 @@ export function Footer() {
               </li>
               <li>
                 <Link
+                  href="/panel/giris"
+                  className="touch-manipulation inline-flex min-h-[44px] items-center py-1 font-medium transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-h-0"
+                >
+                  {t ? "Client portal" : "Müşteri paneli"}
+                </Link>
+              </li>
+              <li>
+                <Link
                   href={withLocalePath("/kvkk", locale)}
                   className="touch-manipulation inline-flex min-h-[44px] items-center py-1 font-medium transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-h-0"
                 >

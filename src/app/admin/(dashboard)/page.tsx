@@ -1,21 +1,37 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db/prisma";
-import { FolderKanban, Inbox, MailOpen, Wrench } from "lucide-react";
+import { Briefcase, FolderKanban, Inbox, MailOpen, Package, Users, Wrench } from "lucide-react";
 
 export default async function AdminDashboardPage() {
   let projectCount = 0;
   let messageCount = 0;
   let unreadCount = 0;
   let serviceCount = 0;
+  let clientCount = 0;
+  let clientProjectCount = 0;
+  let deliveryNewCount = 0;
   let recentProjects: Array<{ id: string; title: string; slug: string; createdAt: Date }> = [];
   let recentMessages: Array<{ id: string; firstName: string; lastName: string; email: string; read: boolean; createdAt: Date }> = [];
 
   try {
-    [projectCount, serviceCount, messageCount, unreadCount, recentProjects, recentMessages] = await Promise.all([
+    [
+      projectCount,
+      serviceCount,
+      messageCount,
+      unreadCount,
+      clientCount,
+      clientProjectCount,
+      deliveryNewCount,
+      recentProjects,
+      recentMessages,
+    ] = await Promise.all([
       prisma.project.count(),
       prisma.service.count(),
       prisma.message.count(),
       prisma.message.count({ where: { read: false } }),
+      prisma.clientUser.count(),
+      prisma.clientProject.count(),
+      prisma.clientDeliveryRequest.count({ where: { status: "new" } }),
       prisma.project.findMany({
         orderBy: { createdAt: "desc" },
         take: 5,
@@ -113,15 +129,57 @@ export default async function AdminDashboardPage() {
       </div>
 
       <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Müşteri portalı</p>
+          <Link href="/panel/giris" className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600 hover:text-zinc-400">
+            /panel/giris ↗
+          </Link>
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <Link
+            href="/admin/clients"
+            className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3 transition-colors hover:border-zinc-700"
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-zinc-500">Müşteriler</p>
+              <Users className="h-4 w-4 text-zinc-600" aria-hidden />
+            </div>
+            <p className="mt-1 text-2xl font-semibold tabular-nums text-zinc-100">{clientCount}</p>
+          </Link>
+          <Link
+            href="/admin/client-projects"
+            className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3 transition-colors hover:border-zinc-700"
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-zinc-500">Portal projeleri</p>
+              <Briefcase className="h-4 w-4 text-zinc-600" aria-hidden />
+            </div>
+            <p className="mt-1 text-2xl font-semibold tabular-nums text-zinc-100">{clientProjectCount}</p>
+          </Link>
+          <Link
+            href="/admin/delivery-requests"
+            className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3 transition-colors hover:border-zinc-700"
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-zinc-500">Yeni teslim</p>
+              <Package className="h-4 w-4 text-zinc-600" aria-hidden />
+            </div>
+            <p className="mt-1 text-2xl font-semibold tabular-nums text-[rgb(200,170,130)]">{deliveryNewCount}</p>
+          </Link>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
         <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Hızlı bağlantılar</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {[
             { href: "/admin/projects/new", label: "Yeni proje" },
             { href: "/admin/services/new", label: "Yeni hizmet" },
+            { href: "/admin/clients", label: "Yeni müşteri" },
+            { href: "/admin/client-projects/new", label: "Portal projesi" },
+            { href: "/admin/delivery-requests", label: "Teslimler" },
             { href: "/admin/about", label: "Hakkımızda" },
             { href: "/admin/contact", label: "İletişim metinleri" },
-            { href: "/admin/clients", label: "Müşteriler" },
-            { href: "/admin/delivery-requests", label: "Teslim talepleri" },
           ].map((l) => (
             <Link
               key={l.href}

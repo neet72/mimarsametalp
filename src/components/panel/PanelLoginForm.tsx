@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -16,7 +17,7 @@ export function PanelLoginForm() {
     setError(null);
     startTransition(async () => {
       const res = await signIn("client-credentials", {
-        username,
+        username: username.trim().toLowerCase(),
         password,
         redirect: false,
       });
@@ -32,50 +33,71 @@ export function PanelLoginForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="mx-auto w-full max-w-sm space-y-5 rounded-2xl border border-border bg-white/60 p-8 shadow-sm"
+      className="relative w-full max-w-md space-y-6 rounded-2xl border border-border/80 bg-surface/90 p-8 shadow-[0_24px_80px_-40px_rgb(15_23_42/0.35)] backdrop-blur-md sm:p-10"
     >
       <div>
-        <p className="font-display text-[10px] font-semibold uppercase tracking-[0.22em] text-accent">
+        <p className="font-display text-[10px] font-semibold uppercase tracking-[0.28em] text-accent">
           Samet Alp Mimarlık
         </p>
-        <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-primary">
-          Müşteri girişi
+        <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-primary">
+          Müşteri paneli
         </h1>
-        <p className="mt-1 text-sm text-muted">Proje panelinize erişin.</p>
+        <p className="mt-2 text-sm leading-relaxed text-muted">
+          Proje durumunuz, güncellemeler ve teslim talepleri için güvenli giriş.
+        </p>
       </div>
+
       {error ? (
-        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+        <p
+          role="alert"
+          className="rounded-xl border border-red-200/80 bg-red-50 px-3.5 py-2.5 text-sm text-red-700"
+        >
+          {error}
+        </p>
       ) : null}
-      <label className="block text-sm">
-        <span className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-muted">
-          Kullanıcı adı
-        </span>
-        <input
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          autoComplete="username"
-          required
-          className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-primary outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
-        />
-      </label>
-      <label className="block text-sm">
-        <span className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-muted">Şifre</span>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-          required
-          className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-primary outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
-        />
-      </label>
+
+      <div className="space-y-4">
+        <label className="block text-sm">
+          <span className="mb-1.5 block text-xs font-medium uppercase tracking-[0.16em] text-muted">
+            Kullanıcı adı
+          </span>
+          <input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="username"
+            required
+            className="w-full rounded-xl border border-border bg-white/70 px-3.5 py-3 text-primary outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-accent/35"
+          />
+        </label>
+        <label className="block text-sm">
+          <span className="mb-1.5 block text-xs font-medium uppercase tracking-[0.16em] text-muted">
+            Şifre
+          </span>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            required
+            className="w-full rounded-xl border border-border bg-white/70 px-3.5 py-3 text-primary outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-accent/35"
+          />
+        </label>
+      </div>
+
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-lg bg-accent py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+        className="w-full rounded-full bg-accent py-3.5 text-sm font-semibold uppercase tracking-[0.18em] text-white transition-opacity hover:opacity-90 disabled:opacity-50"
       >
-        {pending ? "Giriş…" : "Giriş yap"}
+        {pending ? "Giriş yapılıyor…" : "Giriş yap"}
       </button>
+
+      <p className="text-center text-xs text-muted">
+        Hesabınız yoksa ofisimizle iletişime geçin.{" "}
+        <Link href="/iletisim" className="text-accent underline-offset-2 hover:underline">
+          İletişim
+        </Link>
+      </p>
     </form>
   );
 }

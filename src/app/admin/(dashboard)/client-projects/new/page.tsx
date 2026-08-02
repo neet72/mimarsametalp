@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db/prisma";
 import { AdminClientProjectForm } from "@/components/admin/portal/AdminClientProjectForm";
+import { AdminPageHeader } from "@/components/admin/ui/AdminPageChrome";
 
 export const dynamic = "force-dynamic";
 
@@ -13,12 +14,15 @@ export default async function AdminClientProjectNewPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-semibold text-zinc-100">Yeni müşteri projesi</h1>
-        <Link href="/admin/client-projects" className="text-sm text-zinc-500">
-          ← Liste
-        </Link>
-      </div>
+      <AdminPageHeader
+        title="Yeni portal projesi"
+        description="Müşteriye atanacak şantiye / iş kaydı."
+        actions={
+          <Link href="/admin/client-projects" className="text-sm text-zinc-500 hover:text-zinc-300">
+            ← Liste
+          </Link>
+        }
+      />
       <AdminClientProjectForm mode="create" clients={clients} />
     </div>
   );

@@ -204,6 +204,12 @@ export function Navbar() {
         </nav>
 
         <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3 md:justify-self-end">
+          <Link
+            href="/panel/giris"
+            className="touch-manipulation hidden min-h-[44px] items-center rounded-full border border-border/90 px-3 font-display text-[0.6875rem] font-medium tracking-[0.14em] text-muted transition-colors hover:border-accent/40 hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:inline-flex sm:min-h-0 sm:px-4 sm:py-2 sm:text-xs md:text-[0.75rem]"
+          >
+            {locale === "en" ? "Client login" : "Müşteri girişi"}
+          </Link>
           <ThemeToggle />
           <button
             type="button"
@@ -330,6 +336,15 @@ export function Navbar() {
                       </motion.li>
                     );
                   })}
+                  <motion.li variants={reduceMotion ? undefined : mobileItem}>
+                    <Link
+                      href="/panel/giris"
+                      className={cn(mobileMenuLinkClass, "mt-4 border border-border/80 text-accent")}
+                      onClick={() => setOpen(false)}
+                    >
+                      {locale === "en" ? "Client login" : "Müşteri girişi"}
+                    </Link>
+                  </motion.li>
                 </motion.ul>
               </nav>
             </motion.div>
