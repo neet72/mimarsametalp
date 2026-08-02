@@ -19,8 +19,8 @@ const IMAGE_MIME = [
 ] as const;
 const VIDEO_MIME = ["video/mp4", "video/webm"] as const;
 
-const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
-const MAX_VIDEO_BYTES = 50 * 1024 * 1024; // 50MB
+const MAX_IMAGE_BYTES = 50 * 1024 * 1024; // 50MB
+const MAX_VIDEO_BYTES = 500 * 1024 * 1024; // 500MB
 
 const uploadSchema = z
   .object({
@@ -45,7 +45,7 @@ const uploadSchema = z
     if (size > max) {
       ctx.addIssue({
         code: "custom",
-        message: isVideo ? "Video çok büyük (max 50MB)." : "Görsel çok büyük (max 5MB).",
+        message: isVideo ? "Video çok büyük (max 500MB)." : "Görsel çok büyük (max 50MB).",
         path: ["file"],
       });
     }

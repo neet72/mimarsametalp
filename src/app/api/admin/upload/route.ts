@@ -5,11 +5,11 @@ import { uploadToCloudinary } from "@/lib/storage/cloudinary";
 import { logger } from "@/lib/observability/logger";
 
 export const runtime = "nodejs";
-/** Vercel / Node: büyük galeri yüklemeleri için */
-export const maxDuration = 60;
+/** Büyük video yüklemeleri için (Vercel Pro vb. plan limitine bağlı) */
+export const maxDuration = 300;
 
-const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
-const MAX_VIDEO_BYTES = 50 * 1024 * 1024; // 50MB
+const MAX_IMAGE_BYTES = 50 * 1024 * 1024; // 50MB
+const MAX_VIDEO_BYTES = 500 * 1024 * 1024; // 500MB
 const IMAGE_MIME = new Set([
   "image/jpeg",
   "image/jpg",
@@ -153,7 +153,7 @@ export async function POST(req: Request) {
       max,
     });
     return NextResponse.json(
-      { ok: false, error: isVideo ? "Video çok büyük (max 50MB)." : "Görsel çok büyük (max 5MB)." },
+      { ok: false, error: isVideo ? "Video çok büyük (max 500MB)." : "Görsel çok büyük (max 50MB)." },
       { status: 400 },
     );
   }

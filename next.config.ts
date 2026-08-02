@@ -18,10 +18,10 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["bcryptjs"],
   experimental: {
     serverActions: {
-      bodySizeLimit: "50mb",
+      bodySizeLimit: "500mb",
     },
     // Middleware / proxy katmanı (15.5+); büyük FormData yüklemeleri için
-    middlewareClientMaxBodySize: "50mb",
+    middlewareClientMaxBodySize: "500mb",
   },
   images: {
     formats: ["image/avif", "image/webp"],
