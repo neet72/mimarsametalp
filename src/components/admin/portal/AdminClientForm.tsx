@@ -162,7 +162,7 @@ export function AdminClientForm({
               className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-zinc-100"
             />
             <span className="mt-1 block text-xs text-zinc-600">
-              E-posta yazmayın — sadece harf, rakam, nokta, _ veya - (örn. ahmet.yilmaz)
+              Türkçe harfler otomatik dönüşür (bünyamin → bunyamin). E-posta yazmayın.
             </span>
           </label>
         ) : (

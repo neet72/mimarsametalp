@@ -4,6 +4,7 @@ import authConfig from "./auth.config";
 import { rateLimit } from "@/lib/security/rate-limit";
 import { logger } from "@/lib/observability/logger";
 import { prisma } from "@/lib/db/prisma";
+import { normalizeUsername } from "@/lib/security/username";
 
 function stripEnvQuotes(value: string): string {
   const t = value.trim();
@@ -139,7 +140,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           if (!credentials?.username || !credentials?.password) return null;
 
-          const username = String(credentials.username).trim().toLowerCase();
+          const username = normalizeUsername(String(credentials.username));
           const rl = rateLimit(`client-login:${username}`, 8, 10 * 60 * 1000);
           if (!rl.ok) return null;
 

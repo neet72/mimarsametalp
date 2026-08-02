@@ -7,6 +7,7 @@ import { prisma } from "@/lib/db/prisma";
 import { generateTempPassword, hashPassword } from "@/lib/security/password";
 import { sendClientTempPasswordEmail } from "@/lib/email/portal-emails";
 import { auditAdmin } from "@/lib/observability/audit";
+import { normalizeUsername } from "@/lib/security/username";
 
 const optionalEmail = z.preprocess(
   (v) => (typeof v === "string" ? v.trim() : v),
@@ -18,14 +19,15 @@ const optionalPhone = z.preprocess(
   z.union([z.literal(""), z.string().max(40)]),
 );
 
-const usernameSchema = z.preprocess(
-  (v) => (typeof v === "string" ? v.trim().toLowerCase() : v),
-  z
-    .string()
-    .min(3, "Kullanıcı adı en az 3 karakter")
-    .max(40, "Kullanıcı adı en fazla 40 karakter")
-    .regex(/^[a-z0-9._-]+$/, "Sadece harf, rakam, nokta, _ ve - (e-posta değil)"),
-);
+const usernameSchema = z.preprocess((v) => {
+  if (typeof v !== "string") return v;
+  return normalizeUsername(v);
+}, z
+  .string()
+  .min(3, "Kullanıcı adı en az 3 karakter")
+  .max(40, "Kullanıcı adı en fazla 40 karakter")
+  .regex(/^[a-z0-9._-]+$/, "Geçersiz karakter kaldı — harf, rakam, nokta, _ veya - kullanın"));
+
 
 const idList = z.array(z.string().min(1)).optional();
 
