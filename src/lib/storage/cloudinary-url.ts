@@ -57,3 +57,10 @@ export function withCloudinaryAttachment(url: string, filename: string): string 
   const encoded = encodeURIComponent(safe).replace(/'/g, "%27");
   return url.replace("/upload/", `/upload/fl_attachment:${encoded}/`);
 }
+
+/** Görsel/video delivery URL’lerine f_auto,q_auto ekler (raw dokunulmaz). */
+export function withCloudinaryAutoFormat(url: string): string {
+  if (!url.includes("/upload/") || url.includes("/raw/upload/")) return url;
+  if (url.includes("f_auto") || url.includes("q_auto")) return url;
+  return url.replace("/upload/", "/upload/f_auto,q_auto/");
+}

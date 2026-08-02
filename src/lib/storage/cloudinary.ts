@@ -32,18 +32,82 @@ export type CloudinaryUploadResult = {
 };
 
 function withAutoFormatQuality(url: string) {
-  // Insert f_auto,q_auto right after /upload/
-  // Works for both image and video delivery URLs.
   return url.replace("/upload/", "/upload/f_auto,q_auto/");
+}
+
+function resolveFolder(opts: {
+  mimeType: string;
+  folderKind?: "portfolio" | "portal";
+}) {
+  const isVideo = opts.mimeType.startsWith("video/");
+  const isImage = opts.mimeType.startsWith("image/");
+  const isRawDoc = !isVideo && !isImage;
+  const kind = opts.folderKind ?? "portfolio";
+  if (kind === "portal") {
+    if (isVideo) return "samet-alp/portal/videos";
+    if (isRawDoc) return "samet-alp/portal/docs";
+    return "samet-alp/portal/images";
+  }
+  if (isVideo) return "samet-alp/videos";
+  if (isRawDoc) return "samet-alp/docs";
+  return "samet-alp/images";
+}
+
+export type SignedDirectUpload = {
+  cloudName: string;
+  apiKey: string;
+  timestamp: number;
+  signature: string;
+  folder: string;
+  publicId: string;
+  /** Cloudinary endpoint resource type segment */
+  resourceType: "image" | "video" | "raw" | "auto";
+};
+
+/** Tarayıcıdan doğrudan Cloudinary’ye yüklemek için imzalı parametreler. */
+export function createSignedDirectUpload(opts: {
+  mimeType: string;
+  originalFilename?: string;
+  folderKind?: "portfolio" | "portal";
+}): SignedDirectUpload {
+  if (!configureCloudinary()) {
+    throw new Error("CLOUDINARY_NOT_CONFIGURED");
+  }
+
+  const isVideo = opts.mimeType.startsWith("video/");
+  const isImage = opts.mimeType.startsWith("image/");
+  const isRawDoc = !isVideo && !isImage;
+  const folder = resolveFolder(opts);
+  const ext = extensionFromFilenameOrMime(opts.originalFilename, opts.mimeType);
+  const publicId = `${crypto.randomUUID()}${ext}`;
+  const timestamp = Math.round(Date.now() / 1000);
+
+  const paramsToSign: Record<string, string | number> = {
+    folder,
+    public_id: publicId,
+    timestamp,
+    unique_filename: "true",
+    overwrite: "false",
+  };
+
+  const signature = cloudinary.utils.api_sign_request(paramsToSign, CLOUDINARY_API_SECRET);
+
+  return {
+    cloudName: CLOUDINARY_CLOUD_NAME,
+    apiKey: CLOUDINARY_API_KEY,
+    timestamp,
+    signature,
+    folder,
+    publicId,
+    resourceType: isRawDoc ? "raw" : "auto",
+  };
 }
 
 export async function uploadToCloudinary(opts: {
   buffer: Buffer;
   mimeType: string;
   actor?: string;
-  /** Varsayılan portfolyo klasörleri; portal medyası için `portal` kullanın. */
   folderKind?: "portfolio" | "portal";
-  /** Orijinal dosya adı — public_id uzantısı ve indirme adı için. */
   originalFilename?: string;
 }): Promise<CloudinaryUploadResult> {
   if (!configureCloudinary()) {
@@ -54,20 +118,7 @@ export async function uploadToCloudinary(opts: {
   const isVideo = opts.mimeType.startsWith("video/");
   const isImage = opts.mimeType.startsWith("image/");
   const isRawDoc = !isVideo && !isImage;
-  const kind = opts.folderKind ?? "portfolio";
-  const folder =
-    kind === "portal"
-      ? isVideo
-        ? "samet-alp/portal/videos"
-        : isRawDoc
-          ? "samet-alp/portal/docs"
-          : "samet-alp/portal/images"
-      : isVideo
-        ? "samet-alp/videos"
-        : isRawDoc
-          ? "samet-alp/docs"
-          : "samet-alp/images";
-  // UUID + uzantı: indirmede tarayıcı doğru tip/adı tanısın; folder ayrı verilir (çift yol yok).
+  const folder = resolveFolder(opts);
   const ext = extensionFromFilenameOrMime(opts.originalFilename, opts.mimeType);
   const publicId = `${crypto.randomUUID()}${ext}`;
 
@@ -87,15 +138,11 @@ export async function uploadToCloudinary(opts: {
         unique_filename: true,
         overwrite: false,
         use_filename: false,
-        // Dokümanlar (PDF/Word/Excel) raw; görsel/video auto.
         resource_type: isRawDoc ? "raw" : "auto",
         ...(isVideo
           ? {
-              // Derive a poster/thumbnail from the first frame.
               eager: [
                 {
-                  // Take first frame (start_offset 0) and output as webp.
-                  // NOTE: Cloudinary will return eager[0].secure_url for derived asset.
                   transformation: [{ start_offset: 0 }],
                   format: "webp",
                 },
@@ -121,9 +168,7 @@ export async function uploadToCloudinary(opts: {
   return {
     publicId: String(res?.public_id ?? publicId),
     resourceType,
-    // f_auto raw/PDF URL’lerini bozabilir — sadece görsel/video.
     secureUrl: isRawDoc ? secureUrl : withAutoFormatQuality(secureUrl),
     thumbnailUrl: eagerThumb ? withAutoFormatQuality(eagerThumb) : undefined,
   };
 }
-

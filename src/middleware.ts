@@ -30,7 +30,7 @@ function buildCspHeaderValue(): string {
     "media-src 'self' blob: https://res.cloudinary.com",
     "font-src 'self' data:",
     // Vercel Analytics / Web Vitals
-    `connect-src 'self' https://vitals.vercel-insights.com${devConnectExtras}`,
+    `connect-src 'self' https://vitals.vercel-insights.com https://api.cloudinary.com https://res.cloudinary.com${devConnectExtras}`,
     // Google Maps iframe + yaygın alt çerçeve kaynakları
     "frame-src 'self' https://www.google.com https://maps.google.com https://www.gstatic.com",
     // Extra hardening

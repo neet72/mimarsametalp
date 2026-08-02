@@ -3,13 +3,16 @@ import { auth } from "@/auth";
 import { isAdminEmail } from "@/lib/security/admin";
 import { uploadToCloudinary } from "@/lib/storage/cloudinary";
 import { logger } from "@/lib/observability/logger";
+import {
+  MAX_ADMIN_IMAGE_BYTES,
+  MAX_ADMIN_VIDEO_BYTES,
+  formatBytesMb,
+} from "@/lib/admin/upload-limits";
 
 export const runtime = "nodejs";
 /** Büyük video yüklemeleri için (Vercel Pro vb. plan limitine bağlı) */
 export const maxDuration = 300;
 
-const MAX_IMAGE_BYTES = 50 * 1024 * 1024; // 50MB
-const MAX_VIDEO_BYTES = 500 * 1024 * 1024; // 500MB
 const IMAGE_MIME = new Set([
   "image/jpeg",
   "image/jpg",
@@ -141,7 +144,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const max = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
+  const max = isVideo ? MAX_ADMIN_VIDEO_BYTES : MAX_ADMIN_IMAGE_BYTES;
   if (file.size > max) {
     logger.warn({
       msg: "upload too large",
@@ -153,7 +156,12 @@ export async function POST(req: Request) {
       max,
     });
     return NextResponse.json(
-      { ok: false, error: isVideo ? "Video çok büyük (max 500MB)." : "Görsel çok büyük (max 50MB)." },
+      {
+        ok: false,
+        error: isVideo
+          ? `Video çok büyük (${formatBytesMb(file.size)} / max ${formatBytesMb(max)}).`
+          : `Görsel çok büyük (${formatBytesMb(file.size)} / max ${formatBytesMb(max)}).`,
+      },
       { status: 400 },
     );
   }

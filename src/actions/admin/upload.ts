@@ -5,6 +5,7 @@ import { requireAdmin } from "@/actions/admin/guard";
 import { createSafeAction } from "@/lib/actions/safe-action";
 import { uploadToCloudinary } from "@/lib/storage/cloudinary";
 import { logger } from "@/lib/observability/logger";
+import { MAX_ADMIN_IMAGE_BYTES, MAX_ADMIN_VIDEO_BYTES } from "@/lib/admin/upload-limits";
 
 // iPhone/Android devices can upload HEIC/HEIF; some browsers also label JPEG as image/jpg.
 const IMAGE_MIME = [
@@ -18,9 +19,6 @@ const IMAGE_MIME = [
   "image/gif",
 ] as const;
 const VIDEO_MIME = ["video/mp4", "video/webm"] as const;
-
-const MAX_IMAGE_BYTES = 50 * 1024 * 1024; // 50MB
-const MAX_VIDEO_BYTES = 500 * 1024 * 1024; // 500MB
 
 const uploadSchema = z
   .object({
@@ -37,7 +35,7 @@ const uploadSchema = z
       return;
     }
 
-    const max = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
+    const max = isVideo ? MAX_ADMIN_VIDEO_BYTES : MAX_ADMIN_IMAGE_BYTES;
     if (size <= 0) {
       ctx.addIssue({ code: "custom", message: "Dosya boş.", path: ["file"] });
       return;
