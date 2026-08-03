@@ -8,6 +8,7 @@ import {
 } from "@/lib/portal/queries";
 import { projectStatusTr, stageStatusTr } from "@/lib/portal/labels";
 import { shouldUnoptimizeImage } from "@/lib/media/next-image";
+import { PanelProjectRoadmap } from "@/components/panel/PanelProjectRoadmap";
 
 export default async function PanelOverviewPage() {
   const { client } = await requireClient();
@@ -157,6 +158,16 @@ export default async function PanelOverviewPage() {
                         </div>
                         <p className="text-xs text-muted">{p._count.updates} güncelleme</p>
                       </div>
+
+                      <PanelProjectRoadmap
+                        items={p.roadmapItems.map((r) => ({
+                          id: r.id,
+                          title: r.title,
+                          note: r.note,
+                          startDate: r.startDate.toISOString(),
+                          endDate: r.endDate?.toISOString() ?? null,
+                        }))}
+                      />
 
                       {p.stages.length ? (
                         <>

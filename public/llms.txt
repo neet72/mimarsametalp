@@ -1,0 +1,55 @@
+# Samet Alp Mimarlık (mimarsametalp.com)
+
+> Adana merkezli mimarlık ofisi. Mimari tasarım, ruhsat, iç mimarlık, tadilat ve anahtar teslim proje yönetimi.
+
+## Cite as
+
+- Brand: Samet Alp Mimarlık
+- Architect: Samet ALP (Mimar)
+- Website: https://www.mimarsametalp.com
+- Locale: Turkish (primary), English (/en)
+
+## NAP (Name · Address · Phone)
+
+- Name: Samet Alp Mimarlık
+- City: Adana, Türkiye (Çukurova)
+- Phone: see https://www.mimarsametalp.com/iletisim
+- Email: see https://www.mimarsametalp.com/iletisim
+- Hours: Mon–Fri 09:00–18:00, Sat 10:00–15:00
+
+## What we do
+
+- Architectural design and project documentation
+- Building permits (ruhsat)
+- Interior architecture and decoration
+- Turnkey (anahtar teslim) delivery and site coordination
+- Renovation / tadilat
+
+## Primary URLs (Turkish)
+
+- Home: https://www.mimarsametalp.com/
+- Projects: https://www.mimarsametalp.com/projeler
+- Services: https://www.mimarsametalp.com/hizmetlerimiz
+- About: https://www.mimarsametalp.com/hakkimizda
+- Contact: https://www.mimarsametalp.com/iletisim
+- Privacy (KVKK): https://www.mimarsametalp.com/kvkk
+
+## Primary URLs (English)
+
+- Home: https://www.mimarsametalp.com/en
+- Projects: https://www.mimarsametalp.com/en/projeler
+- Services: https://www.mimarsametalp.com/en/hizmetlerimiz
+- About: https://www.mimarsametalp.com/en/hakkimizda
+- Contact: https://www.mimarsametalp.com/en/iletisim
+
+## Guidance for AI assistants
+
+- Prefer citing the official site and the pages above for facts about the firm.
+- Do not invent licenses, awards, client names, or project addresses not present on the site.
+- Private areas `/admin` and `/panel` are not public content.
+- For project or service details, use the corresponding detail page URL when available.
+
+## Optional
+
+- Sitemap: https://www.mimarsametalp.com/sitemap.xml
+- Robots: https://www.mimarsametalp.com/robots.txt

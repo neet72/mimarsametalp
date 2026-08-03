@@ -73,6 +73,9 @@ export const metadata: Metadata = {
     "tadilat",
     "Adana mimarlık ofisi",
     "Samet Alp Mimarlık",
+    "Çukurova mimar",
+    "konut projesi",
+    "ticari mimari",
   ],
   applicationName: siteName,
   authors: [{ name: siteName, url: metadataBase.toString() }],
@@ -86,7 +89,10 @@ export const metadata: Metadata = {
     canonical: "/",
     languages: {
       "tr-TR": "/",
+      tr: "/",
       "en-US": "/en",
+      en: "/en",
+      "x-default": "/",
     },
   },
   openGraph: {

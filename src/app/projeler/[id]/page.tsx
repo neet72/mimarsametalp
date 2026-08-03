@@ -13,16 +13,34 @@ type PageProps = {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
   const slug = String(id ?? "").trim().toLowerCase();
-  if (!slug) return pageMetadata({ title: "Proje", description: "Proje detayı.", path: "/projeler" });
+  if (!slug) {
+    return pageMetadata({
+      title: "Projeler",
+      description: "Adana mimarlık portföyü — Samet Alp Mimarlık proje galerisi.",
+      path: "/projeler",
+    });
+  }
 
   const project = await getPublicProjectBySlug(slug);
-  if (!project) return pageMetadata({ title: "Proje", description: "Proje detayı.", path: "/projeler" });
+  if (!project) {
+    return {
+      ...pageMetadata({
+        title: "Proje bulunamadı",
+        description: "Aradığınız proje yayında değil veya taşınmış olabilir. Portföy listesine göz atın.",
+        path: "/projeler",
+      }),
+      robots: { index: false, follow: true },
+    };
+  }
 
   const img = firstImageUrl(project.imageUrls);
   const title = project.title;
   const description =
     project.description?.slice(0, 180) ||
-    "Samet Alp Mimarlık proje detayı: mimari yaklaşım, galeri ve proje bilgileri.";
+    `${project.title}${project.category ? ` — ${project.category}` : ""}${project.location ? `, ${project.location}` : ""}. Samet Alp Mimarlık mimari proje detayı, galeri ve teknik bilgiler.`.slice(
+      0,
+      180,
+    );
 
   return {
     ...pageMetadata({

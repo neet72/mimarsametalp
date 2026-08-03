@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ContactPageExperience } from "@/components/contact/ContactPageExperience";
 import { pageMetadata } from "@/lib/seo";
-import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
+import { breadcrumbJsonLd, contactPageJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
 
 const pageTitle = "İletişim | Samet Alp Mimarlık";
 const pageDescription =
@@ -26,6 +26,15 @@ export default function IletisimPage() {
             { name: "Ana Sayfa", path: "/" },
             { name: "İletişim", path: "/iletisim" },
           ]),
+        )}
+      />
+      <script
+        {...jsonLdScriptProps(
+          contactPageJsonLd({
+            path: "/iletisim",
+            inLanguage: "tr-TR",
+            description: pageDescription,
+          }),
         )}
       />
       <ContactPageExperience />

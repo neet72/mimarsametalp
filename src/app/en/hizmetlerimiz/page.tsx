@@ -40,6 +40,7 @@ export default async function ServicesPageEn() {
               name: s.title,
               path: `/en/hizmetlerimiz/${s.slug}`,
               imageUrl: s.imageUrl,
+              itemType: "Service",
             })),
           }),
         )}

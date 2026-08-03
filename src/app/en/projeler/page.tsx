@@ -7,7 +7,7 @@ import { breadcrumbJsonLd, itemListJsonLd, jsonLdScriptProps } from "@/lib/seo-j
 
 const pageTitle = "Projects | Samet Alp Architecture";
 const pageDescription =
-  "A curated selection of residential, commercial, and interior architecture projects and applications.";
+  "Architecture portfolio in Adana: residential, commercial, and interior projects by Samet Alp Architecture.";
 
 export const metadata: Metadata = {
   ...pageMetadata({
@@ -49,6 +49,7 @@ export default async function ProjectsPageEn() {
               name: p.title,
               path: `/en/projeler/${p.slug}`,
               imageUrl: p.imageUrl,
+              itemType: "Project",
             })),
           }),
         )}

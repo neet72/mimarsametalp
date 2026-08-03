@@ -177,6 +177,7 @@ model ClientProject {
   updates          ClientProjectUpdate[]
   members          ClientProjectMember[]
   deliveryRequests ClientDeliveryRequest[]
+  roadmapItems     ClientProjectRoadmapItem[]
 
   @@index([status])
   @@index([createdAt])
@@ -205,6 +206,23 @@ model ClientProjectStage {
   updates ClientProjectUpdate[]
 
   @@index([projectId, orderIndex])
+}
+
+model ClientProjectRoadmapItem {
+  id         String        @id @default(cuid())
+  projectId  String
+  project    ClientProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title      String
+  note       String        @db.Text @default("")
+  startDate  DateTime
+  endDate    DateTime?
+  orderIndex Int           @default(0)
+  visible    Boolean       @default(true)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([projectId, orderIndex])
+  @@index([projectId, visible])
 }
 
 model ClientProjectUpdate {

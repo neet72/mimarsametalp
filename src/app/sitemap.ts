@@ -4,9 +4,6 @@ import { getPublicProjects } from "@/lib/public/projects";
 import { SERVICES_GALLERY } from "@/content/services-gallery";
 import { getPublicServices } from "@/lib/public/services";
 
-const routes = ["", "/projeler", "/hizmetlerimiz", "/hakkimizda", "/iletisim", "/kvkk"] as const;
-const enRoutes = ["/en", "/en/projeler", "/en/hizmetlerimiz", "/en/hakkimizda", "/en/iletisim", "/en/kvkk"] as const;
-
 // Çok sık değişmiyor — cache dostu.
 export const revalidate = 86400; // 1 gün
 
@@ -15,30 +12,24 @@ const lastModified = new Date();
 function isValidPublicSlug(slug: unknown): slug is string {
   if (typeof slug !== "string") return false;
   const s = slug.trim().toLowerCase();
-  // Avoid emitting accidental/garbage slugs into sitemap (helps reduce GSC 404 noise).
   if (s.length < 2 || s.length > 120) return false;
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s);
 }
 
-const paths: MetadataRoute.Sitemap = routes.map((path) => {
+function withLangAlternates(
+  trPath: string,
+  enPath: string,
+  extra: Omit<MetadataRoute.Sitemap[number], "url" | "alternates">,
+): MetadataRoute.Sitemap {
   const base = getSiteUrl();
-  return {
-    url: path === "" ? `${base}/` : `${base}${path}`,
-    lastModified,
-    changeFrequency: path === "" ? "weekly" : "monthly",
-    priority: path === "" ? 1 : 0.75,
-  };
-});
-
-const enPaths: MetadataRoute.Sitemap = enRoutes.map((path) => {
-  const base = getSiteUrl();
-  return {
-    url: `${base}${path}`,
-    lastModified,
-    changeFrequency: path === "/en" ? "weekly" : "monthly",
-    priority: path === "/en" ? 0.9 : 0.7,
-  };
-});
+  const trUrl = trPath === "/" ? `${base}/` : `${base}${trPath}`;
+  const enUrl = `${base}${enPath}`;
+  const languages = { "tr-TR": trUrl, tr: trUrl, "en-US": enUrl, en: enUrl, "x-default": trUrl };
+  return [
+    { url: trUrl, alternates: { languages }, ...extra },
+    { url: enUrl, alternates: { languages }, ...extra },
+  ];
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = getSiteUrl();
@@ -51,46 +42,62 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB yoksa bile sitemap çalışsın.
   }
 
-  const projectPaths: MetadataRoute.Sitemap = projects
-    .filter((p) => isValidPublicSlug(p.slug))
-    .map((p) => ({
-      url: `${base}/projeler/${p.slug}`,
-      lastModified: p.updatedAt ?? lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    }));
-
-  const projectPathsEn: MetadataRoute.Sitemap = projects
-    .filter((p) => isValidPublicSlug(p.slug))
-    .map((p) => ({
-      url: `${base}/en/projeler/${p.slug}`,
-      lastModified: p.updatedAt ?? lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.55,
-    }));
+  const staticPairs: MetadataRoute.Sitemap = [
+    ...withLangAlternates("/", "/en", { lastModified, changeFrequency: "weekly", priority: 1 }),
+    ...withLangAlternates("/projeler", "/en/projeler", {
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    }),
+    ...withLangAlternates("/hizmetlerimiz", "/en/hizmetlerimiz", {
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    }),
+    ...withLangAlternates("/hakkimizda", "/en/hakkimizda", {
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.75,
+    }),
+    ...withLangAlternates("/iletisim", "/en/iletisim", {
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    }),
+    ...withLangAlternates("/kvkk", "/en/kvkk", {
+      lastModified,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    }),
+  ];
 
   const serviceSource =
     services.length > 0
       ? services.map((s) => ({ slug: s.slug, updatedAt: s.updatedAt }))
       : SERVICES_GALLERY.map((s) => ({ slug: s.slug, updatedAt: lastModified }));
 
-  const servicePaths: MetadataRoute.Sitemap = serviceSource
+  const servicePairs: MetadataRoute.Sitemap = serviceSource
     .filter((s) => isValidPublicSlug(s.slug))
-    .map((s) => ({
-      url: `${base}/hizmetlerimiz/${s.slug}`,
-      lastModified: s.updatedAt ?? lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.55,
-    }));
+    .flatMap((s) =>
+      withLangAlternates(`/hizmetlerimiz/${s.slug}`, `/en/hizmetlerimiz/${s.slug}`, {
+        lastModified: s.updatedAt ?? lastModified,
+        changeFrequency: "monthly",
+        priority: 0.65,
+      }),
+    );
 
-  const servicePathsEn: MetadataRoute.Sitemap = serviceSource
-    .filter((s) => isValidPublicSlug(s.slug))
-    .map((s) => ({
-      url: `${base}/en/hizmetlerimiz/${s.slug}`,
-      lastModified: s.updatedAt ?? lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.5,
-    }));
+  const projectPairs: MetadataRoute.Sitemap = projects
+    .filter((p) => isValidPublicSlug(p.slug))
+    .flatMap((p) =>
+      withLangAlternates(`/projeler/${p.slug}`, `/en/projeler/${p.slug}`, {
+        lastModified: p.updatedAt ?? lastModified,
+        changeFrequency: "monthly",
+        priority: 0.7,
+      }),
+    );
 
-  return [...paths, ...enPaths, ...servicePaths, ...servicePathsEn, ...projectPaths, ...projectPathsEn];
+  // llms.txt keşfi için (sitemap’te opsiyonel ama zararsız değil — atlıyoruz; public’te zaten var)
+  void base;
+
+  return [...staticPairs, ...servicePairs, ...projectPairs];
 }

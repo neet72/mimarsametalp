@@ -16,19 +16,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const slug = String(id ?? "").trim().toLowerCase();
   if (!slug) {
     return pageMetadata({
-      title: "Project",
-      description: "Project details.",
+      title: "Projects",
+      description: "Architecture portfolio — Samet Alp Architecture project gallery.",
       path: "/en/projeler",
     });
   }
 
   const project = await getPublicProjectBySlug(slug);
   if (!project) {
-    return pageMetadata({
-      title: "Project",
-      description: "Project details.",
-      path: "/en/projeler",
-    });
+    return {
+      ...pageMetadata({
+        title: "Project not found",
+        description: "This project is not published or may have moved. Browse the portfolio list.",
+        path: "/en/projeler",
+      }),
+      robots: { index: false, follow: true },
+    };
   }
 
   const view = pickProjectForLocale(project, "en");
@@ -36,7 +39,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = view.title;
   const description =
     view.description?.slice(0, 180) ||
-    "Samet Alp Architecture project detail: architectural approach, gallery, and key project information.";
+    `${view.title}${view.category ? ` — ${view.category}` : ""}${view.location ? `, ${view.location}` : ""}. Samet Alp Architecture project detail, gallery, and key information.`.slice(
+      0,
+      180,
+    );
 
   return {
     ...pageMetadata({

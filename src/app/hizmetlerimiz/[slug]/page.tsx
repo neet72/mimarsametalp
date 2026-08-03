@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ServiceDetailClient } from "@/components/hizmetlerimiz/ServiceDetailClient";
 import { pageMetadata, siteName } from "@/lib/seo";
-import { breadcrumbJsonLd, jsonLdScriptProps, serviceJsonLd } from "@/lib/seo-jsonld";
+import { breadcrumbJsonLd, faqPageJsonLd, jsonLdScriptProps, serviceJsonLd } from "@/lib/seo-jsonld";
 import { getPublicServiceBySlug } from "@/lib/public/services";
 import { resolveServiceDetailData } from "@/lib/public/resolve-service-detail";
 import { getServiceListingItems } from "@/lib/public/service-listing";
@@ -94,9 +94,18 @@ export default async function HizmetDetayPage({ params }: PageProps) {
             imageUrl: service.heroImageUrl,
             inLanguage: "tr-TR",
             dateModified: db?.updatedAt ?? null,
+            serviceType: service.name,
           }),
         )}
       />
+      {(() => {
+        const faq = faqPageJsonLd({
+          path: `/hizmetlerimiz/${service.slug}`,
+          inLanguage: "tr-TR",
+          items: service.sss.map((x) => ({ question: x.question, answer: x.answer })),
+        });
+        return faq ? <script key="jsonld-faq" {...jsonLdScriptProps(faq)} /> : null;
+      })()}
       <ServiceDetailClient service={service} relatedServices={relatedServices} />
     </div>
   );

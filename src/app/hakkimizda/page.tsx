@@ -3,7 +3,7 @@ import { AboutPageExperience } from "@/components/about/AboutPageExperience";
 import { getSiteContent } from "@/actions/admin/site-content";
 import { mergeAboutWithPortraitFallback, parseAboutCms } from "@/lib/site-content/about-cms";
 import { pageMetadata } from "@/lib/seo";
-import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo-jsonld";
+import { aboutPageJsonLd, breadcrumbJsonLd, jsonLdScriptProps, personArchitectJsonLd } from "@/lib/seo-jsonld";
 
 const pageTitle = "Hakkımızda | Samet Alp Mimarlık";
 const pageDescription =
@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 export default async function HakkimizdaPage() {
   const [rawTr, rawEn] = await Promise.all([getSiteContent("about", "tr"), getSiteContent("about", "en")]);
   const aboutCms = mergeAboutWithPortraitFallback(parseAboutCms(rawTr), parseAboutCms(rawEn));
+  const portrait = aboutCms?.portraitImageUrl?.trim() || null;
 
   return (
     <div className="w-full">
@@ -33,6 +34,17 @@ export default async function HakkimizdaPage() {
           ]),
         )}
       />
+      <script
+        {...jsonLdScriptProps(
+          aboutPageJsonLd({
+            path: "/hakkimizda",
+            inLanguage: "tr-TR",
+            description: pageDescription,
+            portraitImageUrl: portrait,
+          }),
+        )}
+      />
+      <script {...jsonLdScriptProps(personArchitectJsonLd({ imageUrl: portrait }))} />
       <AboutPageExperience aboutCms={aboutCms} />
     </div>
   );

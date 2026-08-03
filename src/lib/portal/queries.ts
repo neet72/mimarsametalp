@@ -8,6 +8,10 @@ export async function listClientProjectsForUser(clientId: string) {
     where: { members: { some: { clientId } } },
     include: {
       stages: { orderBy: { orderIndex: "asc" } },
+      roadmapItems: {
+        where: { visible: true },
+        orderBy: [{ orderIndex: "asc" }, { startDate: "asc" }],
+      },
       _count: { select: { updates: { where: { isPublished: true } } } },
     },
     orderBy: { updatedAt: "desc" },
@@ -22,6 +26,10 @@ export async function getClientProjectForUser(clientId: string, projectId: strin
     },
     include: {
       stages: { orderBy: { orderIndex: "asc" } },
+      roadmapItems: {
+        where: { visible: true },
+        orderBy: [{ orderIndex: "asc" }, { startDate: "asc" }],
+      },
     },
   });
 }

@@ -232,3 +232,142 @@ export const deleteClientProject = createSafeAction({
     return { id: input.id, title: existing.title };
   },
 });
+
+function parseDateOnly(raw: string, fieldLabel: string): Date {
+  const s = raw.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    throw new ActionError(`${fieldLabel} geçerli bir tarih olmalı (YYYY-MM-DD).`);
+  }
+  const d = new Date(`${s}T12:00:00.000Z`);
+  if (Number.isNaN(d.getTime())) throw new ActionError(`${fieldLabel} geçersiz.`);
+  return d;
+}
+
+export const upsertClientProjectRoadmapItem = createSafeAction({
+  scope: "admin.client-project.roadmap.upsert",
+  schema: z.object({
+    id: z.string().min(1).optional(),
+    projectId: z.string().min(1),
+    title: z.string().trim().min(2, "Başlık gerekli").max(200),
+    note: z.string().trim().max(10_000).optional().or(z.literal("")),
+    startDate: z.string().min(1, "Başlangıç tarihi gerekli"),
+    endDate: z.string().optional().or(z.literal("")),
+    orderIndex: z.coerce.number().int().min(0).max(999).optional(),
+    visible: z.boolean().optional().default(true),
+  }),
+  authorize: async () => {
+    const session = await requireAdmin();
+    return { actor: session.user.email ?? "unknown" };
+  },
+  handler: async (input, ctx) => {
+    const project = await prisma.clientProject.findUnique({
+      where: { id: input.projectId },
+      select: { id: true },
+    });
+    if (!project) throw new ActionError("Proje bulunamadı.");
+
+    const startDate = parseDateOnly(input.startDate, "Başlangıç tarihi");
+    const endRaw = input.endDate?.trim() ?? "";
+    const endDate = endRaw ? parseDateOnly(endRaw, "Bitiş tarihi") : null;
+    if (endDate && endDate.getTime() < startDate.getTime()) {
+      throw new ActionError("Bitiş tarihi başlangıçtan önce olamaz.");
+    }
+
+    const note = input.note?.trim() ?? "";
+
+    if (input.id) {
+      const existing = await prisma.clientProjectRoadmapItem.findFirst({
+        where: { id: input.id, projectId: input.projectId },
+        select: { id: true },
+      });
+      if (!existing) throw new ActionError("Yol haritası maddesi bulunamadı.");
+
+      const updated = await prisma.clientProjectRoadmapItem.update({
+        where: { id: input.id },
+        data: {
+          title: input.title,
+          note,
+          startDate,
+          endDate,
+          visible: input.visible ?? true,
+          ...(typeof input.orderIndex === "number" ? { orderIndex: input.orderIndex } : {}),
+        },
+      });
+      await auditAdmin({
+        actor: ctx.actor ?? "unknown",
+        action: "client-project.roadmap.update",
+        entity: "ClientProjectRoadmapItem",
+        entityId: updated.id,
+      });
+      return { id: updated.id };
+    }
+
+    const maxOrder = await prisma.clientProjectRoadmapItem.aggregate({
+      where: { projectId: input.projectId },
+      _max: { orderIndex: true },
+    });
+    const orderIndex =
+      typeof input.orderIndex === "number" ? input.orderIndex : (maxOrder._max.orderIndex ?? -1) + 1;
+
+    const created = await prisma.clientProjectRoadmapItem.create({
+      data: {
+        projectId: input.projectId,
+        title: input.title,
+        note,
+        startDate,
+        endDate,
+        orderIndex,
+        visible: input.visible ?? true,
+      },
+    });
+    await auditAdmin({
+      actor: ctx.actor ?? "unknown",
+      action: "client-project.roadmap.create",
+      entity: "ClientProjectRoadmapItem",
+      entityId: created.id,
+    });
+    return { id: created.id };
+  },
+});
+
+export const deleteClientProjectRoadmapItem = createSafeAction({
+  scope: "admin.client-project.roadmap.delete",
+  schema: z.object({ id: z.string().min(1) }),
+  authorize: async () => {
+    const session = await requireAdmin();
+    return { actor: session.user.email ?? "unknown" };
+  },
+  handler: async (input, ctx) => {
+    await prisma.clientProjectRoadmapItem.delete({ where: { id: input.id } });
+    await auditAdmin({
+      actor: ctx.actor ?? "unknown",
+      action: "client-project.roadmap.delete",
+      entity: "ClientProjectRoadmapItem",
+      entityId: input.id,
+    });
+    return { id: input.id };
+  },
+});
+
+export const reorderClientProjectRoadmapItems = createSafeAction({
+  scope: "admin.client-project.roadmap.reorder",
+  schema: z.object({
+    projectId: z.string().min(1),
+    orderedIds: z.array(z.string().min(1)).min(1),
+  }),
+  authorize: async () => {
+    const session = await requireAdmin();
+    return { actor: session.user.email ?? "unknown" };
+  },
+  handler: async (input) => {
+    await prisma.$transaction(
+      input.orderedIds.map((id, index) =>
+        prisma.clientProjectRoadmapItem.update({
+          where: { id },
+          data: { orderIndex: index },
+        }),
+      ),
+    );
+    return { ok: true as const };
+  },
+});

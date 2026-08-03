@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db/prisma";
 import { AdminClientProjectForm } from "@/components/admin/portal/AdminClientProjectForm";
 import { AdminClientProjectHeaderActions } from "@/components/admin/portal/AdminClientProjectHeaderActions";
+import { AdminProjectRoadmapEditor } from "@/components/admin/portal/AdminProjectRoadmapEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,7 @@ export default async function AdminClientProjectDetailPage({ params }: Props) {
       include: {
         members: true,
         stages: { orderBy: { orderIndex: "asc" } },
+        roadmapItems: { orderBy: { orderIndex: "asc" } },
       },
     }),
     prisma.clientUser.findMany({
@@ -48,6 +50,18 @@ export default async function AdminClientProjectDetailPage({ params }: Props) {
           status: s.status,
           targetDate: s.targetDate?.toISOString() ?? null,
           completedDate: s.completedDate?.toISOString() ?? null,
+        }))}
+      />
+      <AdminProjectRoadmapEditor
+        projectId={project.id}
+        items={project.roadmapItems.map((r) => ({
+          id: r.id,
+          title: r.title,
+          note: r.note,
+          startDate: r.startDate.toISOString(),
+          endDate: r.endDate?.toISOString() ?? null,
+          orderIndex: r.orderIndex,
+          visible: r.visible,
         }))}
       />
     </div>

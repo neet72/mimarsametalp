@@ -6,7 +6,7 @@ import { breadcrumbJsonLd, itemListJsonLd, jsonLdScriptProps } from "@/lib/seo-j
 
 const pageTitle = "Projeler | Samet Alp Mimarlık";
 const pageDescription =
-  "Konut, ticari ve iç mimarlık projelerinden seçilmiş mimari çalışmalar ve uygulama örnekleri.";
+  "Adana mimarlık portföyü: konut, ticari ve iç mimarlık projeleri. Samet Alp Mimarlık uygulama ve tasarım çalışmalarını keşfedin.";
 
 export const metadata: Metadata = {
   ...pageMetadata({
@@ -45,6 +45,7 @@ export default async function ProjelerPage() {
               name: p.title,
               path: `/projeler/${p.slug}`,
               imageUrl: p.imageUrl,
+              itemType: "Project",
             })),
           }),
         )}
