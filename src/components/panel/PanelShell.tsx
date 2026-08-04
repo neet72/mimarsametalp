@@ -18,6 +18,21 @@ const nav = [
     badgeKey: "updates" as const,
   },
   {
+    href: "/panel/bakiye",
+    label: "Bakiye / Ekstre",
+    match: (p: string) => p.startsWith("/panel/bakiye"),
+  },
+  {
+    href: "/panel/sure-takibi",
+    label: "Süre Takibi",
+    match: (p: string) => p.startsWith("/panel/sure-takibi"),
+  },
+  {
+    href: "/panel/ekler",
+    label: "Ekler",
+    match: (p: string) => p.startsWith("/panel/ekler"),
+  },
+  {
     href: "/panel/tercihler",
     label: "Tercihler",
     match: (p: string) => p.startsWith("/panel/tercihler") || p.startsWith("/panel/sifre"),

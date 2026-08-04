@@ -1,13 +1,14 @@
 "use server";
 
 import { z } from "zod";
-import { ClientProjectStatus, ClientStageStatus } from "@prisma/client";
+import { ClientProjectCategory, ClientProjectStatus, ClientStageStatus } from "@prisma/client";
 import { requireAdmin } from "@/actions/admin/guard";
 import { createSafeAction, ActionError } from "@/lib/actions/safe-action";
 import { prisma } from "@/lib/db/prisma";
 import { auditAdmin } from "@/lib/observability/audit";
 
 const statusSchema = z.nativeEnum(ClientProjectStatus);
+const categorySchema = z.nativeEnum(ClientProjectCategory);
 const stageStatusSchema = z.nativeEnum(ClientStageStatus);
 
 const optionalText = z.preprocess(
@@ -23,6 +24,7 @@ export const createClientProject = createSafeAction({
     title: z.string().trim().min(2, "Başlık gerekli").max(200),
     address: optionalText,
     status: statusSchema.optional(),
+    category: categorySchema.optional(),
     coverImageUrl: optionalText,
     clientIds: idList.optional(),
   }),
@@ -38,6 +40,7 @@ export const createClientProject = createSafeAction({
         title: input.title,
         address: input.address || null,
         status: input.status ?? ClientProjectStatus.PLANNING,
+        category: input.category ?? ClientProjectCategory.DIGER,
         coverImageUrl: input.coverImageUrl || null,
         members:
           input.clientIds && input.clientIds.length
@@ -64,6 +67,7 @@ export const updateClientProject = createSafeAction({
     title: z.string().trim().min(2).max(200),
     address: optionalText,
     status: statusSchema,
+    category: categorySchema,
     coverImageUrl: optionalText,
     clientIds: idList,
   }),
@@ -81,6 +85,7 @@ export const updateClientProject = createSafeAction({
           title: input.title,
           address: input.address || null,
           status: input.status,
+          category: input.category,
           coverImageUrl: input.coverImageUrl || null,
         },
       });

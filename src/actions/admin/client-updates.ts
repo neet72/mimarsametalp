@@ -11,7 +11,7 @@ import { logger } from "@/lib/observability/logger";
 import {
   isPortalAllowedMime,
   MAX_PORTAL_MEDIA_BYTES,
-  portalMediaKindFromMime,
+  portalMediaKindFromFile,
 } from "@/lib/portal/media-types";
 
 export const createClientProjectUpdate = createSafeAction({
@@ -21,6 +21,7 @@ export const createClientProjectUpdate = createSafeAction({
     stageId: z.string().min(1).optional().nullable(),
     title: z.string().trim().min(2).max(200),
     body: z.string().trim().min(1).max(50_000),
+    eventDate: z.string().min(1).optional().nullable(),
   }),
   authorize: async () => {
     const session = await requireAdmin();
@@ -28,6 +29,7 @@ export const createClientProjectUpdate = createSafeAction({
   },
   toFieldErrors: (err) => err.flatten().fieldErrors,
   handler: async (input, ctx) => {
+    const eventDate = parseUpdateEventDate(input.eventDate);
     const update = await prisma.clientProjectUpdate.create({
       data: {
         projectId: input.projectId,
@@ -35,6 +37,7 @@ export const createClientProjectUpdate = createSafeAction({
         title: input.title,
         body: input.body,
         isPublished: false,
+        eventDate,
       },
     });
     await auditAdmin({
@@ -54,6 +57,7 @@ export const updateClientProjectUpdate = createSafeAction({
     stageId: z.string().min(1).optional().nullable(),
     title: z.string().trim().min(2).max(200),
     body: z.string().trim().min(1).max(50_000),
+    eventDate: z.string().min(1).optional().nullable(),
   }),
   authorize: async () => {
     const session = await requireAdmin();
@@ -61,12 +65,14 @@ export const updateClientProjectUpdate = createSafeAction({
   },
   toFieldErrors: (err) => err.flatten().fieldErrors,
   handler: async (input, ctx) => {
+    const eventDate = parseUpdateEventDate(input.eventDate);
     await prisma.clientProjectUpdate.update({
       where: { id: input.id },
       data: {
         stageId: input.stageId || null,
         title: input.title,
         body: input.body,
+        eventDate,
       },
     });
     await auditAdmin({
@@ -79,6 +85,21 @@ export const updateClientProjectUpdate = createSafeAction({
   },
 });
 
+function parseUpdateEventDate(v: string | null | undefined): Date {
+  if (!v || !String(v).trim()) {
+    const now = new Date();
+    return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 12, 0, 0));
+  }
+  const s = String(v).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(`${s}T12:00:00.000Z`);
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) {
+    const now = new Date();
+    return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 12, 0, 0));
+  }
+  return d;
+}
+
 export const publishClientProjectUpdate = createSafeAction({
   scope: "admin.client-update.publish",
   schema: z.object({ id: z.string().min(1) }),
@@ -87,9 +108,18 @@ export const publishClientProjectUpdate = createSafeAction({
     return { actor: session.user.email ?? "unknown" };
   },
   handler: async (input, ctx) => {
+    const existing = await prisma.clientProjectUpdate.findUnique({
+      where: { id: input.id },
+      select: { eventDate: true, publishedAt: true },
+    });
     const updated = await prisma.clientProjectUpdate.update({
       where: { id: input.id },
-      data: { isPublished: true, publishedAt: new Date() },
+      data: {
+        isPublished: true,
+        publishedAt: new Date(),
+        // Yayınlanırken eventDate yoksa bugünü yaz (geriye dönük tarih korunur).
+        ...(existing?.eventDate ? {} : { eventDate: new Date() }),
+      },
     });
 
     await auditAdmin({
@@ -175,10 +205,12 @@ export const uploadClientUpdateMedia = createSafeAction({
                       ? "application/vnd.openxmlformats-officedocument.presentationml.presentation"
                       : name.endsWith(".txt")
                         ? "text/plain"
-                        : type;
+                        : name.endsWith(".rar")
+                          ? "application/vnd.rar"
+                          : type;
 
-    if (!isPortalAllowedMime(inferredType)) {
-      throw new ActionError("Desteklenmeyen dosya. Görsel, video, PDF, Word, Excel veya metin kullanın.");
+    if (!isPortalAllowedMime(inferredType, input.file.name)) {
+      throw new ActionError("Desteklenmeyen dosya. Görsel, video, PDF, Word, Excel, RAR veya metin kullanın.");
     }
     if (input.file.size > MAX_PORTAL_MEDIA_BYTES) {
       throw new ActionError("Dosya çok büyük (max 50MB).");
@@ -193,7 +225,7 @@ export const uploadClientUpdateMedia = createSafeAction({
       originalFilename: input.file.name,
     });
 
-    const mediaType = portalMediaKindFromMime(inferredType);
+    const mediaType = portalMediaKindFromFile({ name: input.file.name, type: inferredType });
 
     const maxOrder = await prisma.clientUpdateMedia.aggregate({
       where: { updateId: input.updateId },

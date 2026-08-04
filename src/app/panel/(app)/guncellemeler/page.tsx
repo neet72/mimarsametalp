@@ -44,6 +44,7 @@ export default async function PanelUpdatesPage() {
             title: u.title,
             body: u.body,
             publishedAt: u.publishedAt?.toISOString() ?? null,
+            eventDate: u.eventDate?.toISOString() ?? null,
             project: u.project,
             stage: u.stage ? { name: u.stage.name } : null,
             media: u.media.map((m) => ({

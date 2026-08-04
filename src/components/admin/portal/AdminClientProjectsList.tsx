@@ -4,19 +4,13 @@ import Link from "next/link";
 import { deleteClientProject } from "@/actions/admin/client-projects";
 import { AdminConfirmDeleteButton } from "@/components/admin/portal/AdminConfirmDeleteButton";
 import { AdminStatusPill } from "@/components/admin/ui/AdminPageChrome";
-
-const STATUS_LABEL: Record<string, string> = {
-  PLANNING: "Planlama",
-  PERMITTING: "Ruhsat",
-  CONSTRUCTION: "İnşaat",
-  INTERIOR: "İç mimari",
-  COMPLETED: "Tamamlandı",
-};
+import { projectCategoryTr, projectStatusTr } from "@/lib/portal/labels";
 
 type Row = {
   id: string;
   title: string;
   status: string;
+  category: string;
   address: string | null;
   memberCount: number;
   stageCount: number;
@@ -34,7 +28,8 @@ export function AdminClientProjectsList({ projects }: { projects: Row[] }) {
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <p className="truncate font-medium text-zinc-100">{p.title}</p>
-              <AdminStatusPill tone="accent">{STATUS_LABEL[p.status] ?? p.status}</AdminStatusPill>
+              <AdminStatusPill tone="accent">{projectCategoryTr(p.category)}</AdminStatusPill>
+              <AdminStatusPill tone="neutral">{projectStatusTr(p.status)}</AdminStatusPill>
             </div>
             <p className="mt-1 text-zinc-500">
               {p.memberCount} üye · {p.stageCount} aşama · {p.updateCount} güncelleme

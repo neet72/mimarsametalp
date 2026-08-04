@@ -16,6 +16,7 @@ export type PanelUpdateItem = {
   title: string;
   body: string;
   publishedAt: string | null;
+  eventDate: string | null;
   project: { id: string; title: string };
   stage: { name: string } | null;
   media: Array<{
@@ -137,9 +138,12 @@ export function PanelUpdatesFeed({ updates }: { updates: PanelUpdateItem[] }) {
                     {u.stage?.name ? (
                       <span className="rounded-full bg-primary/5 px-2.5 py-0.5 text-muted">{u.stage.name}</span>
                     ) : null}
-                    {u.publishedAt ? (
-                      <time className="text-muted" dateTime={u.publishedAt}>
-                        {new Date(u.publishedAt).toLocaleDateString("tr-TR", {
+                    {u.eventDate || u.publishedAt ? (
+                      <time
+                        className="text-muted"
+                        dateTime={u.eventDate ?? u.publishedAt ?? undefined}
+                      >
+                        {new Date(u.eventDate ?? u.publishedAt!).toLocaleDateString("tr-TR", {
                           day: "numeric",
                           month: "long",
                           year: "numeric",

@@ -21,7 +21,7 @@ export default async function AdminClientProjectUpdatesPage({ params, searchPara
     include: {
       stages: { orderBy: { orderIndex: "asc" }, select: { id: true, name: true } },
       updates: {
-        orderBy: { createdAt: "desc" },
+        orderBy: [{ eventDate: "desc" }, { createdAt: "desc" }],
         include: { media: { orderBy: { orderIndex: "asc" } } },
       },
     },
@@ -53,6 +53,7 @@ export default async function AdminClientProjectUpdatesPage({ params, searchPara
                 body: editing.body,
                 stageId: editing.stageId,
                 isPublished: editing.isPublished,
+                eventDate: editing.eventDate?.toISOString() ?? null,
                 media: editing.media.map((m) => ({
                   id: m.id,
                   cloudinaryUrl: m.cloudinaryUrl,
@@ -72,6 +73,7 @@ export default async function AdminClientProjectUpdatesPage({ params, searchPara
             id: u.id,
             title: u.title,
             isPublished: u.isPublished,
+            eventDate: u.eventDate?.toISOString() ?? null,
           }))}
         />
       </section>

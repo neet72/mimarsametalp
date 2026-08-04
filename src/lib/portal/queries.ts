@@ -45,7 +45,7 @@ export async function listPublishedUpdatesForUser(clientId: string) {
       stage: true,
       project: { select: { id: true, title: true } },
     },
-    orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+    orderBy: [{ eventDate: "desc" }, { publishedAt: "desc" }, { createdAt: "desc" }],
   });
 }
 
@@ -67,11 +67,61 @@ export async function listRecentUpdatesForUser(clientId: string, take = 3) {
     select: {
       id: true,
       title: true,
+      eventDate: true,
       publishedAt: true,
       project: { select: { title: true } },
     },
-    orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+    orderBy: [{ eventDate: "desc" }, { publishedAt: "desc" }, { createdAt: "desc" }],
     take,
+  });
+}
+
+export async function listTransactionsForUser(clientId: string) {
+  return prisma.clientProjectTransaction.findMany({
+    where: { project: { members: { some: { clientId } } } },
+    include: { project: { select: { id: true, title: true } } },
+    orderBy: [{ eventDate: "desc" }, { createdAt: "desc" }],
+  });
+}
+
+export async function listRoadmapDurationForUser(clientId: string) {
+  return prisma.clientProject.findMany({
+    where: { members: { some: { clientId } } },
+    select: {
+      id: true,
+      title: true,
+      category: true,
+      roadmapItems: {
+        where: { visible: true },
+        orderBy: [{ orderIndex: "asc" }, { startDate: "asc" }],
+        select: {
+          id: true,
+          title: true,
+          note: true,
+          startDate: true,
+          endDate: true,
+        },
+      },
+      stages: {
+        orderBy: { orderIndex: "asc" },
+        select: {
+          id: true,
+          name: true,
+          status: true,
+          targetDate: true,
+          completedDate: true,
+        },
+      },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+}
+
+export async function listAttachmentsForUser(clientId: string) {
+  return prisma.clientProjectAttachment.findMany({
+    where: { project: { members: { some: { clientId } } } },
+    include: { project: { select: { id: true, title: true } } },
+    orderBy: { createdAt: "desc" },
   });
 }
 

@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db/prisma";
 import { AdminClientProjectForm } from "@/components/admin/portal/AdminClientProjectForm";
 import { AdminClientProjectHeaderActions } from "@/components/admin/portal/AdminClientProjectHeaderActions";
 import { AdminProjectRoadmapEditor } from "@/components/admin/portal/AdminProjectRoadmapEditor";
+import { AdminProjectFinanceEditor } from "@/components/admin/portal/AdminProjectFinanceEditor";
+import { AdminProjectAttachmentsEditor } from "@/components/admin/portal/AdminProjectAttachmentsEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +19,8 @@ export default async function AdminClientProjectDetailPage({ params }: Props) {
         members: true,
         stages: { orderBy: { orderIndex: "asc" } },
         roadmapItems: { orderBy: { orderIndex: "asc" } },
+        transactions: { orderBy: [{ eventDate: "desc" }, { createdAt: "desc" }] },
+        attachments: { orderBy: { createdAt: "desc" } },
       },
     }),
     prisma.clientUser.findMany({
@@ -40,6 +44,7 @@ export default async function AdminClientProjectDetailPage({ params }: Props) {
           title: project.title,
           address: project.address,
           status: project.status,
+          category: project.category,
           coverImageUrl: project.coverImageUrl,
           clientIds: project.members.map((m) => m.clientId),
         }}
@@ -62,6 +67,27 @@ export default async function AdminClientProjectDetailPage({ params }: Props) {
           endDate: r.endDate?.toISOString() ?? null,
           orderIndex: r.orderIndex,
           visible: r.visible,
+        }))}
+      />
+      <AdminProjectFinanceEditor
+        projectId={project.id}
+        items={project.transactions.map((t) => ({
+          id: t.id,
+          type: t.type,
+          amount: t.amount.toString(),
+          eventDate: t.eventDate.toISOString(),
+          description: t.description,
+        }))}
+      />
+      <AdminProjectAttachmentsEditor
+        projectId={project.id}
+        items={project.attachments.map((a) => ({
+          id: a.id,
+          kind: a.kind,
+          name: a.name,
+          url: a.url,
+          uploadedByEmail: a.uploadedByEmail,
+          createdAt: a.createdAt.toISOString(),
         }))}
       />
     </div>

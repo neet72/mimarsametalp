@@ -44,6 +44,7 @@ export function AdminClientUpdateEditor({
     body: string;
     stageId: string | null;
     isPublished: boolean;
+    eventDate: string | null;
     media: MediaRow[];
   };
 }) {
@@ -54,6 +55,8 @@ export function AdminClientUpdateEditor({
   const [media, setMedia] = useState(initial?.media ?? []);
   const [isPublished, setIsPublished] = useState(initial?.isPublished ?? false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const defaultEventDate =
+    initial?.eventDate?.slice(0, 10) ?? new Date().toISOString().slice(0, 10);
 
   function save(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -63,6 +66,7 @@ export function AdminClientUpdateEditor({
         title: String(fd.get("title") ?? ""),
         body: String(fd.get("body") ?? ""),
         stageId: String(fd.get("stageId") || "") || null,
+        eventDate: String(fd.get("eventDate") || "") || null,
       };
       if (!updateId) {
         const res = await createClientProjectUpdate({ projectId, ...payload });
@@ -173,6 +177,19 @@ export function AdminClientUpdateEditor({
           </select>
         </label>
         <label className="block text-sm">
+          <span className="mb-1 block text-zinc-500">İşlem tarihi</span>
+          <input
+            name="eventDate"
+            type="date"
+            required
+            defaultValue={defaultEventDate}
+            className="h-11 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-zinc-100"
+          />
+          <span className="mt-1 block text-xs text-zinc-600">
+            Müşteri listesinde bu tarih görünür (sistem kayıt tarihinden bağımsız; geçmiş tarih seçilebilir).
+          </span>
+        </label>
+        <label className="block text-sm">
           <span className="mb-1 block text-zinc-500">Rapor metni (Markdown)</span>
           <textarea
             name="body"
@@ -201,7 +218,7 @@ export function AdminClientUpdateEditor({
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-zinc-200">Medya ve dosyalar</p>
               <p className="mt-1 text-xs text-zinc-500">
-                Görsel · Video (mp4/webm) · PDF · Word (.doc/.docx) · Excel · PPT — max 50MB, birden fazla seçim.
+                Görsel · Video (mp4/webm) · PDF · Word · Excel · PPT · RAR — max 50MB, birden fazla seçim.
               </p>
 
               <div className="mt-4 grid gap-2 sm:grid-cols-3">
@@ -239,7 +256,7 @@ export function AdminClientUpdateEditor({
                   onClick={() => {
                     if (fileRef.current) {
                       fileRef.current.accept =
-                        ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                        ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.rar,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/x-rar-compressed,application/vnd.rar";
                       fileRef.current.click();
                     }
                   }}

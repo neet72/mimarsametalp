@@ -37,6 +37,7 @@ export default async function AdminClientProjectsPage() {
             id: p.id,
             title: p.title,
             status: p.status,
+            category: p.category,
             address: p.address,
             memberCount: p._count.members,
             stageCount: p._count.stages,

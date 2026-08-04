@@ -8,6 +8,7 @@ type UpdateRow = {
   id: string;
   title: string;
   isPublished: boolean;
+  eventDate?: string | null;
 };
 
 export function AdminClientUpdatesList({
@@ -27,7 +28,12 @@ export function AdminClientUpdatesList({
         <li key={u.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm">
           <div>
             <p className="text-zinc-100">{u.title}</p>
-            <p className="text-zinc-500">{u.isPublished ? "Yayında" : "Taslak"}</p>
+            <p className="text-zinc-500">
+              {u.isPublished ? "Yayında" : "Taslak"}
+              {u.eventDate
+                ? ` · ${new Date(u.eventDate).toLocaleDateString("tr-TR")}`
+                : ""}
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Link

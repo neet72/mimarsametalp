@@ -132,10 +132,29 @@ enum ClientProjectStatus {
   COMPLETED
 }
 
+enum ClientProjectCategory {
+  BELEDIYE
+  MIMAR
+  DIGER
+  YAPI_DENETIM
+}
+
 enum ClientStageStatus {
   PENDING
   IN_PROGRESS
   DONE
+}
+
+/// Cari hareket tipi — bakiye = ödemeler − (proje bedeli + diğer borçlar)
+enum ClientTransactionType {
+  PROJECT_FEE
+  PAYMENT
+  OTHER
+}
+
+enum ClientAttachmentKind {
+  FILE
+  EXTERNAL_LINK
 }
 
 model ClientUser {
@@ -165,22 +184,56 @@ model ClientUser {
 }
 
 model ClientProject {
-  id            String              @id @default(cuid())
+  id            String                @id @default(cuid())
   title         String
   address       String?
-  status        ClientProjectStatus @default(PLANNING)
-  coverImageUrl String?             @db.Text
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
+  status        ClientProjectStatus   @default(PLANNING)
+  category      ClientProjectCategory @default(DIGER)
+  coverImageUrl String?               @db.Text
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
 
   stages           ClientProjectStage[]
   updates          ClientProjectUpdate[]
   members          ClientProjectMember[]
   deliveryRequests ClientDeliveryRequest[]
   roadmapItems     ClientProjectRoadmapItem[]
+  transactions     ClientProjectTransaction[]
+  attachments      ClientProjectAttachment[]
 
   @@index([status])
+  @@index([category])
   @@index([createdAt])
+}
+
+model ClientProjectTransaction {
+  id          String                @id @default(cuid())
+  projectId   String
+  project     ClientProject         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type        ClientTransactionType
+  /// Her zaman pozitif; yön tip ile belirlenir (PAYMENT alacak, diğerleri borç).
+  amount      Decimal               @db.Decimal(14, 2)
+  eventDate   DateTime
+  description String                @db.Text @default("")
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  @@index([projectId, eventDate])
+}
+
+model ClientProjectAttachment {
+  id                 String               @id @default(cuid())
+  projectId          String
+  project            ClientProject        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  kind               ClientAttachmentKind
+  name               String
+  url                String               @db.Text
+  cloudinaryPublicId String?
+  mimeType           String?
+  uploadedByEmail    String?
+  createdAt          DateTime             @default(now())
+
+  @@index([projectId, createdAt])
 }
 
 model ClientProjectMember {
@@ -235,6 +288,8 @@ model ClientProjectUpdate {
   body        String    @db.Text
   isPublished Boolean   @default(false)
   publishedAt DateTime?
+  /// Müşteri/admin listesinde gösterilen işlem tarihi (createdAt’ten bağımsız).
+  eventDate   DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -242,6 +297,7 @@ model ClientProjectUpdate {
   notifications   ClientNotificationLog[]
 
   @@index([projectId, isPublished, publishedAt])
+  @@index([projectId, eventDate])
   @@index([createdAt])
 }
 

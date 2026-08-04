@@ -6,7 +6,7 @@ import {
   listRecentUpdatesForUser,
   countPublishedUpdatesForUser,
 } from "@/lib/portal/queries";
-import { projectStatusTr, stageStatusTr } from "@/lib/portal/labels";
+import { projectStatusTr, projectCategoryTr, stageStatusTr } from "@/lib/portal/labels";
 import { shouldUnoptimizeImage } from "@/lib/media/next-image";
 import { PanelProjectRoadmap } from "@/components/panel/PanelProjectRoadmap";
 
@@ -91,9 +91,9 @@ export default async function PanelOverviewPage() {
                 >
                   <p className="text-xs font-medium uppercase tracking-wider text-accent">{u.project.title}</p>
                   <p className="mt-0.5 font-medium text-primary">{u.title}</p>
-                  {u.publishedAt ? (
+                  {u.eventDate ?? u.publishedAt ? (
                     <p className="mt-1 text-xs text-muted">
-                      {u.publishedAt.toLocaleDateString("tr-TR", {
+                      {(u.eventDate ?? u.publishedAt)!.toLocaleDateString("tr-TR", {
                         day: "numeric",
                         month: "long",
                         year: "numeric",
@@ -153,7 +153,7 @@ export default async function PanelOverviewPage() {
                           <h3 className="font-display text-xl font-semibold text-primary">{p.title}</h3>
                           {p.address ? <p className="mt-1 text-sm text-muted">{p.address}</p> : null}
                           <p className="mt-2 text-xs font-medium uppercase tracking-wider text-accent">
-                            {projectStatusTr(p.status)}
+                            {projectCategoryTr(p.category)} · {projectStatusTr(p.status)}
                           </p>
                         </div>
                         <p className="text-xs text-muted">{p._count.updates} güncelleme</p>
@@ -237,6 +237,24 @@ export default async function PanelOverviewPage() {
                           className="text-sm font-medium text-accent underline-offset-2 hover:underline"
                         >
                           Güncellemelere bak
+                        </Link>
+                        <Link
+                          href="/panel/sure-takibi"
+                          className="text-sm font-medium text-accent underline-offset-2 hover:underline"
+                        >
+                          Süre takibi
+                        </Link>
+                        <Link
+                          href="/panel/bakiye"
+                          className="text-sm font-medium text-accent underline-offset-2 hover:underline"
+                        >
+                          Bakiye
+                        </Link>
+                        <Link
+                          href="/panel/ekler"
+                          className="text-sm font-medium text-accent underline-offset-2 hover:underline"
+                        >
+                          Ekler
                         </Link>
                       </div>
                     </div>

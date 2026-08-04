@@ -1,4 +1,8 @@
-import type { ClientProjectStatus, ClientStageStatus } from "@prisma/client";
+import type {
+  ClientProjectCategory,
+  ClientProjectStatus,
+  ClientStageStatus,
+} from "@prisma/client";
 
 export const CLIENT_PROJECT_STATUS_TR: Record<ClientProjectStatus, string> = {
   PLANNING: "Planlama",
@@ -7,6 +11,23 @@ export const CLIENT_PROJECT_STATUS_TR: Record<ClientProjectStatus, string> = {
   INTERIOR: "İç mimari",
   COMPLETED: "Tamamlandı",
 };
+
+export const CLIENT_PROJECT_CATEGORY_TR: Record<ClientProjectCategory, string> = {
+  BELEDIYE: "Belediye",
+  MIMAR: "Mimar",
+  DIGER: "Diğer Projeler",
+  YAPI_DENETIM: "Yapı Denetim",
+};
+
+export const CLIENT_PROJECT_CATEGORY_OPTS: {
+  value: ClientProjectCategory;
+  label: string;
+}[] = [
+  { value: "BELEDIYE", label: CLIENT_PROJECT_CATEGORY_TR.BELEDIYE },
+  { value: "MIMAR", label: CLIENT_PROJECT_CATEGORY_TR.MIMAR },
+  { value: "DIGER", label: CLIENT_PROJECT_CATEGORY_TR.DIGER },
+  { value: "YAPI_DENETIM", label: CLIENT_PROJECT_CATEGORY_TR.YAPI_DENETIM },
+];
 
 export const CLIENT_STAGE_STATUS_TR: Record<ClientStageStatus, string> = {
   PENDING: "Bekliyor",
@@ -18,8 +39,20 @@ export function projectStatusTr(status: string): string {
   return CLIENT_PROJECT_STATUS_TR[status as ClientProjectStatus] ?? status;
 }
 
+export function projectCategoryTr(category: string): string {
+  return CLIENT_PROJECT_CATEGORY_TR[category as ClientProjectCategory] ?? category;
+}
+
 export function stageStatusTr(status: string): string {
   return CLIENT_STAGE_STATUS_TR[status as ClientStageStatus] ?? status;
+}
+
+/** Başlangıç–bitiş arası tam gün (bitiş yoksa bugüne kadar). */
+export function durationDays(start: Date, end: Date | null, now = new Date()): number {
+  const endMs = (end ?? now).getTime();
+  const startMs = start.getTime();
+  const diff = Math.max(0, endMs - startMs);
+  return Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
 
 /** Panel form input ortak sınıfları */

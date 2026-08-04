@@ -22,7 +22,22 @@ export const PORTAL_DOC_MIME = [
   "application/vnd.ms-powerpoint",
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
   "text/plain",
+  "application/x-rar-compressed",
+  "application/vnd.rar",
+  "application/x-rar",
 ] as const;
+
+/** RAR bazen boş/yanlış MIME ile gelir — uzantı yedek kontrolü. */
+export function isPortalRarFile(file: { name?: string; type?: string }) {
+  const name = (file.name ?? "").toLowerCase();
+  const type = (file.type ?? "").toLowerCase();
+  if (name.endsWith(".rar")) return true;
+  return (
+    type === "application/x-rar-compressed" ||
+    type === "application/vnd.rar" ||
+    type === "application/x-rar"
+  );
+}
 
 export type PortalMediaKind = "image" | "video" | "pdf" | "doc" | "sheet" | "other";
 
@@ -38,8 +53,10 @@ export function isPortalDocMime(type: string) {
   return (PORTAL_DOC_MIME as readonly string[]).includes(type);
 }
 
-export function isPortalAllowedMime(type: string) {
-  return isPortalImageMime(type) || isPortalVideoMime(type) || isPortalDocMime(type);
+export function isPortalAllowedMime(type: string, fileName?: string) {
+  if (isPortalImageMime(type) || isPortalVideoMime(type) || isPortalDocMime(type)) return true;
+  if (fileName && isPortalRarFile({ name: fileName, type })) return true;
+  return false;
 }
 
 export function portalMediaKindFromMime(type: string): PortalMediaKind {
@@ -58,8 +75,14 @@ export function portalMediaKindFromMime(type: string): PortalMediaKind {
   ) {
     return "sheet";
   }
+  if (isPortalRarFile({ type })) return "other";
   if (isPortalDocMime(type)) return "other";
   return "other";
+}
+
+export function portalMediaKindFromFile(file: { name: string; type: string }): PortalMediaKind {
+  if (isPortalRarFile(file)) return "other";
+  return portalMediaKindFromMime(file.type);
 }
 
 export function portalMediaKindLabel(kind: string): string {
@@ -92,11 +115,14 @@ export const PORTAL_ACCEPT_ATTR = [
   ".ppt",
   ".pptx",
   ".txt",
+  ".rar",
   "application/pdf",
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "application/vnd.ms-excel",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/x-rar-compressed",
+  "application/vnd.rar",
 ].join(",");
 
 export const MAX_PORTAL_MEDIA_BYTES = 50 * 1024 * 1024;

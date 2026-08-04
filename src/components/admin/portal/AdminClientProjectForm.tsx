@@ -10,7 +10,8 @@ import {
 } from "@/actions/admin/client-projects";
 import { uploadAdminMedia } from "@/actions/admin/upload";
 import { useAdminToast } from "@/components/admin/ui/toast";
-import type { ClientProjectStatus, ClientStageStatus } from "@prisma/client";
+import type { ClientProjectCategory, ClientProjectStatus, ClientStageStatus } from "@prisma/client";
+import { CLIENT_PROJECT_CATEGORY_OPTS } from "@/lib/portal/labels";
 
 const STATUS_OPTS: { value: ClientProjectStatus; label: string }[] = [
   { value: "PLANNING", label: "Planlama" },
@@ -53,6 +54,7 @@ export function AdminClientProjectForm({
     title: string;
     address: string | null;
     status: ClientProjectStatus;
+    category: ClientProjectCategory;
     coverImageUrl: string | null;
     clientIds: string[];
   };
@@ -95,6 +97,7 @@ export function AdminClientProjectForm({
           title: String(fd.get("title") ?? ""),
           address: String(fd.get("address") ?? ""),
           status: String(fd.get("status") ?? "PLANNING") as ClientProjectStatus,
+          category: String(fd.get("category") ?? "DIGER") as ClientProjectCategory,
           coverImageUrl: coverUrl,
           clientIds: selected,
         });
@@ -113,6 +116,7 @@ export function AdminClientProjectForm({
         title: String(fd.get("title") ?? ""),
         address: String(fd.get("address") ?? ""),
         status: String(fd.get("status") ?? "PLANNING") as ClientProjectStatus,
+        category: String(fd.get("category") ?? "DIGER") as ClientProjectCategory,
         coverImageUrl: coverUrl,
         clientIds: selected,
       });
@@ -177,6 +181,20 @@ export function AdminClientProjectForm({
             className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3"
           >
             {STATUS_OPTS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block text-sm">
+          <span className="mb-1 block text-zinc-500">Kategori</span>
+          <select
+            name="category"
+            defaultValue={initial?.category ?? "DIGER"}
+            className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3"
+          >
+            {CLIENT_PROJECT_CATEGORY_OPTS.map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
               </option>
