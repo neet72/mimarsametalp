@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import Link from "next/link";
 import {
   createClientProjectUpdate,
   deleteClientUpdateMedia,
@@ -23,7 +24,7 @@ import {
 import { PORTAL_ACCEPT_ATTR, portalMediaKindLabel } from "@/lib/portal/media-types";
 import { withCloudinaryAttachment } from "@/lib/storage/cloudinary-url";
 import { cn } from "@/lib/cn";
-import { FileText, ImageIcon, Video, Upload } from "lucide-react";
+import { FileText, ImageIcon, Plus, Video, Upload } from "lucide-react";
 
 type StageOpt = { id: string; name: string };
 type MediaRow = { id: string; cloudinaryUrl: string; mediaType: string; caption: string | null };
@@ -68,9 +69,19 @@ export function AdminClientUpdateEditor({
   const defaultEventDate =
     initial?.eventDate?.slice(0, 10) ?? new Date().toISOString().slice(0, 10);
 
+  // Soft navigation’da state eski kalmasın (düzenle → yeni kayıt bug’ı).
+  useEffect(() => {
+    setUpdateId(initial?.id ?? "");
+    setMedia(initial?.media ?? []);
+    setIsPublished(initial?.isPublished ?? false);
+    // Yalnızca düzenlenen kayıt değişince senkronize et.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- media/isPublished initial.id ile gelir
+  }, [initial?.id]);
+
   function save(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
+    const editingId = updateId || initial?.id || "";
     startTransition(async () => {
       const payload = {
         title: String(fd.get("title") ?? ""),
@@ -78,7 +89,7 @@ export function AdminClientUpdateEditor({
         stageId: String(fd.get("stageId") || "") || null,
         eventDate: String(fd.get("eventDate") || "") || null,
       };
-      if (!updateId) {
+      if (!editingId) {
         const res = await createClientProjectUpdate({ projectId, ...payload });
         if (!res.ok) {
           toast.error({ title: res.error });
@@ -90,11 +101,12 @@ export function AdminClientUpdateEditor({
         router.refresh();
         return;
       }
-      const res = await updateClientProjectUpdate({ id: updateId, ...payload });
+      const res = await updateClientProjectUpdate({ id: editingId, ...payload });
       if (!res.ok) {
         toast.error({ title: res.error });
         return;
       }
+      setUpdateId(editingId);
       toast.success({ title: "Rapor kaydedildi." });
       router.refresh();
     });
@@ -154,14 +166,25 @@ export function AdminClientUpdateEditor({
     <div className="space-y-5 sm:space-y-6">
       <AdminSectionCard
         eyebrow="Rapor"
-        title="Saha raporu / güncelleme"
+        title={updateId || initial?.id ? "Raporu düzenle" : "Yeni saha raporu"}
         description="Markdown ile yazın; görsel, video ve dosya (PDF, Word, Excel, RAR) ekleyin."
         actions={
-          updateId ? (
-            <AdminStatusPill tone={isPublished ? "ok" : "neutral"}>
-              {isPublished ? "Yayında" : "Taslak"}
-            </AdminStatusPill>
-          ) : null
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+            {updateId || initial?.id ? (
+              <>
+                <AdminStatusPill tone={isPublished ? "ok" : "neutral"}>
+                  {isPublished ? "Yayında" : "Taslak"}
+                </AdminStatusPill>
+                <Link
+                  href={`/admin/client-projects/${projectId}/updates`}
+                  className={cn(adminBtnSecondaryClass, "w-full sm:w-auto")}
+                >
+                  <Plus className="h-4 w-4" aria-hidden />
+                  Yeni rapor
+                </Link>
+              </>
+            ) : null}
+          </div>
         }
       >
         <form onSubmit={save} className="space-y-4">
@@ -220,7 +243,7 @@ export function AdminClientUpdateEditor({
           </label>
 
           <button type="submit" disabled={pending} className={cn(adminBtnAccentClass, "w-full sm:w-auto")}>
-            {updateId ? "Raporu kaydet" : "Taslak oluştur"}
+            {updateId || initial?.id ? "Değişiklikleri kaydet" : "Taslak oluştur"}
           </button>
         </form>
       </AdminSectionCard>

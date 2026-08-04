@@ -20,7 +20,7 @@ import {
 import type { ClientProjectCategory, ClientProjectStatus, ClientStageStatus } from "@prisma/client";
 import { CLIENT_PROJECT_CATEGORY_OPTS } from "@/lib/portal/labels";
 import { cn } from "@/lib/cn";
-import { ImagePlus, Trash2 } from "lucide-react";
+import { ImagePlus, Pencil, Trash2, X } from "lucide-react";
 
 const STATUS_OPTS: { value: ClientProjectStatus; label: string }[] = [
   { value: "PLANNING", label: "Planlama" },
@@ -46,9 +46,28 @@ type StageRow = {
   completedDate: string | null;
 };
 
+type StageDraft = {
+  id?: string;
+  name: string;
+  orderIndex: number;
+  status: ClientStageStatus;
+  targetDate: string;
+  completedDate: string;
+};
+
 function toDateInput(iso: string | null) {
   if (!iso) return "";
   return iso.slice(0, 10);
+}
+
+function emptyStageDraft(orderIndex: number): StageDraft {
+  return {
+    name: "",
+    orderIndex,
+    status: "PENDING",
+    targetDate: "",
+    completedDate: "",
+  };
 }
 
 export function AdminClientProjectForm({
@@ -76,6 +95,7 @@ export function AdminClientProjectForm({
   const [selected, setSelected] = useState<string[]>(initial?.clientIds ?? []);
   const [coverUrl, setCoverUrl] = useState(initial?.coverImageUrl ?? "");
   const [uploading, setUploading] = useState(false);
+  const [stageDraft, setStageDraft] = useState<StageDraft | null>(null);
 
   async function onCoverFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -144,6 +164,7 @@ export function AdminClientProjectForm({
     const fd = new FormData(e.currentTarget);
     startTransition(async () => {
       const res = await upsertClientProjectStage({
+        id: stageDraft?.id,
         projectId: initial.id,
         name: String(fd.get("name") ?? ""),
         orderIndex: Number(fd.get("orderIndex") ?? stages.length),
@@ -155,9 +176,21 @@ export function AdminClientProjectForm({
         toast.error({ title: res.error });
         return;
       }
-      toast.success({ title: "Aşama eklendi." });
+      toast.success({ title: stageDraft?.id ? "Aşama güncellendi." : "Aşama eklendi." });
+      setStageDraft(null);
       (e.target as HTMLFormElement).reset();
       router.refresh();
+    });
+  }
+
+  function openEditStage(s: StageRow) {
+    setStageDraft({
+      id: s.id,
+      name: s.name,
+      orderIndex: s.orderIndex,
+      status: s.status,
+      targetDate: toDateInput(s.targetDate),
+      completedDate: toDateInput(s.completedDate),
     });
   }
 
@@ -334,7 +367,9 @@ export function AdminClientProjectForm({
                       {s.orderIndex}. {s.name}
                     </p>
                     <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                      <AdminStatusPill tone="neutral">{s.status}</AdminStatusPill>
+                      <AdminStatusPill tone="neutral">
+                        {STAGE_OPTS.find((o) => o.value === s.status)?.label ?? s.status}
+                      </AdminStatusPill>
                       {s.targetDate ? (
                         <span className="text-xs text-zinc-500">
                           hedef {toDateInput(s.targetDate)}
@@ -347,23 +382,34 @@ export function AdminClientProjectForm({
                       ) : null}
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    aria-label="Aşamayı sil"
-                    className="inline-flex h-11 w-11 items-center justify-center self-end rounded-lg border border-red-900/40 text-red-300 hover:bg-red-950/40 sm:self-center"
-                    onClick={() =>
-                      startTransition(async () => {
-                        const res = await deleteClientProjectStage({ id: s.id });
-                        if (!res.ok) toast.error({ title: res.error });
-                        else {
-                          toast.success({ title: "Silindi." });
-                          router.refresh();
-                        }
-                      })
-                    }
-                  >
-                    <Trash2 className="h-4 w-4" aria-hidden />
-                  </button>
+                  <div className="flex items-center justify-end gap-1.5 self-end sm:self-center">
+                    <button
+                      type="button"
+                      aria-label="Aşamayı düzenle"
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-zinc-800 text-[rgb(200,170,130)] hover:bg-zinc-900"
+                      onClick={() => openEditStage(s)}
+                    >
+                      <Pencil className="h-4 w-4" aria-hidden />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Aşamayı sil"
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-red-900/40 text-red-300 hover:bg-red-950/40"
+                      onClick={() =>
+                        startTransition(async () => {
+                          const res = await deleteClientProjectStage({ id: s.id });
+                          if (!res.ok) toast.error({ title: res.error });
+                          else {
+                            toast.success({ title: "Silindi." });
+                            if (stageDraft?.id === s.id) setStageDraft(null);
+                            router.refresh();
+                          }
+                        })
+                      }
+                    >
+                      <Trash2 className="h-4 w-4" aria-hidden />
+                    </button>
+                  </div>
                 </li>
               ))}
             {stages.length === 0 ? (
@@ -373,47 +419,86 @@ export function AdminClientProjectForm({
             ) : null}
           </ul>
 
-          <form
-            onSubmit={onAddStage}
-            className="grid gap-3 rounded-xl border border-zinc-800/80 bg-zinc-950/40 p-3 sm:grid-cols-2 sm:p-4 lg:grid-cols-3"
-          >
-            <label className="sm:col-span-2 lg:col-span-1">
-              <span className={adminLabelClass}>Aşama adı</span>
-              <input name="name" required className={adminFieldClass} />
-            </label>
-            <label>
-              <span className={adminLabelClass}>Sıra</span>
-              <input
-                name="orderIndex"
-                type="number"
-                defaultValue={stages.length}
-                className={adminFieldClass}
-              />
-            </label>
-            <label>
-              <span className={adminLabelClass}>Durum</span>
-              <select name="status" className={adminFieldClass}>
-                {STAGE_OPTS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span className={adminLabelClass}>Hedef tarih</span>
-              <input name="targetDate" type="date" className={adminFieldClass} />
-            </label>
-            <label>
-              <span className={adminLabelClass}>Tamamlanma</span>
-              <input name="completedDate" type="date" className={adminFieldClass} />
-            </label>
-            <div className="flex items-end sm:col-span-2 lg:col-span-1">
-              <button type="submit" disabled={pending} className={cn(adminBtnAccentClass, "w-full")}>
-                Aşama ekle
-              </button>
-            </div>
-          </form>
+          {stageDraft ? (
+            <form
+              key={stageDraft.id ?? "new-stage"}
+              onSubmit={onAddStage}
+              className="grid gap-3 rounded-xl border border-[rgb(166,124,82)]/25 bg-zinc-950 p-3 ring-1 ring-[rgb(166,124,82)]/10 sm:grid-cols-2 sm:p-4 lg:grid-cols-3"
+            >
+              <div className="flex items-center justify-between gap-2 sm:col-span-2 lg:col-span-3">
+                <p className="text-sm font-medium text-zinc-200">
+                  {stageDraft.id ? "Aşamayı düzenle" : "Yeni aşama"}
+                </p>
+                <button
+                  type="button"
+                  aria-label="Kapat"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-900"
+                  onClick={() => setStageDraft(null)}
+                >
+                  <X className="h-4 w-4" aria-hidden />
+                </button>
+              </div>
+              <label className="sm:col-span-2 lg:col-span-1">
+                <span className={adminLabelClass}>Aşama adı</span>
+                <input
+                  name="name"
+                  required
+                  defaultValue={stageDraft.name}
+                  className={adminFieldClass}
+                />
+              </label>
+              <label>
+                <span className={adminLabelClass}>Sıra</span>
+                <input
+                  name="orderIndex"
+                  type="number"
+                  defaultValue={stageDraft.orderIndex}
+                  className={adminFieldClass}
+                />
+              </label>
+              <label>
+                <span className={adminLabelClass}>Durum</span>
+                <select name="status" defaultValue={stageDraft.status} className={adminFieldClass}>
+                  {STAGE_OPTS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span className={adminLabelClass}>Hedef tarih</span>
+                <input
+                  name="targetDate"
+                  type="date"
+                  defaultValue={stageDraft.targetDate}
+                  className={adminFieldClass}
+                />
+              </label>
+              <label>
+                <span className={adminLabelClass}>Tamamlanma</span>
+                <input
+                  name="completedDate"
+                  type="date"
+                  defaultValue={stageDraft.completedDate}
+                  className={adminFieldClass}
+                />
+              </label>
+              <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-1">
+                <button type="submit" disabled={pending} className={cn(adminBtnAccentClass, "w-full")}>
+                  {stageDraft.id ? "Güncelle" : "Ekle"}
+                </button>
+              </div>
+            </form>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setStageDraft(emptyStageDraft(stages.length))}
+              className={cn(adminBtnAccentClass, "w-full sm:w-auto")}
+            >
+              Aşama ekle
+            </button>
+          )}
         </AdminSectionCard>
       ) : null}
     </div>

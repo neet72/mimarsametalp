@@ -3,18 +3,16 @@ import Link from "next/link";
 import { requireClient } from "@/actions/client/guard";
 import {
   listClientProjectsForUser,
-  listRecentUpdatesForUser,
   countPublishedUpdatesForUser,
 } from "@/lib/portal/queries";
-import { projectStatusTr, projectCategoryTr, stageStatusTr } from "@/lib/portal/labels";
+import { projectStatusTr, projectCategoryTr } from "@/lib/portal/labels";
 import { shouldUnoptimizeImage } from "@/lib/media/next-image";
-import { PanelProjectRoadmap } from "@/components/panel/PanelProjectRoadmap";
+import { PanelProjectFoldouts } from "@/components/panel/PanelProjectFoldouts";
 
 export default async function PanelOverviewPage() {
   const { client } = await requireClient();
-  const [projects, recentUpdates, updateCount] = await Promise.all([
+  const [projects, updateCount] = await Promise.all([
     listClientProjectsForUser(client.id),
-    listRecentUpdatesForUser(client.id, 3),
     countPublishedUpdatesForUser(client.id),
   ]);
 
@@ -29,7 +27,9 @@ export default async function PanelOverviewPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-display text-3xl font-semibold tracking-tight text-primary">Özet</h1>
-          <p className="mt-2 text-muted">Projelerinizin durumu ve aşama takibi.</p>
+          <p className="mt-2 text-muted">
+            Projelerinize tıklayarak güncelleme ve yol haritasını açın.
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
@@ -62,56 +62,19 @@ export default async function PanelOverviewPage() {
             value: projects[0] ? projectStatusTr(projects[0].status) : "—",
           },
         ].map((s) => (
-          <div
-            key={s.label}
-            className="rounded-2xl border border-border bg-surface/80 px-4 py-4"
-          >
+          <div key={s.label} className="rounded-2xl border border-border bg-surface/80 px-4 py-4">
             <dt className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">{s.label}</dt>
             <dd className="mt-1 font-display text-xl font-semibold tracking-tight text-primary">{s.value}</dd>
           </div>
         ))}
       </dl>
 
-      {recentUpdates.length > 0 ? (
-        <section aria-labelledby="recent-updates-heading" className="space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <h2 id="recent-updates-heading" className="font-display text-lg font-semibold text-primary">
-              Son güncellemeler
-            </h2>
-            <Link href="/panel/guncellemeler" className="text-sm text-accent underline-offset-2 hover:underline">
-              Tümü
-            </Link>
-          </div>
-          <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface/80">
-            {recentUpdates.map((u) => (
-              <li key={u.id}>
-                <Link
-                  href="/panel/guncellemeler"
-                  className="block px-4 py-3.5 transition-colors hover:bg-primary/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/40"
-                >
-                  <p className="text-xs font-medium uppercase tracking-wider text-accent">{u.project.title}</p>
-                  <p className="mt-0.5 font-medium text-primary">{u.title}</p>
-                  {u.eventDate ?? u.publishedAt ? (
-                    <p className="mt-1 text-xs text-muted">
-                      {(u.eventDate ?? u.publishedAt)!.toLocaleDateString("tr-TR", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </p>
-                  ) : null}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
       {projects.length === 0 ? (
         <div className="rounded-2xl border border-border bg-surface/80 px-6 py-14 text-center sm:px-10">
           <p className="font-display text-xl font-semibold text-primary">Henüz atanmış proje yok</p>
           <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-muted">
-            Ofis size bir portal projesi atadığında burada görünecek. Sorunuz varsa İstekler’den yazabilirsiniz.
+            Ofis size bir portal projesi atadığında burada görünecek. Sorunuz varsa İstekler’den
+            yazabilirsiniz.
           </p>
           <Link
             href="/panel/istekler"
@@ -130,7 +93,9 @@ export default async function PanelOverviewPage() {
               const progress =
                 p.stages.length === 0
                   ? 0
-                  : Math.round((p.stages.filter((s) => s.status === "DONE").length / p.stages.length) * 100);
+                  : Math.round(
+                      (p.stages.filter((s) => s.status === "DONE").length / p.stages.length) * 100,
+                    );
               return (
                 <li key={p.id}>
                   <article className="overflow-hidden rounded-2xl border border-border bg-surface/80">
@@ -156,11 +121,63 @@ export default async function PanelOverviewPage() {
                             {projectCategoryTr(p.category)} · {projectStatusTr(p.status)}
                           </p>
                         </div>
-                        <p className="text-xs text-muted">{p._count.updates} güncelleme</p>
+                        {p.stages.length ? (
+                          <p className="text-xs tabular-nums text-muted">%{progress}</p>
+                        ) : null}
                       </div>
 
-                      <PanelProjectRoadmap
-                        items={p.roadmapItems.map((r) => ({
+                      {p.stages.length ? (
+                        <div>
+                          <div className="mb-1.5 flex justify-between text-xs text-muted">
+                            <span>İlerleme</span>
+                            <span>%{progress}</span>
+                          </div>
+                          <div
+                            className="h-2 overflow-hidden rounded-full bg-border/80"
+                            role="progressbar"
+                            aria-valuenow={progress}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                            aria-label={`${p.title} ilerleme`}
+                          >
+                            <div
+                              className={
+                                progress === 0
+                                  ? "h-full w-0 rounded-full bg-accent"
+                                  : progress <= 10
+                                    ? "h-full w-[10%] rounded-full bg-accent"
+                                    : progress <= 20
+                                      ? "h-full w-[20%] rounded-full bg-accent"
+                                      : progress <= 30
+                                        ? "h-full w-[30%] rounded-full bg-accent"
+                                        : progress <= 40
+                                          ? "h-full w-[40%] rounded-full bg-accent"
+                                          : progress <= 50
+                                            ? "h-full w-[50%] rounded-full bg-accent"
+                                            : progress <= 60
+                                              ? "h-full w-[60%] rounded-full bg-accent"
+                                              : progress <= 70
+                                                ? "h-full w-[70%] rounded-full bg-accent"
+                                                : progress <= 80
+                                                  ? "h-full w-[80%] rounded-full bg-accent"
+                                                  : progress <= 90
+                                                    ? "h-full w-[90%] rounded-full bg-accent"
+                                                    : "h-full w-full rounded-full bg-accent"
+                              }
+                            />
+                          </div>
+                        </div>
+                      ) : null}
+
+                      <PanelProjectFoldouts
+                        updateTotal={p._count.updates}
+                        updates={p.updates.map((u) => ({
+                          id: u.id,
+                          title: u.title,
+                          eventDate: u.eventDate?.toISOString() ?? null,
+                          publishedAt: u.publishedAt?.toISOString() ?? null,
+                        }))}
+                        roadmapItems={p.roadmapItems.map((r) => ({
                           id: r.id,
                           title: r.title,
                           note: r.note,
@@ -168,83 +185,15 @@ export default async function PanelOverviewPage() {
                           startDate: r.startDate.toISOString(),
                           endDate: r.endDate?.toISOString() ?? null,
                         }))}
+                        stages={p.stages.map((s) => ({
+                          id: s.id,
+                          name: s.name,
+                          status: s.status,
+                          targetDate: s.targetDate?.toISOString() ?? null,
+                        }))}
                       />
 
-                      {p.stages.length ? (
-                        <>
-                          <div>
-                            <div className="mb-1.5 flex justify-between text-xs text-muted">
-                              <span>İlerleme</span>
-                              <span>%{progress}</span>
-                            </div>
-                            <div
-                              className="h-2 overflow-hidden rounded-full bg-border/80"
-                              role="progressbar"
-                              aria-valuenow={progress}
-                              aria-valuemin={0}
-                              aria-valuemax={100}
-                              aria-label={`${p.title} ilerleme`}
-                            >
-                              <div
-                                className={
-                                  progress === 0
-                                    ? "h-full w-0 rounded-full bg-accent"
-                                    : progress <= 10
-                                      ? "h-full w-[10%] rounded-full bg-accent"
-                                      : progress <= 20
-                                        ? "h-full w-[20%] rounded-full bg-accent"
-                                        : progress <= 30
-                                          ? "h-full w-[30%] rounded-full bg-accent"
-                                          : progress <= 40
-                                            ? "h-full w-[40%] rounded-full bg-accent"
-                                            : progress <= 50
-                                              ? "h-full w-[50%] rounded-full bg-accent"
-                                              : progress <= 60
-                                                ? "h-full w-[60%] rounded-full bg-accent"
-                                                : progress <= 70
-                                                  ? "h-full w-[70%] rounded-full bg-accent"
-                                                  : progress <= 80
-                                                    ? "h-full w-[80%] rounded-full bg-accent"
-                                                    : progress <= 90
-                                                      ? "h-full w-[90%] rounded-full bg-accent"
-                                                      : "h-full w-full rounded-full bg-accent"
-                                }
-                              />
-                            </div>
-                          </div>
-                          <ol className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                            {p.stages.map((s) => (
-                              <li
-                                key={s.id}
-                                className="rounded-lg border border-border/80 bg-surface px-3 py-3 text-sm"
-                              >
-                                <p className="font-medium text-primary">{s.name}</p>
-                                <p className="mt-0.5 text-xs text-muted">{stageStatusTr(s.status)}</p>
-                                {s.targetDate ? (
-                                  <p className="mt-1 text-xs text-muted/80">
-                                    Hedef: {s.targetDate.toLocaleDateString("tr-TR")}
-                                  </p>
-                                ) : null}
-                              </li>
-                            ))}
-                          </ol>
-                        </>
-                      ) : (
-                        <p className="text-sm text-muted">Aşama henüz tanımlanmadı.</p>
-                      )}
-                      <div className="flex flex-wrap gap-2 pt-1">
-                        <Link
-                          href="/panel/guncellemeler"
-                          className="text-sm font-medium text-accent underline-offset-2 hover:underline"
-                        >
-                          Güncellemelere bak
-                        </Link>
-                        <Link
-                          href="/panel/sure-takibi"
-                          className="text-sm font-medium text-accent underline-offset-2 hover:underline"
-                        >
-                          Süre takibi
-                        </Link>
+                      <div className="flex flex-wrap gap-x-4 gap-y-2 border-t border-border/70 pt-3">
                         <Link
                           href="/panel/bakiye"
                           className="text-sm font-medium text-accent underline-offset-2 hover:underline"
@@ -256,6 +205,12 @@ export default async function PanelOverviewPage() {
                           className="text-sm font-medium text-accent underline-offset-2 hover:underline"
                         >
                           Ekler
+                        </Link>
+                        <Link
+                          href="/panel/sure-takibi"
+                          className="text-sm font-medium text-accent underline-offset-2 hover:underline"
+                        >
+                          Süre takibi
                         </Link>
                       </div>
                     </div>

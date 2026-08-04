@@ -12,6 +12,17 @@ export async function listClientProjectsForUser(clientId: string) {
         where: { visible: true },
         orderBy: [{ orderIndex: "asc" }, { startDate: "asc" }],
       },
+      updates: {
+        where: { isPublished: true },
+        select: {
+          id: true,
+          title: true,
+          eventDate: true,
+          publishedAt: true,
+        },
+        orderBy: [{ eventDate: "desc" }, { publishedAt: "desc" }, { createdAt: "desc" }],
+        take: 12,
+      },
       _count: { select: { updates: { where: { isPublished: true } } } },
     },
     orderBy: { updatedAt: "desc" },

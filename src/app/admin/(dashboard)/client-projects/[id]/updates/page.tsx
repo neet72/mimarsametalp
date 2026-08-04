@@ -53,6 +53,7 @@ export default async function AdminClientProjectUpdatesPage({ params, searchPara
       />
 
       <AdminClientUpdateEditor
+        key={editing?.id ?? "new"}
         projectId={projectId}
         stages={project.stages}
         initial={
