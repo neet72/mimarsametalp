@@ -153,7 +153,7 @@ export function AdminDashboardShell({
               <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-200 hover:bg-white/10"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-200 hover:bg-white/10"
                 aria-label="Menüyü aç"
               >
                 <Menu className="h-5 w-5" aria-hidden />
@@ -162,10 +162,10 @@ export function AdminDashboardShell({
                 <p className="truncate text-sm font-semibold text-zinc-100">Admin Panel</p>
                 <p className="truncate text-xs text-zinc-500">{userEmail}</p>
               </div>
-              <div className="h-10 w-10" aria-hidden />
+              <div className="h-11 w-11" aria-hidden />
             </div>
 
-            <div className="min-w-0 overflow-x-auto p-4 sm:p-6 md:p-10">{children}</div>
+            <div className="min-w-0 overflow-x-hidden p-3 sm:p-5 md:p-8 lg:p-10">{children}</div>
           </div>
 
           {/* Mobile drawer */}
@@ -204,7 +204,7 @@ export function AdminDashboardShell({
                     <button
                       type="button"
                       onClick={() => setOpen(false)}
-                      className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-200 hover:bg-white/10"
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-200 hover:bg-white/10"
                       aria-label="Kapat"
                     >
                       <X className="h-5 w-5" aria-hidden />

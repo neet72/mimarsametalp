@@ -3,6 +3,12 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db/prisma";
 import { AdminClientUpdateEditor } from "@/components/admin/portal/AdminClientUpdateEditor";
 import { AdminClientUpdatesList } from "@/components/admin/portal/AdminClientUpdatesList";
+import {
+  AdminPageHeader,
+  adminBtnSecondaryClass,
+} from "@/components/admin/ui/AdminPageChrome";
+import { ArrowLeft } from "lucide-react";
+import { cn } from "@/lib/cn";
 
 export const dynamic = "force-dynamic";
 
@@ -31,16 +37,20 @@ export default async function AdminClientProjectUpdatesPage({ params, searchPara
   const editing = editId ? project.updates.find((u) => u.id === editId) : undefined;
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-zinc-100">Güncellemeler</h1>
-          <p className="text-sm text-zinc-500">{project.title}</p>
-        </div>
-        <Link href={`/admin/client-projects/${projectId}`} className="text-sm text-zinc-500">
-          ← Proje
-        </Link>
-      </div>
+    <div className="mx-auto max-w-5xl space-y-5 sm:space-y-6">
+      <AdminPageHeader
+        title="Güncellemeler"
+        description={project.title}
+        actions={
+          <Link
+            href={`/admin/client-projects/${projectId}`}
+            className={cn(adminBtnSecondaryClass, "w-full justify-center sm:w-auto")}
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            Projeye dön
+          </Link>
+        }
+      />
 
       <AdminClientUpdateEditor
         projectId={projectId}
@@ -65,8 +75,10 @@ export default async function AdminClientProjectUpdatesPage({ params, searchPara
         }
       />
 
-      <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-zinc-500">Kayıtlar</h2>
+      <section className="space-y-3">
+        <h2 className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+          Kayıtlar
+        </h2>
         <AdminClientUpdatesList
           projectId={projectId}
           updates={project.updates.map((u) => ({

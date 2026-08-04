@@ -49,7 +49,7 @@ export function AdminConfirmDeleteButton({
         }}
         className={
           className ??
-          "rounded-md border border-red-900/50 bg-red-950/30 px-2.5 py-1.5 text-xs font-semibold text-red-300 hover:bg-red-950/50 disabled:opacity-50"
+          "inline-flex min-h-11 items-center justify-center rounded-lg border border-red-900/50 bg-red-950/30 px-4 text-sm font-semibold text-red-300 transition-colors hover:bg-red-950/50 disabled:opacity-50"
         }
       >
         {pending ? "…" : label}

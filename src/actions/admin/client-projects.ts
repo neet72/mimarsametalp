@@ -255,6 +255,7 @@ export const upsertClientProjectRoadmapItem = createSafeAction({
     projectId: z.string().min(1),
     title: z.string().trim().min(2, "Başlık gerekli").max(200),
     note: z.string().trim().max(10_000).optional().or(z.literal("")),
+    category: categorySchema.optional(),
     startDate: z.string().min(1, "Başlangıç tarihi gerekli"),
     endDate: z.string().optional().or(z.literal("")),
     orderIndex: z.coerce.number().int().min(0).max(999).optional(),
@@ -279,6 +280,7 @@ export const upsertClientProjectRoadmapItem = createSafeAction({
     }
 
     const note = input.note?.trim() ?? "";
+    const category = input.category ?? ClientProjectCategory.DIGER;
 
     if (input.id) {
       const existing = await prisma.clientProjectRoadmapItem.findFirst({
@@ -292,6 +294,7 @@ export const upsertClientProjectRoadmapItem = createSafeAction({
         data: {
           title: input.title,
           note,
+          category,
           startDate,
           endDate,
           visible: input.visible ?? true,
@@ -319,6 +322,7 @@ export const upsertClientProjectRoadmapItem = createSafeAction({
         projectId: input.projectId,
         title: input.title,
         note,
+        category,
         startDate,
         endDate,
         orderIndex,

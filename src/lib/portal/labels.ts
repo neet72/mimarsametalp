@@ -55,6 +55,58 @@ export function durationDays(start: Date, end: Date | null, now = new Date()): n
   return Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
 
+/** Gün → hafta (en yakın tam sayı; en az 1). */
+export function daysToWeeks(days: number): number {
+  if (days <= 0) return 0;
+  return Math.max(1, Math.round(days / 7));
+}
+
+export function formatWeeksTr(weeks: number): string {
+  return `${weeks} hafta`;
+}
+
+export type RoadmapDurationItem = {
+  category: string;
+  startDate: Date | string;
+  endDate: Date | string | null;
+};
+
+/** Kategoriye göre toplam süre özeti (hafta). */
+export function summarizeRoadmapByCategory(
+  items: RoadmapDurationItem[],
+  now = new Date(),
+): Array<{ category: ClientProjectCategory; label: string; days: number; weeks: number }> {
+  const totals = new Map<ClientProjectCategory, number>();
+
+  for (const item of items) {
+    const cat = (item.category as ClientProjectCategory) in CLIENT_PROJECT_CATEGORY_TR
+      ? (item.category as ClientProjectCategory)
+      : "DIGER";
+    const start = item.startDate instanceof Date ? item.startDate : new Date(item.startDate);
+    const end =
+      item.endDate == null || item.endDate === ""
+        ? null
+        : item.endDate instanceof Date
+          ? item.endDate
+          : new Date(item.endDate);
+    const days = durationDays(start, end, now);
+    totals.set(cat, (totals.get(cat) ?? 0) + days);
+  }
+
+  const order: ClientProjectCategory[] = ["BELEDIYE", "MIMAR", "YAPI_DENETIM", "DIGER"];
+  return order
+    .filter((c) => (totals.get(c) ?? 0) > 0)
+    .map((category) => {
+      const days = totals.get(category) ?? 0;
+      return {
+        category,
+        label: CLIENT_PROJECT_CATEGORY_TR[category],
+        days,
+        weeks: daysToWeeks(days),
+      };
+    });
+}
+
 /** Panel form input ortak sınıfları */
 export const panelFieldClass =
   "w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-primary outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface";

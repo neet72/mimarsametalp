@@ -10,8 +10,17 @@ import {
 } from "@/actions/admin/client-projects";
 import { uploadAdminMedia } from "@/actions/admin/upload";
 import { useAdminToast } from "@/components/admin/ui/toast";
+import {
+  AdminSectionCard,
+  AdminStatusPill,
+  adminBtnAccentClass,
+  adminFieldClass,
+  adminLabelClass,
+} from "@/components/admin/ui/AdminPageChrome";
 import type { ClientProjectCategory, ClientProjectStatus, ClientStageStatus } from "@prisma/client";
 import { CLIENT_PROJECT_CATEGORY_OPTS } from "@/lib/portal/labels";
+import { cn } from "@/lib/cn";
+import { ImagePlus, Trash2 } from "lucide-react";
 
 const STATUS_OPTS: { value: ClientProjectStatus; label: string }[] = [
   { value: "PLANNING", label: "Planlama" },
@@ -153,134 +162,164 @@ export function AdminClientProjectForm({
   }
 
   return (
-    <div className="space-y-8">
-      <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-950/40 p-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">Proje bilgileri</p>
-        <label className="block text-sm">
-          <span className="mb-1 block text-zinc-500">Başlık</span>
-          <input
-            name="title"
-            required
-            defaultValue={initial?.title}
-            className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3"
-          />
-        </label>
-        <label className="block text-sm">
-          <span className="mb-1 block text-zinc-500">Adres / konum</span>
-          <input
-            name="address"
-            defaultValue={initial?.address ?? ""}
-            className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3"
-          />
-        </label>
-        <label className="block text-sm">
-          <span className="mb-1 block text-zinc-500">Durum</span>
-          <select
-            name="status"
-            defaultValue={initial?.status ?? "PLANNING"}
-            className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3"
-          >
-            {STATUS_OPTS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block text-sm">
-          <span className="mb-1 block text-zinc-500">Kategori</span>
-          <select
-            name="category"
-            defaultValue={initial?.category ?? "DIGER"}
-            className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3"
-          >
-            {CLIENT_PROJECT_CATEGORY_OPTS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <div className="space-y-2 rounded-lg border border-zinc-800 bg-zinc-950/50 p-3">
-          <p className="text-sm text-zinc-500">Kapak görseli</p>
-          {coverUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={coverUrl} alt="" className="h-36 w-full rounded-lg object-cover" />
-          ) : (
-            <p className="text-xs text-zinc-600">Henüz kapak yok.</p>
-          )}
-          <input type="hidden" name="coverImageUrl" value={coverUrl} />
-          <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-[rgb(200,170,130)]">
-            <span className="rounded-lg border border-zinc-700 px-3 py-1.5">
-              {uploading ? "Yükleniyor…" : "Görsel yükle"}
-            </span>
+    <div className="space-y-5 sm:space-y-6">
+      <AdminSectionCard
+        eyebrow="Proje"
+        title="Proje bilgileri"
+        description="Başlık, kategori, kapak ve atanan müşteriler."
+      >
+        <form onSubmit={onSubmit} className="space-y-4">
+          <label className="block">
+            <span className={adminLabelClass}>Başlık</span>
             <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              disabled={uploading || pending}
-              onChange={onCoverFile}
+              name="title"
+              required
+              defaultValue={initial?.title}
+              className={adminFieldClass}
             />
           </label>
-          {coverUrl ? (
-            <button
-              type="button"
-              className="ml-2 text-xs text-red-400 hover:underline"
-              onClick={() => setCoverUrl("")}
-            >
-              Kapağı kaldır
-            </button>
-          ) : null}
-        </div>
 
-        <fieldset>
-          <legend className="mb-2 text-sm text-zinc-500">Atanan müşteriler</legend>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {clients.map((c) => (
-              <label key={c.id} className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={selected.includes(c.id)}
-                  onChange={() =>
-                    setSelected((prev) =>
-                      prev.includes(c.id) ? prev.filter((x) => x !== c.id) : [...prev, c.id],
-                    )
-                  }
-                />
-                {c.fullName} ({c.username})
-              </label>
-            ))}
-            {clients.length === 0 ? (
-              <p className="text-sm text-zinc-600">Aktif müşteri yok — önce müşteri oluşturun.</p>
-            ) : null}
+          <label className="block">
+            <span className={adminLabelClass}>Adres / konum</span>
+            <input
+              name="address"
+              defaultValue={initial?.address ?? ""}
+              className={adminFieldClass}
+            />
+          </label>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="block">
+              <span className={adminLabelClass}>Durum</span>
+              <select
+                name="status"
+                defaultValue={initial?.status ?? "PLANNING"}
+                className={adminFieldClass}
+              >
+                {STATUS_OPTS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block">
+              <span className={adminLabelClass}>Kategori</span>
+              <select
+                name="category"
+                defaultValue={initial?.category ?? "DIGER"}
+                className={adminFieldClass}
+              >
+                {CLIENT_PROJECT_CATEGORY_OPTS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
-        </fieldset>
-        <button
-          type="submit"
-          disabled={pending || uploading}
-          className="rounded-lg bg-[rgb(166,124,82)] px-4 py-2.5 text-sm font-semibold text-zinc-950 disabled:opacity-50"
-        >
-          {mode === "create" ? "Oluştur" : "Kaydet"}
-        </button>
-      </form>
+
+          <div className="space-y-3 rounded-xl border border-zinc-800/80 bg-zinc-950/40 p-3 sm:p-4">
+            <p className="text-xs font-medium text-zinc-500">Kapak görseli</p>
+            {coverUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={coverUrl}
+                alt=""
+                className="aspect-[21/9] w-full rounded-lg object-cover sm:aspect-[2.4/1]"
+              />
+            ) : (
+              <div className="flex aspect-[21/9] items-center justify-center rounded-lg border border-dashed border-zinc-800 bg-zinc-950/50 sm:aspect-[2.4/1]">
+                <p className="text-xs text-zinc-600">Henüz kapak yok</p>
+              </div>
+            )}
+            <input type="hidden" name="coverImageUrl" value={coverUrl} />
+            <div className="flex flex-wrap gap-2">
+              <label
+                className={cn(
+                  adminBtnAccentClass,
+                  "cursor-pointer",
+                  (uploading || pending) && "pointer-events-none opacity-50",
+                )}
+              >
+                <ImagePlus className="h-4 w-4" aria-hidden />
+                {uploading ? "Yükleniyor…" : "Görsel yükle"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={uploading || pending}
+                  onChange={onCoverFile}
+                />
+              </label>
+              {coverUrl ? (
+                <button
+                  type="button"
+                  className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm text-red-300 hover:bg-red-950/30"
+                  onClick={() => setCoverUrl("")}
+                >
+                  Kapağı kaldır
+                </button>
+              ) : null}
+            </div>
+          </div>
+
+          <fieldset>
+            <legend className={cn(adminLabelClass, "mb-2")}>Atanan müşteriler</legend>
+            <div className="grid max-h-56 gap-1 overflow-y-auto rounded-xl border border-zinc-800 p-2 sm:grid-cols-2 sm:max-h-none sm:overflow-visible sm:p-3">
+              {clients.map((c) => (
+                <label
+                  key={c.id}
+                  className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-sm text-zinc-300 hover:bg-zinc-900/60"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selected.includes(c.id)}
+                    onChange={() =>
+                      setSelected((prev) =>
+                        prev.includes(c.id) ? prev.filter((x) => x !== c.id) : [...prev, c.id],
+                      )
+                    }
+                    className="h-4 w-4 rounded border-zinc-700"
+                  />
+                  <span className="min-w-0 truncate">
+                    {c.fullName}{" "}
+                    <span className="text-zinc-600">({c.username})</span>
+                  </span>
+                </label>
+              ))}
+              {clients.length === 0 ? (
+                <p className="col-span-full px-2 py-3 text-sm text-zinc-600">
+                  Aktif müşteri yok — önce müşteri oluşturun.
+                </p>
+              ) : null}
+            </div>
+          </fieldset>
+
+          <button
+            type="submit"
+            disabled={pending || uploading}
+            className={cn(adminBtnAccentClass, "w-full sm:w-auto")}
+          >
+            {mode === "create" ? "Oluştur" : "Kaydet"}
+          </button>
+        </form>
+      </AdminSectionCard>
 
       {mode === "edit" && initial ? (
-        <section className="space-y-4">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2 className="font-display text-lg font-semibold text-zinc-100">Aşamalar</h2>
-              <p className="text-sm text-zinc-500">
-                Müşteri panelindeki ilerleme takipçisi buradan beslenir.
-              </p>
-            </div>
+        <AdminSectionCard
+          eyebrow="İlerleme"
+          title="Aşamalar"
+          description="Müşteri panelindeki ilerleme takipçisi buradan beslenir."
+          actions={
             <a
               href={`/admin/client-projects/${initial.id}/updates`}
-              className="text-sm font-semibold text-[rgb(200,170,130)] hover:underline"
+              className="text-sm font-semibold text-[rgb(200,170,130)] underline-offset-2 hover:underline"
             >
-              Rapor / güncelleme yaz →
+              Rapor yaz →
             </a>
-          </div>
+          }
+        >
           <ul className="space-y-2">
             {stages
               .slice()
@@ -288,21 +327,30 @@ export function AdminClientProjectForm({
               .map((s) => (
                 <li
                   key={s.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-zinc-800 px-3 py-2.5 text-sm"
+                  className="flex flex-col gap-2 rounded-xl border border-zinc-800/90 bg-zinc-950/40 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-medium text-zinc-100">
                       {s.orderIndex}. {s.name}
                     </p>
-                    <p className="text-xs text-zinc-500">
-                      {s.status}
-                      {s.targetDate ? ` · hedef ${toDateInput(s.targetDate)}` : ""}
-                      {s.completedDate ? ` · bitti ${toDateInput(s.completedDate)}` : ""}
-                    </p>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                      <AdminStatusPill tone="neutral">{s.status}</AdminStatusPill>
+                      {s.targetDate ? (
+                        <span className="text-xs text-zinc-500">
+                          hedef {toDateInput(s.targetDate)}
+                        </span>
+                      ) : null}
+                      {s.completedDate ? (
+                        <span className="text-xs text-zinc-500">
+                          bitti {toDateInput(s.completedDate)}
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
                   <button
                     type="button"
-                    className="text-red-400 hover:underline"
+                    aria-label="Aşamayı sil"
+                    className="inline-flex h-11 w-11 items-center justify-center self-end rounded-lg border border-red-900/40 text-red-300 hover:bg-red-950/40 sm:self-center"
                     onClick={() =>
                       startTransition(async () => {
                         const res = await deleteClientProjectStage({ id: s.id });
@@ -314,34 +362,37 @@ export function AdminClientProjectForm({
                       })
                     }
                   >
-                    Sil
+                    <Trash2 className="h-4 w-4" aria-hidden />
                   </button>
                 </li>
               ))}
             {stages.length === 0 ? (
-              <p className="text-sm text-zinc-600">Henüz aşama yok.</p>
+              <p className="rounded-xl border border-dashed border-zinc-800 px-4 py-8 text-center text-sm text-zinc-600">
+                Henüz aşama yok.
+              </p>
             ) : null}
           </ul>
+
           <form
             onSubmit={onAddStage}
-            className="grid gap-3 rounded-xl border border-zinc-800 p-4 sm:grid-cols-2 lg:grid-cols-3"
+            className="grid gap-3 rounded-xl border border-zinc-800/80 bg-zinc-950/40 p-3 sm:grid-cols-2 sm:p-4 lg:grid-cols-3"
           >
-            <label className="text-sm sm:col-span-2 lg:col-span-1">
-              <span className="mb-1 block text-zinc-500">Aşama adı</span>
-              <input name="name" required className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3" />
+            <label className="sm:col-span-2 lg:col-span-1">
+              <span className={adminLabelClass}>Aşama adı</span>
+              <input name="name" required className={adminFieldClass} />
             </label>
-            <label className="text-sm">
-              <span className="mb-1 block text-zinc-500">Sıra</span>
+            <label>
+              <span className={adminLabelClass}>Sıra</span>
               <input
                 name="orderIndex"
                 type="number"
                 defaultValue={stages.length}
-                className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3"
+                className={adminFieldClass}
               />
             </label>
-            <label className="text-sm">
-              <span className="mb-1 block text-zinc-500">Durum</span>
-              <select name="status" className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3">
+            <label>
+              <span className={adminLabelClass}>Durum</span>
+              <select name="status" className={adminFieldClass}>
                 {STAGE_OPTS.map((o) => (
                   <option key={o.value} value={o.value}>
                     {o.label}
@@ -349,29 +400,21 @@ export function AdminClientProjectForm({
                 ))}
               </select>
             </label>
-            <label className="text-sm">
-              <span className="mb-1 block text-zinc-500">Hedef tarih</span>
-              <input name="targetDate" type="date" className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3" />
+            <label>
+              <span className={adminLabelClass}>Hedef tarih</span>
+              <input name="targetDate" type="date" className={adminFieldClass} />
             </label>
-            <label className="text-sm">
-              <span className="mb-1 block text-zinc-500">Tamamlanma</span>
-              <input
-                name="completedDate"
-                type="date"
-                className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3"
-              />
+            <label>
+              <span className={adminLabelClass}>Tamamlanma</span>
+              <input name="completedDate" type="date" className={adminFieldClass} />
             </label>
-            <div className="flex items-end">
-              <button
-                type="submit"
-                disabled={pending}
-                className="h-10 w-full rounded-lg bg-zinc-100 px-4 text-sm font-semibold text-zinc-950"
-              >
+            <div className="flex items-end sm:col-span-2 lg:col-span-1">
+              <button type="submit" disabled={pending} className={cn(adminBtnAccentClass, "w-full")}>
                 Aşama ekle
               </button>
             </div>
           </form>
-        </section>
+        </AdminSectionCard>
       ) : null}
     </div>
   );

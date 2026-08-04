@@ -98,6 +98,7 @@ export async function listRoadmapDurationForUser(clientId: string) {
           id: true,
           title: true,
           note: true,
+          category: true,
           startDate: true,
           endDate: true,
         },

@@ -11,8 +11,18 @@ import {
   uploadClientUpdateMedia,
 } from "@/actions/admin/client-updates";
 import { useAdminToast } from "@/components/admin/ui/toast";
+import {
+  AdminSectionCard,
+  AdminStatusPill,
+  adminBtnAccentClass,
+  adminBtnSecondaryClass,
+  adminFieldClass,
+  adminLabelClass,
+  adminTextareaClass,
+} from "@/components/admin/ui/AdminPageChrome";
 import { PORTAL_ACCEPT_ATTR, portalMediaKindLabel } from "@/lib/portal/media-types";
 import { withCloudinaryAttachment } from "@/lib/storage/cloudinary-url";
+import { cn } from "@/lib/cn";
 import { FileText, ImageIcon, Video, Upload } from "lucide-react";
 
 type StageOpt = { id: string; name: string };
@@ -141,153 +151,92 @@ export function AdminClientUpdateEditor({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950/30 px-4 py-3 text-sm text-zinc-400">
-        <p className="font-medium text-zinc-200">Saha raporu / güncelleme</p>
-        <p className="mt-1">
-          Markdown ile rapor yazın; görsel, video ve dosya (PDF, Word, Excel) ekleyin. Yayınlayınca müşteri
-          paneline düşer.
-        </p>
-      </div>
+    <div className="space-y-5 sm:space-y-6">
+      <AdminSectionCard
+        eyebrow="Rapor"
+        title="Saha raporu / güncelleme"
+        description="Markdown ile yazın; görsel, video ve dosya (PDF, Word, Excel, RAR) ekleyin."
+        actions={
+          updateId ? (
+            <AdminStatusPill tone={isPublished ? "ok" : "neutral"}>
+              {isPublished ? "Yayında" : "Taslak"}
+            </AdminStatusPill>
+          ) : null
+        }
+      >
+        <form onSubmit={save} className="space-y-4">
+          <label className="block">
+            <span className={adminLabelClass}>Rapor başlığı</span>
+            <input
+              name="title"
+              required
+              defaultValue={initial?.title}
+              placeholder="Örn. 12. hafta şantiye raporu"
+              className={adminFieldClass}
+            />
+          </label>
 
-      <form onSubmit={save} className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-950/40 p-5">
-        <label className="block text-sm">
-          <span className="mb-1 block text-zinc-500">Rapor başlığı</span>
-          <input
-            name="title"
-            required
-            defaultValue={initial?.title}
-            placeholder="Örn. 12. hafta şantiye raporu"
-            className="h-11 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-zinc-100"
-          />
-        </label>
-        <label className="block text-sm">
-          <span className="mb-1 block text-zinc-500">İlgili aşama</span>
-          <select
-            name="stageId"
-            defaultValue={initial?.stageId ?? ""}
-            className="h-11 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-zinc-100"
-          >
-            <option value="">— Genel / aşamasız —</option>
-            {stages.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block text-sm">
-          <span className="mb-1 block text-zinc-500">İşlem tarihi</span>
-          <input
-            name="eventDate"
-            type="date"
-            required
-            defaultValue={defaultEventDate}
-            className="h-11 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-zinc-100"
-          />
-          <span className="mt-1 block text-xs text-zinc-600">
-            Müşteri listesinde bu tarih görünür (sistem kayıt tarihinden bağımsız; geçmiş tarih seçilebilir).
-          </span>
-        </label>
-        <label className="block text-sm">
-          <span className="mb-1 block text-zinc-500">Rapor metni (Markdown)</span>
-          <textarea
-            name="body"
-            required
-            rows={14}
-            defaultValue={initial?.body}
-            placeholder={"## Özet\nBu hafta...\n\n- Madde 1\n- Madde 2"}
-            className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 font-mono text-sm leading-relaxed text-zinc-100"
-          />
-          <span className="mt-1 block text-xs text-zinc-600">
-            ## başlık, **kalın**, - liste, [link](https://…) desteklenir.
-          </span>
-        </label>
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex min-h-11 items-center rounded-lg bg-zinc-100 px-4 text-sm font-semibold text-zinc-950 disabled:opacity-50"
-        >
-          {updateId ? "Raporu kaydet" : "Taslak oluştur"}
-        </button>
-      </form>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="block">
+              <span className={adminLabelClass}>İlgili aşama</span>
+              <select
+                name="stageId"
+                defaultValue={initial?.stageId ?? ""}
+                className={adminFieldClass}
+              >
+                <option value="">— Genel / aşamasız —</option>
+                {stages.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block">
+              <span className={adminLabelClass}>İşlem tarihi</span>
+              <input
+                name="eventDate"
+                type="date"
+                required
+                defaultValue={defaultEventDate}
+                className={adminFieldClass}
+              />
+            </label>
+          </div>
+
+          <label className="block">
+            <span className={adminLabelClass}>Rapor metni (Markdown)</span>
+            <textarea
+              name="body"
+              required
+              rows={12}
+              defaultValue={initial?.body}
+              placeholder={"## Özet\nBu hafta...\n\n- Madde 1\n- Madde 2"}
+              className={cn(adminTextareaClass, "min-h-[220px] font-mono text-[13px] leading-relaxed sm:min-h-[280px]")}
+            />
+            <span className="mt-1.5 block text-[11px] text-zinc-600">
+              ## başlık, **kalın**, - liste, [link](https://…) desteklenir.
+            </span>
+          </label>
+
+          <button type="submit" disabled={pending} className={cn(adminBtnAccentClass, "w-full sm:w-auto")}>
+            {updateId ? "Raporu kaydet" : "Taslak oluştur"}
+          </button>
+        </form>
+      </AdminSectionCard>
 
       {updateId ? (
-        <div className="space-y-5 rounded-xl border border-zinc-800 p-5">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-zinc-200">Medya ve dosyalar</p>
-              <p className="mt-1 text-xs text-zinc-500">
-                Görsel · Video (mp4/webm) · PDF · Word · Excel · PPT · RAR — max 50MB, birden fazla seçim.
-              </p>
-
-              <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => {
-                    if (fileRef.current) {
-                      fileRef.current.accept = "image/*";
-                      fileRef.current.click();
-                    }
-                  }}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-zinc-700 px-3 text-sm text-zinc-200 hover:border-zinc-500 disabled:opacity-50"
-                >
-                  <ImageIcon className="h-4 w-4 text-[rgb(200,170,130)]" aria-hidden />
-                  Fotoğraf
-                </button>
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => {
-                    if (fileRef.current) {
-                      fileRef.current.accept = "video/mp4,video/webm,video/quicktime";
-                      fileRef.current.click();
-                    }
-                  }}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-zinc-700 px-3 text-sm text-zinc-200 hover:border-zinc-500 disabled:opacity-50"
-                >
-                  <Video className="h-4 w-4 text-[rgb(200,170,130)]" aria-hidden />
-                  Video
-                </button>
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => {
-                    if (fileRef.current) {
-                      fileRef.current.accept =
-                        ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.rar,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/x-rar-compressed,application/vnd.rar";
-                      fileRef.current.click();
-                    }
-                  }}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-zinc-700 px-3 text-sm text-zinc-200 hover:border-zinc-500 disabled:opacity-50"
-                >
-                  <FileText className="h-4 w-4 text-[rgb(200,170,130)]" aria-hidden />
-                  Dosya
-                </button>
-              </div>
-
-              <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-zinc-700 px-3 py-2.5 text-sm text-[rgb(200,170,130)] hover:border-[rgb(166,124,82)]/50">
-                <Upload className="h-4 w-4" aria-hidden />
-                Tüm türlerden seç (çoklu)
-                <input
-                  ref={fileRef}
-                  type="file"
-                  multiple
-                  accept={PORTAL_ACCEPT_ATTR}
-                  className="hidden"
-                  onChange={onUpload}
-                  disabled={pending}
-                />
-              </label>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
+        <AdminSectionCard
+          eyebrow="Medya"
+          title="Medya ve dosyalar"
+          description="Görsel · Video · PDF · Office · RAR — max 50MB, çoklu seçim."
+          actions={
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
               {isPublished ? (
                 <button
                   type="button"
                   disabled={pending}
-                  className="inline-flex min-h-11 items-center rounded-lg border border-zinc-700 px-4 text-sm"
+                  className={cn(adminBtnSecondaryClass, "w-full sm:w-auto")}
                   onClick={() =>
                     startTransition(async () => {
                       const res = await unpublishClientProjectUpdate({ id: updateId });
@@ -306,7 +255,7 @@ export function AdminClientUpdateEditor({
                 <button
                   type="button"
                   disabled={pending}
-                  className="inline-flex min-h-11 items-center rounded-lg bg-[rgb(166,124,82)] px-4 text-sm font-semibold text-zinc-950"
+                  className={cn(adminBtnAccentClass, "w-full sm:w-auto")}
                   onClick={() =>
                     startTransition(async () => {
                       const res = await publishClientProjectUpdate({ id: updateId });
@@ -323,10 +272,77 @@ export function AdminClientUpdateEditor({
                 </button>
               )}
             </div>
+          }
+        >
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => {
+                if (fileRef.current) {
+                  fileRef.current.accept = "image/*";
+                  fileRef.current.click();
+                }
+              }}
+              className={cn(adminBtnSecondaryClass, "w-full")}
+            >
+              <ImageIcon className="h-4 w-4 text-[rgb(200,170,130)]" aria-hidden />
+              Fotoğraf
+            </button>
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => {
+                if (fileRef.current) {
+                  fileRef.current.accept = "video/mp4,video/webm,video/quicktime";
+                  fileRef.current.click();
+                }
+              }}
+              className={cn(adminBtnSecondaryClass, "w-full")}
+            >
+              <Video className="h-4 w-4 text-[rgb(200,170,130)]" aria-hidden />
+              Video
+            </button>
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => {
+                if (fileRef.current) {
+                  fileRef.current.accept =
+                    ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.rar,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/x-rar-compressed,application/vnd.rar";
+                  fileRef.current.click();
+                }
+              }}
+              className={cn(adminBtnSecondaryClass, "w-full")}
+            >
+              <FileText className="h-4 w-4 text-[rgb(200,170,130)]" aria-hidden />
+              Dosya
+            </button>
           </div>
 
+          <label
+            className={cn(
+              "flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-700 px-3 py-3 text-sm text-[rgb(200,170,130)] transition-colors hover:border-[rgb(166,124,82)]/50",
+              pending && "pointer-events-none opacity-50",
+            )}
+          >
+            <Upload className="h-4 w-4" aria-hidden />
+            Tüm türlerden seç (çoklu)
+            <input
+              ref={fileRef}
+              type="file"
+              multiple
+              accept={PORTAL_ACCEPT_ATTR}
+              className="hidden"
+              onChange={onUpload}
+              disabled={pending}
+            />
+          </label>
+
           {media.length === 0 ? (
-            <p className="text-sm text-zinc-600">Henüz medya / dosya yok.</p>
+            <p className="rounded-xl border border-dashed border-zinc-800 px-4 py-8 text-center text-sm text-zinc-600">
+              Henüz medya / dosya yok.
+            </p>
           ) : (
             <div className="space-y-5">
               {images.length ? (
@@ -352,9 +368,9 @@ export function AdminClientUpdateEditor({
               ) : null}
             </div>
           )}
-        </div>
+        </AdminSectionCard>
       ) : (
-        <p className="rounded-xl border border-dashed border-zinc-800 px-4 py-6 text-center text-sm text-zinc-500">
+        <p className="rounded-2xl border border-dashed border-zinc-800 px-4 py-8 text-center text-sm text-zinc-500">
           Medya eklemek için önce yukarıdan taslağı kaydedin.
         </p>
       )}
@@ -365,7 +381,7 @@ export function AdminClientUpdateEditor({
 function MediaSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">{title}</p>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">{title}</p>
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{children}</ul>
     </div>
   );
@@ -381,7 +397,7 @@ function MediaCard({
   onDelete: (id: string) => void;
 }) {
   return (
-    <li className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950/40">
+    <li className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950/40">
       {m.mediaType === "image" ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={m.cloudinaryUrl} alt={m.caption ?? ""} className="aspect-[4/3] w-full object-cover" />
@@ -402,12 +418,12 @@ function MediaCard({
           <span className="line-clamp-2 text-xs text-zinc-500">{m.caption || "Dosyayı aç"}</span>
         </a>
       )}
-      <div className="flex items-center justify-between gap-2 px-2 py-2 text-xs">
+      <div className="flex items-center justify-between gap-2 px-2.5 py-2.5 text-xs">
         <span className="truncate text-zinc-500">{portalMediaKindLabel(m.mediaType)}</span>
         <button
           type="button"
           disabled={pending}
-          className="min-h-8 shrink-0 rounded px-2 text-red-400 hover:bg-red-950/40 disabled:opacity-50"
+          className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-2.5 text-red-400 hover:bg-red-950/40 disabled:opacity-50"
           onClick={() => onDelete(m.id)}
         >
           Sil

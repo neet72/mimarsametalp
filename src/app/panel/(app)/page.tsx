@@ -164,6 +164,7 @@ export default async function PanelOverviewPage() {
                           id: r.id,
                           title: r.title,
                           note: r.note,
+                          category: r.category,
                           startDate: r.startDate.toISOString(),
                           endDate: r.endDate?.toISOString() ?? null,
                         }))}

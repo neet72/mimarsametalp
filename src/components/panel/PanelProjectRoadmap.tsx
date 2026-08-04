@@ -1,13 +1,19 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { cn } from "@/lib/cn";
+import {
+  formatWeeksTr,
+  projectCategoryTr,
+  summarizeRoadmapByCategory,
+} from "@/lib/portal/labels";
 import { ChevronDown } from "lucide-react";
 
 export type PanelRoadmapItem = {
   id: string;
   title: string;
   note: string;
+  category: string;
   startDate: string;
   endDate: string | null;
 };
@@ -39,6 +45,18 @@ export function PanelProjectRoadmap({ items }: { items: PanelRoadmapItem[] }) {
   const baseId = useId();
   const [openId, setOpenId] = useState<string | null>(null);
 
+  const summary = useMemo(
+    () =>
+      summarizeRoadmapByCategory(
+        items.map((i) => ({
+          category: i.category,
+          startDate: i.startDate,
+          endDate: i.endDate,
+        })),
+      ),
+    [items],
+  );
+
   if (items.length === 0) return null;
 
   return (
@@ -46,12 +64,32 @@ export function PanelProjectRoadmap({ items }: { items: PanelRoadmapItem[] }) {
       <h4 id={`${baseId}-heading`} className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">
         Yol haritası
       </h4>
+
+      {summary.length > 0 ? (
+        <ul
+          className="flex flex-wrap gap-2"
+          aria-label="Kategori süre özeti"
+        >
+          {summary.map((row) => (
+            <li
+              key={row.category}
+              className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs text-primary"
+            >
+              <span className="font-semibold text-accent">{row.label}</span>
+              <span className="text-muted"> · </span>
+              {formatWeeksTr(row.weeks)}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
       <ol className="relative space-y-0 border-l border-border/80 pl-5 sm:pl-6">
         {items.map((item) => {
           const hasNote = Boolean(item.note.trim());
           const isOpen = openId === item.id;
           const panelId = `${baseId}-note-${item.id}`;
           const dateLabel = formatRoadmapRange(item.startDate, item.endDate);
+          const categoryLabel = projectCategoryTr(item.category);
 
           return (
             <li key={item.id} className="relative pb-4 last:pb-0">
@@ -73,7 +111,9 @@ export function PanelProjectRoadmap({ items }: { items: PanelRoadmapItem[] }) {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-[11px] font-medium uppercase tracking-wider text-accent">{dateLabel}</p>
+                      <p className="text-[11px] font-medium uppercase tracking-wider text-accent">
+                        {categoryLabel} · {dateLabel}
+                      </p>
                       <p className="mt-1 font-display text-sm font-semibold tracking-tight text-primary sm:text-base">
                         {item.title}
                       </p>
@@ -96,7 +136,9 @@ export function PanelProjectRoadmap({ items }: { items: PanelRoadmapItem[] }) {
                 </button>
               ) : (
                 <div className="rounded-xl border border-border/80 bg-surface/80 px-3.5 py-3">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-accent">{dateLabel}</p>
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-accent">
+                    {categoryLabel} · {dateLabel}
+                  </p>
                   <p className="mt-1 font-display text-sm font-semibold tracking-tight text-primary sm:text-base">
                     {item.title}
                   </p>

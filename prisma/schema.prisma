@@ -262,20 +262,22 @@ model ClientProjectStage {
 }
 
 model ClientProjectRoadmapItem {
-  id         String        @id @default(cuid())
+  id         String                @id @default(cuid())
   projectId  String
-  project    ClientProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project    ClientProject         @relation(fields: [projectId], references: [id], onDelete: Cascade)
   title      String
-  note       String        @db.Text @default("")
+  note       String                @db.Text @default("")
+  category   ClientProjectCategory @default(DIGER)
   startDate  DateTime
   endDate    DateTime?
-  orderIndex Int           @default(0)
-  visible    Boolean       @default(true)
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  orderIndex Int                   @default(0)
+  visible    Boolean               @default(true)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
 
   @@index([projectId, orderIndex])
   @@index([projectId, visible])
+  @@index([projectId, category])
 }
 
 model ClientProjectUpdate {
